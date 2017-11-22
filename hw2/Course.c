@@ -1,22 +1,7 @@
-#ifndef COURSE_H
-#define COURSE_H
-
+#include <assert.h>
+#include <string.h>
+#include "Course.h"
 #include "DynamicArray.h"
-
-typedef struct course
-{
-    char *id;
-    char *name;
-    double credits;
-    DynamicArray preCourses;
-} *Course;
-
-
-/*******************************************************************/
-/* Interface of data type CourseDynamicArray  */
-
-typedef enum { COURSE_OK , COURSE_MEMORY_ERROR , COURSE_ILLEGAL_PARAMETER ,
-               COURSE_THE_SAME_COURSE , COURSE_ALREADY_EXISTS , COURSE_NOT_EXIST} CourseResult;
 
 //------------------------------------------------------------------------------------------
 // create a new course with the details of the parameters id , name , credits;
@@ -28,7 +13,23 @@ typedef enum { COURSE_OK , COURSE_MEMORY_ERROR , COURSE_ILLEGAL_PARAMETER ,
 // return value : COURSE_OK ,
 //                COURSE_MEMORY_ERROR  if there are memory problems
 //                COURSE_ILLEGAL_PARAMETER if credits < 0
-CourseResult createCourse(char *id, char *name, double credits, Course *course) ;
+CourseResult createCourse(char *id, char *name, double credits, Course *course) {
+	assert((id != NULL) && (name != NULL));
+	if(credits < 0) {
+		return COURSE_ILLEGAL_PARAMETER;
+	}
+	course = malloc(sizeof(*course));
+	course->id = (char *)malloc(strlen(id) + 1);
+	course->name = (char *)malloc(strlen(name) + 1);
+	if(course == NULL || course->id == NULL || course->name == NULL) {
+		return COURSE_MEMORY_ERROR;
+	}
+	strcpy(course->id, id);
+	strcpy(course->name, name);
+	course->credits = credits;
+	course->preCourses = NULL;
+	return COURSE_OK;
+}
 
 //------------------------------------------------------------------------------------------
 // checks if course1 and course2 have the same id. returns 1 or 0 accordingly.
@@ -42,7 +43,9 @@ int coursesEqualId(Course course1, Course course2) {
 // checks if course1 is less than (not equal) course2. returns 1 if yes or 0 if no.
 // the comparison is made according to the id of the courses, by means of a lexicographic order.
 // Either course1 or course2 must not be NULL. (handled by assert).
-int courseLessThan(Course course1, Course course2);
+int courseLessThan(Course course1, Course course2) {
+	
+}
 
 //------------------------------------------------------------------------------------------
 // update course1 so that its name will be as new_name.
