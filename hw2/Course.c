@@ -36,7 +36,8 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 // Either course1 or course2 must not be NULL. (handled by assert).
 
 int coursesEqualId(Course course1, Course course2) {
-
+	assert((course1 != NULL) &&(course2 != NULL));
+	return(strcmp(course1->id, course2->id)==0);
 }
 
 //------------------------------------------------------------------------------------------
