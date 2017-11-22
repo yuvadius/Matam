@@ -34,7 +34,9 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 // checks if course1 and course2 have the same id. returns 1 or 0 accordingly.
 // Either course1 or course2 must not be NULL. (handled by assert).
 
-int coursesEqualId(Course course1, Course course2);
+int coursesEqualId(Course course1, Course course2) {
+
+}
 
 //------------------------------------------------------------------------------------------
 // checks if course1 is less than (not equal) course2. returns 1 if yes or 0 if no.
@@ -79,7 +81,9 @@ CourseResult removePreCourse(Course course1, Course course2);
 // between evert 2 adjacent word the is a single space. no spaces in the beginning of the line or
 // at its end. no new line at the end of the displayed line.
 
-void displayCourse(Course course1);
+void displayCourse(Course course1) {
+    //todo
+}
 
 //------------------------------------------------------------------------------------------
 // deallocate all relevant memory of course1 and stop using it.
