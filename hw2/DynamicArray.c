@@ -153,6 +153,7 @@ void displayAllElements(DynamicArray dynamic_array) {
     for(int i = 0; i < dynamic_array->len; ++i) {
         assert(dynamic_array->elements[i] != NULL);
         displayCourse(dynamic_array->elements[i]);
+        printf("\n");
     }
 }
 
