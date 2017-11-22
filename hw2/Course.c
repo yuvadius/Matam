@@ -45,7 +45,13 @@ int coursesEqualId(Course course1, Course course2) {
 // the comparison is made according to the id of the courses, by means of a lexicographic order.
 // Either course1 or course2 must not be NULL. (handled by assert).
 int courseLessThan(Course course1, Course course2) {
-	
+	assert((course1 != NULL) && (course2 != NULL));
+	if(strcmp(course1, course2) < 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 //------------------------------------------------------------------------------------------
@@ -55,7 +61,16 @@ int courseLessThan(Course course1, Course course2) {
 // return value : COURSE_OK ,
 //                COURSE_MEMORY_ERROR  if there are memory problems. in that case,
 //                the old name stays.
-CourseResult courseUpdateName(Course course1, char *new_name);
+CourseResult courseUpdateName(Course course1, char *new_name) {
+	assert(new_name != NULL);
+	free(course1->name);
+	course->name = (char *)malloc(strlen(new_name) + 1);
+	if(course->name == NULL) {
+		return COURSE_MEMORY_ERROR;
+	}
+	strcpy(course->name, new_name);
+	return COURSE_OK;
+}
 
 //------------------------------------------------------------------------------------------
 // add course2 as a pre course of course1. course2 is not duplicated. just a simple assignment.
