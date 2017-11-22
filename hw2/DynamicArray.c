@@ -120,14 +120,11 @@ DAResult removeElement(DynamicArray da, int index) {
 // to a given element. the given element must not be changed.
 // no need to duplicate element. just do a simple assignment.
 // return values : DA_OK, DA_MEMORY_ERROR , DA_ILLEGAL_INDEX
-DAResult updateElement(DynamicArray da, int id, Element element) {
-    if(id < 0 || id >= da->len) { //if index is out of the array
+DAResult updateElement(DynamicArray da, int index, Element element) {
+    if(index < 0 || index >= da->len) { //if index is out of the array
         return DA_ILLEGAL_INDEX;
     }
-    if(da->elements[id] == NULL) {
-        return DA_MEMORY_ERROR;
-    }
-    da->elements[id] = element;
+    da->elements[index] = element;
     return DA_OK;
 }
 
