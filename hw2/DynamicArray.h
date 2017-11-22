@@ -1,11 +1,26 @@
-#include "DynamicArray.h"
+#ifndef DYNAMIC_ARRAY_H
+#define DYNAMIC_ARRAY_H
+
+
+typedef struct course *Element;
+
+typedef struct dynamic_array
+{
+    int len;
+    Element *elements;
+} *DynamicArray;
+
+
+/*******************************************************************/
+/* Interface of data type DynamicArray  */
+
+
+typedef enum { DA_OK , DA_MEMORY_ERROR , DA_ILLEGAL_INDEX } DAResult;
 
 //------------------------------------------------------------------------------------------
 // Create a new empty array
 // returns the new array or NULL if can not create one
-DynamicArray createDynamicArray() {
-
-}
+DynamicArray createDynamicArray();
 
 //------------------------------------------------------------------------------------------
 // Enlarge the array and add a given element to the array in a position that appears

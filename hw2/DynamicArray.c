@@ -72,6 +72,3 @@ int size(DynamicArray);
 void destroyDynamicArray(DynamicArray);
 
 //------------------------------------------------------------------------------------------
-
-
-#endif // DYNAMIC_ARRAY_H

@@ -1,0 +1,34 @@
+# depslib dependency file v1.0
+1446667744 source:c:\users\yuvadius\desktop\github\matam\hw2\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1511350032 source:c:\users\yuvadius\desktop\github\matam\hw2\course.c
+	"DynamicArray.h"
+
+1510853514 c:\users\yuvadius\desktop\github\matam\hw2\dynamicarray.h
+
+1511350040 source:c:\users\yuvadius\desktop\github\matam\hw2\coursesystem.c
+	"DynamicArray.h"
+	"Course.h"
+
+1510854458 c:\users\yuvadius\desktop\github\matam\hw2\course.h
+	"DynamicArray.h"
+
+1511350968 source:c:\users\yuvadius\desktop\github\matam\hw2\dynamicarray.c
+	"DynamicArray.h"
+
+1510892838 source:c:\users\yuvadius\desktop\github\matam\hw2\test1.c
+	<stdio.h>
+	"Course.h"
+	"CourseSystem.h"
+
+1510892752 c:\users\yuvadius\desktop\github\matam\hw2\coursesystem.h
+	"DynamicArray.h"
+	"Course.h"
+
+1510892838 source:c:\users\yuvadius\desktop\github\matam\hw2\test2.c
+	<stdio.h>
+	"Course.h"
+	"CourseSystem.h"
+
