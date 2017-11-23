@@ -37,7 +37,7 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 
 int coursesEqualId(Course course1, Course course2) {
 	assert((course1 != NULL) &&(course2 != NULL));
-	return(strcmp(course1->id, course2->id)==0);
+	return(strcmp(course1->id, course2->id) == 0);
 }
 
 //------------------------------------------------------------------------------------------
@@ -64,11 +64,11 @@ int courseLessThan(Course course1, Course course2) {
 CourseResult courseUpdateName(Course course1, char *new_name) {
 	assert(new_name != NULL);
 	free(course1->name);
-	course->name = (char *)malloc(strlen(new_name) + 1);
-	if(course->name == NULL) {
+	course1->name = (char *)malloc(strlen(new_name) + 1);
+	if(course1->name == NULL) {
 		return COURSE_MEMORY_ERROR;
 	}
-	strcpy(course->name, new_name);
+	strcpy(course1->name, new_name);
 	return COURSE_OK;
 }
 
@@ -101,7 +101,13 @@ CourseResult removePreCourse(Course course1, Course course2);
 // at its end. no new line at the end of the displayed line.
 
 void displayCourse(Course course1) {
-    //todo
+	assert(course1 != NULL);
+	printf("%s ", course1->id);
+	printf("%s ", course1->name);
+	printf("%.1f", course1->credits);
+	for(int i = 0; i < course1->preCourses->len; ++i) {
+		printf(" %s", course1->id->preCourses->elements->id);
+	}
 }
 
 //------------------------------------------------------------------------------------------
