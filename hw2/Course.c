@@ -32,6 +32,9 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 	strcpy(temp_course->name, name);
 	temp_course->credits = credits;
 	temp_course->preCourses = createDynamicArray();
+	if(temp_course->preCourses == NULL) {
+		return COURSE_MEMORY_ERROR;
+	}
 	course = temp_course;
 	return COURSE_OK;
 }

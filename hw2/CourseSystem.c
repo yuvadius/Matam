@@ -1,33 +1,37 @@
-#ifndef COURSE_SYSTEM_H
-#define COURSE_SYSTEM_H
-
+#include <string.h>
+#include <stdbool.h>
+#include <assert.h>
 #include "DynamicArray.h"
 #include "Course.h"
-
-typedef struct course_system
-{
-    char *name;
-    DynamicArray courses;
-} *CourseSystem;
-
-
-/*******************************************************************/
-/* Interface of data type CourseSystem  */
-
-
-typedef enum { SYS_OK , SYS_COURSE_ALREADY_EXIST , SYS_MEMORY_PROBLEM ,
-               SYS_NOT_IN_SYSTEM , SYS_ALREADY_PRE_COURSE , SYS_NOT_PRE_COURSE } SysResult;
+#include "CourseSystem.h"
 
 //------------------------------------------------------------------------------------------
 // create a new empty system whose name is the parameter name.
 // if cannot create then NULL is returned.
-CourseSystem createSystem(char *name);
+CourseSystem createSystem(char *name) {
+	CourseSystem course_system = malloc(sizeof(*course_system));
+	if(course_system != NULL) {
+		course_system->name = (char *)malloc(strlen(name) + 1);
+		if(course_system->name == NULL) {
+			return NULL;
+		}
+		strcpy(course_system->name, name);
+		course_system->courses = createDynamicArray();
+		return course_system;
+	}
+	else {
+		return NULL;
+	}
+}
 
 //------------------------------------------------------------------------------------------
 //return the number of courses that are currently defined in the system (which means - have been added
 //                                                                      to the system).
 //sys must not be NULL (handled by assert)
-int sysNumCourses(CourseSystem sys);
+int sysNumCourses(CourseSystem sys) {
+	assert(sys != NULL);
+	return sys->courses->len;
+}
 
 //------------------------------------------------------------------------------------------
 // add the course c1 to the system sys.
@@ -39,7 +43,23 @@ int sysNumCourses(CourseSystem sys);
 // SYS_COURSE_ALREADY_EXIST if there is already a course with the same id as the id of c1 in the system.
 // SYS_MEMORY_PROBLEM - there is a memory problem.
 
-SysResult sysAddCourse(CourseSystem sys, Course c1);
+SysResult sysAddCourse(CourseSystem sys, Course c1) {
+	assert((sys != NULL) && (c1 != NULL));
+	int result_index = 0;
+	if(indexOfElement(sys->courses, c1, 0, &result_index) == DA_OK) {
+		if(result_index != -1) {
+			return SYS_COURSE_ALREADY_EXIST;
+		}
+	}
+	for(int i = 0; i < sys->courses->len; ++i) {
+		if(courseLessThan(c1, sys->courses->elements[i])) {
+			addElementBefore(sys->courses, c1, i);
+			return SYS_OK;
+		}
+	}
+	addElementEnd(sys->courses, c1);
+	return SYS_OK;
+}
 
 //------------------------------------------------------------------------------------------
 // remove the course whose id is course_id from the system sys.
@@ -51,7 +71,18 @@ SysResult sysAddCourse(CourseSystem sys, Course c1);
 // SYS_OK
 // SYS_NOT_IN_SYSTEM if there is no course with course_id in the system.
 
-SysResult sysRemoveCourse(CourseSystem sys, char *course_id);
+SysResult sysRemoveCourse(CourseSystem sys, char *course_id) {
+	assert((sys != NULL) && (course_id != NULL));
+	int result = SYS_NOT_IN_SYSTEM;
+	for(int i = 0; i < sys->courses->len; ++i) {
+		sysRemovePreCourse(sys, sys->courses->elements[i]->id, course_id);
+		if(strcmp(sys->courses->elements[i]->id, course_id) == 0) {
+			assert(removeElement(sys->courses, i) == DA_OK);
+			result = SYS_OK;
+		}
+	}
+	return result;
+}
 
 //------------------------------------------------------------------------------------------
 // check if the course with id course_id2 is defined as a pre course of the course with id course_id1
@@ -62,7 +93,32 @@ SysResult sysRemoveCourse(CourseSystem sys, char *course_id);
 // SYS_OK
 // SYS_NOT_IN_SYSTEM if either course_id1 or course_id2 have not been added to the system
 
-SysResult sysIsPreCourse(CourseSystem sys, char *course_id1 , char *course_id2, int *ans);
+SysResult sysIsPreCourse(CourseSystem sys, char *course_id1 , char *course_id2, int *ans) {
+	assert((sys != NULL) && (course_id1 != NULL) && (course_id2 != NULL) && (ans != NULL));
+	*ans = 0;
+	bool isCourse1InSystem = false, isCourse2InSystem = false;
+	for(int i = 0; i < sys->courses->len; ++i) {
+		if(strcmp(sys->courses->elements[i]->id, course_id1)) {
+			isCourse1InSystem = true;
+			DynamicArray preCourses = sys->courses->elements[i]->preCourses;
+			for(int j = 0; j < preCourses->len; ++j) {
+				if(strcmp(preCourses->elements[i]->id, course_id2)) {
+					*ans = 1;
+					break;
+				}
+			}
+		}
+		else if(strcmp(sys->courses->elements[i]->id, course_id2)) {
+			isCourse2InSystem = true;
+		}
+	}
+	if (isCourse1InSystem && isCourse2InSystem) {
+		return SYS_OK;
+	}
+	else {
+		return SYS_NOT_IN_SYSTEM;
+	}
+}
 
 //------------------------------------------------------------------------------------------
 // add the course with id course_id2 to be a pre course of the course with id course_id1
@@ -83,7 +139,9 @@ SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2)
 // SYS_NOT_IN_SYSTEM if either course_id1 or course_id2 have not been added to the system
 // SYS_NOT_PRE_COURSE if course_id2 is not defined as a pre course of course_id1
 
-SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_id2);
+SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_id2) {
+
+}
 
 //------------------------------------------------------------------------------------------
 // update the name of the course whose id is course_id with new_name.
@@ -108,7 +166,3 @@ void displaySystem(CourseSystem sys);
 //------------------------------------------------------------------------------------------
 // deallocate all memory used by the system and close the system.
 void destroySystem(CourseSystem sys);
-
-//------------------------------------------------------------------------------------------
-
-#endif // COURSE_SYSTEM_H
