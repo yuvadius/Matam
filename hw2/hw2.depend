@@ -3,7 +3,11 @@
 	<stdio.h>
 	<stdlib.h>
 
-1511356136 source:c:\users\yuvadius\desktop\github\matam\hw2\course.c
+1511436402 source:c:\users\yuvadius\desktop\github\matam\hw2\course.c
+	<stdlib.h>
+	<assert.h>
+	<string.h>
+	"Course.h"
 	"DynamicArray.h"
 
 1510853514 c:\users\yuvadius\desktop\github\matam\hw2\dynamicarray.h

@@ -143,7 +143,7 @@ void displayCourse(Course course1) {
 	printf("%s ", course1->name);
 	printf("%.1f", course1->credits);
 	for(int i = 0; i < course1->preCourses->len; ++i) {
-		printf(" %s", course1->id->preCourses->elements->id);
+		printf(" %s", course1->preCourses->elements[i]->id);
 	}
 }
 
