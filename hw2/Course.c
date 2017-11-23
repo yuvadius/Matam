@@ -27,7 +27,7 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 	strcpy(course->id, id);
 	strcpy(course->name, name);
 	course->credits = credits;
-	course->preCourses = NULL;
+	course->preCourses = createDynamicArray();
 	return COURSE_OK;
 }
 
@@ -80,7 +80,26 @@ CourseResult courseUpdateName(Course course1, char *new_name) {
 // return value : COURSE_OK,
 //                COURSE_THE_SAME_COURSE  if the id of course2 is the same as the id of course1
 //                COURSE_ALREADY_EXISTS if a course with the id of course2 already registered as a pre course of course1
-CourseResult addPreCourse(Course course1, Course course2);
+CourseResult addPreCourse(Course course1, Course course2) {
+	assert((course1 != NULL) && (course2 != NULL));
+	if(coursesEqualId(course1, course2)) {
+		return COURSE_THE_SAME_COURSE;
+	}
+	int *result_index;
+	if(indexOfElement(course1->preCourses, course2, 0, result_index) == DA_OK) {
+		if(*result_index != -1) {
+			return COURSE_ALREADY_EXISTS;
+		}
+	}
+	for(int i = 0; i < course1->preCourses->len; ++i) {
+		if(courseLessThan(course2, course1->preCourses->elements[i])) {
+			addElementBefore(course1->preCourses, course2, i);
+			return COURSE_OK;
+		}
+	}
+	addElementEnd(course1->preCourses, course2);
+	return COURSE_OK;
+}
 
 //------------------------------------------------------------------------------------------
 // remove a course with the same id as of course2 from being a pre course of course1.
@@ -112,7 +131,12 @@ void displayCourse(Course course1) {
 
 //------------------------------------------------------------------------------------------
 // deallocate all relevant memory of course1 and stop using it.
-void destroyCourse(Course course1);
+void destroyCourse(Course course1) {
+	free(course1->id);
+	free(course1->name);
+	destroyDynamicArray(course1->preCourses);
+	free(course1);
+}
 
 //------------------------------------------------------------------------------------------
 
