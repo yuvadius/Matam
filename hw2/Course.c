@@ -155,8 +155,3 @@ void destroyCourse(Course course1) {
 	destroyDynamicArray(course1->preCourses);
 	free(course1);
 }
-
-//------------------------------------------------------------------------------------------
-
-
-#endif // COURSE_H
