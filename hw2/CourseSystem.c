@@ -129,7 +129,30 @@ SysResult sysIsPreCourse(CourseSystem sys, char *course_id1 , char *course_id2, 
 // SYS_ALREADY_PRE_COURSE if course_id2 is already defined as a pre course of course_id1
 // SYS_MEMORY_PROBLEM if there is a memory problem
 
-SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2);
+SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2) {
+	assert((sys != NULL) && (course_id1 != NULL) && (course_id2 != NULL));
+	int isPrecourse = 0;
+	int result = sysIsPreCourse(sys, course_id1, course_id2, &isPrecourse);
+	if(result == SYS_NOT_IN_SYSTEM) {
+		return result; 
+	}
+	else if(isPrecourse == 1) {
+		return SYS_ALREADY_PRE_COURSE;
+	}
+	else {
+		Course course1, course2;
+		for(int i = 0; i < sys->courses->len; ++i) {
+			if(strcmp(sys->courses->elements[i]->id, course_id1)) {
+				course1 = sys->courses->elements[i];
+			}
+			else if(strcmp(sys->courses->elements[i]->id, course_id2)) {
+				course2 = sys->courses->elements[i];
+			}
+		}
+		assert(addPreCourse(course1, course2) == COURSE_OK);
+		return SYS_OK;
+	}
+}
 
 //------------------------------------------------------------------------------------------
 // remove the course with id course_id2 from being a pre course of the course with id course_id1
@@ -140,7 +163,28 @@ SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2)
 // SYS_NOT_PRE_COURSE if course_id2 is not defined as a pre course of course_id1
 
 SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_id2) {
-
+	assert((sys != NULL) && (course_id1 != NULL) && (course_id2 != NULL));
+	int isPrecourse = 0;
+	int result = sysIsPreCourse(sys, course_id1, course_id2, &isPrecourse);
+	if(result == SYS_NOT_IN_SYSTEM) {
+		return result; 
+	}
+	else if(isPrecourse == 0) {
+		return SYS_NOT_PRE_COURSE;
+	}
+	else {
+		Course course1, course2;
+		for(int i = 0; i < sys->courses->len; ++i) {
+			if(strcmp(sys->courses->elements[i]->id, course_id1)) {
+				course1 = sys->courses->elements[i];
+			}
+			else if(strcmp(sys->courses->elements[i]->id, course_id2)) {
+				course2 = sys->courses->elements[i];
+			}
+		}
+		assert(removePreCourse(course1, course2) == COURSE_OK);
+		return SYS_OK;
+	}
 }
 
 //------------------------------------------------------------------------------------------
@@ -151,7 +195,22 @@ SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_i
 // SYS_NOT_IN_SYSTEM if course_id have not been added to the system
 // SYS_MEMORY_PROBLEM if there is a memory problem
 
-SysResult sysUpdateCourseName(CourseSystem sys, char *course_id, char *new_name);
+SysResult sysUpdateCourseName(CourseSystem sys, char *course_id, char *new_name) {
+	assert((sys != NULL) && (course_id != NULL) && (new_name != NULL));
+	for(int i = 0; i < sys->courses->len; ++i) {
+		if(strcmp(sys->courses->elements[i]->id, course_id)) {
+			char *name = sys->courses->elements[i]->name;//save lines of code
+			free(name);
+			name = (char *)malloc(strlen(new_name) + 1);
+			if(name == NULL) {
+				return SYS_MEMORY_PROBLEM;
+			}
+			strcpy(name, new_name);
+			return SYS_OK;
+		}
+	}
+	return SYS_NOT_IN_SYSTEM;
+}
 
 //------------------------------------------------------------------------------------------
 // display the contents of the system
@@ -161,8 +220,21 @@ SysResult sysUpdateCourseName(CourseSystem sys, char *course_id, char *new_name)
 // in the end of each line there is a new line.
 // all the lines are displayed in a sorted order according to the id of the course, from small to big, up to down.
 // sys must not be NULL (will be handled by assert)
-void displaySystem(CourseSystem sys);
+void displaySystem(CourseSystem sys) {
+	assert(sys != NULL);
+	printf("%s\n", sys->name);
+	for(int i = 0; i < sys->courses->len; ++i) {
+		displayCourse(sys->courses->elements[i]);
+		printf("\n");
+	}
+}
 
 //------------------------------------------------------------------------------------------
 // deallocate all memory used by the system and close the system.
-void destroySystem(CourseSystem sys);
+void destroySystem(CourseSystem sys) {
+	free(sys->name);
+	for(int i = 0; i < sys->courses->len; ++i) {
+		destroyCourse(sys->courses->elements[i]);
+	}
+	free(sys);
+}
