@@ -19,23 +19,22 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 	if(credits < 0) {
 		return COURSE_ILLEGAL_PARAMETER;
 	}
-	Course temp_course = malloc(sizeof(*temp_course));
-	if(temp_course == NULL) {
+	*course = malloc(sizeof(*course));
+	if((*course) == NULL) {
         return COURSE_MEMORY_ERROR;
 	}
-	temp_course->id = (char *)malloc(strlen(id) + 1);
-	temp_course->name = (char *)malloc(strlen(name) + 1);
-	if(temp_course->id == NULL || temp_course->name == NULL) {
+	(*course)->id = (char *)malloc(strlen(id) + 1);
+	(*course)->name = (char *)malloc(strlen(name) + 1);
+	if((*course)->id == NULL || (*course)->name == NULL) {
 		return COURSE_MEMORY_ERROR;
 	}
-	strcpy(temp_course->id, id);
-	strcpy(temp_course->name, name);
-	temp_course->credits = credits;
-	temp_course->preCourses = createDynamicArray();
-	if(temp_course->preCourses == NULL) {
+	strcpy((*course)->id, id);
+	strcpy((*course)->name, name);
+	(*course)->credits = credits;
+	(*course)->preCourses = createDynamicArray();
+	if((*course)->preCourses == NULL) {
 		return COURSE_MEMORY_ERROR;
 	}
-	course = temp_course;
 	return COURSE_OK;
 }
 
@@ -44,8 +43,8 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 // Either course1 or course2 must not be NULL. (handled by assert).
 
 int coursesEqualId(Course course1, Course course2) {
-	assert((course1 != NULL) &&(course2 != NULL));
-	return(strcmp(course1->id, course2->id) == 0);
+	assert((course1 != NULL) && (course2 != NULL));
+	return (strcmp(course1->id, course2->id) == 0);
 }
 
 //------------------------------------------------------------------------------------------

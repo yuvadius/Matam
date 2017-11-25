@@ -29,10 +29,10 @@ int main(int argc, char **argv)
 
     rs=sysAddCourse(sys, c1);
     n=sysNumCourses(sys);
-    ASSERT("1.5" , n==1)
+    ASSERT("1.5" , n==1);
 
     rs=sysAddCourse(sys, c1);
-    ASSERT("1.6" , rs==SYS_COURSE_ALREADY_EXIST)
+    ASSERT("1.6" , rs==SYS_COURSE_ALREADY_EXIST);
 
     rc = createCourse("234218", "Data Structures 1", 3, &c1);
     rs=sysAddCourse(sys, c1);

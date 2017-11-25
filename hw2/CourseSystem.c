@@ -134,7 +134,7 @@ SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2)
 	int isPrecourse = 0;
 	int result = sysIsPreCourse(sys, course_id1, course_id2, &isPrecourse);
 	if(result == SYS_NOT_IN_SYSTEM) {
-		return result; 
+		return result;
 	}
 	else if(isPrecourse == 1) {
 		return SYS_ALREADY_PRE_COURSE;
@@ -167,7 +167,7 @@ SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_i
 	int isPrecourse = 0;
 	int result = sysIsPreCourse(sys, course_id1, course_id2, &isPrecourse);
 	if(result == SYS_NOT_IN_SYSTEM) {
-		return result; 
+		return result;
 	}
 	else if(isPrecourse == 0) {
 		return SYS_NOT_PRE_COURSE;
