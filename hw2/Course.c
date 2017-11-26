@@ -3,6 +3,7 @@
 #include <string.h>
 #include "Course.h"
 #include "DynamicArray.h"
+#include <stdio.h>
 
 //------------------------------------------------------------------------------------------
 // create a new course with the details of the parameters id , name , credits;
