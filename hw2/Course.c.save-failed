@@ -19,20 +19,23 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 	if(credits < 0) {
 		return COURSE_ILLEGAL_PARAMETER;
 	}
-	Course temp_course = malloc(sizeof(*temp_course));
-	temp_course->id = malloc(sizeof(char) * (strlen(id) + 1));
-	temp_course->name = malloc(sizeof(char) * (strlen(name) + 1));
-	if(temp_course->id == NULL || temp_course->name == NULL) {
+	*course = malloc(sizeof(*course));
+	if((*course) == NULL) {
+        return COURSE_MEMORY_ERROR;
+	}
+	(*course)->id = malloc(sizeof(char) * (strlen(id) + 1));
+	(*course)->name = malloc(sizeof(char) * (strlen(id) + 1));
+	if((*course)->id == NULL || (*course)->name == NULL) {
 		return COURSE_MEMORY_ERROR;
 	}
-	strcpy(temp_course->id, id);
-	strcpy(temp_course->name, name);
-	temp_course->credits = credits;
-	temp_course->preCourses = createDynamicArray();
-	if(temp_course->preCourses == NULL) {
+	strcpy((*course)->id, id);
+	printf("\n%s", (*course)->id);
+	strcpy((*course)->name, name);
+	(*course)->credits = credits;
+	(*course)->preCourses = createDynamicArray();
+	if((*course)->preCourses == NULL) {
 		return COURSE_MEMORY_ERROR;
 	}
-	*course = temp_course;
 	return COURSE_OK;
 }
 

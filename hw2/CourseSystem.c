@@ -234,8 +234,6 @@ void displaySystem(CourseSystem sys) {
 // deallocate all memory used by the system and close the system.
 void destroySystem(CourseSystem sys) {
 	free(sys->name);
-	for(int i = 0; i < sys->courses->len; ++i) {
-		destroyCourse(sys->courses->elements[i]);
-	}
+	destroyDynamicArray(sys->courses);
 	free(sys);
 }

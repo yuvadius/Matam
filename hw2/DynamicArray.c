@@ -8,7 +8,7 @@
 // returns the new array or NULL if can not create one
 DynamicArray createDynamicArray() {
     DynamicArray dynamic_array = malloc(sizeof(*dynamic_array));
-    if(!dynamic_array) { //could not create array
+    if(dynamic_array == NULL) { //could not create array
         return NULL;
     }
     dynamic_array->len = 0;
