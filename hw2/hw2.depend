@@ -43,3 +43,26 @@
 	"Course.h"
 	"CourseSystem.h"
 
+1511691072 source:c:\users\sharon mishayev\documents\github\matam\hw2\coursesystem.c
+	<string.h>
+	<stdbool.h>
+	<assert.h>
+	"DynamicArray.h"
+	"Course.h"
+	"CourseSystem.h"
+
+1511351112 c:\users\sharon mishayev\documents\github\matam\hw2\dynamicarray.h
+
+1511351112 c:\users\sharon mishayev\documents\github\matam\hw2\course.h
+	"DynamicArray.h"
+
+1511351112 c:\users\sharon mishayev\documents\github\matam\hw2\coursesystem.h
+	"DynamicArray.h"
+	"Course.h"
+
+1511691072 source:c:\users\sharon mishayev\documents\github\matam\hw2\dynamicarray.c
+	<stdlib.h>
+	<assert.h>
+	"Course.h"
+	"DynamicArray.h"
+

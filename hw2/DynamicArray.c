@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "Course.h"
 #include "DynamicArray.h"
+#include <stdio.h>
 
 //------------------------------------------------------------------------------------------
 // Create a new empty array
