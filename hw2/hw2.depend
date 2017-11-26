@@ -3,22 +3,25 @@
 	<stdio.h>
 	<stdlib.h>
 
-1511717119 source:c:\users\yuvadius\desktop\github\matam\hw2\course.c
+1511717279 source:c:\users\yuvadius\desktop\github\matam\hw2\course.c
 	<stdlib.h>
 	<assert.h>
 	<string.h>
 	"Course.h"
 	"DynamicArray.h"
+	<stdio.h>
 
 1510853514 c:\users\yuvadius\desktop\github\matam\hw2\dynamicarray.h
 
-1511712376 source:c:\users\yuvadius\desktop\github\matam\hw2\coursesystem.c
+1511717279 source:c:\users\yuvadius\desktop\github\matam\hw2\coursesystem.c
 	<string.h>
 	<stdbool.h>
 	<assert.h>
 	"DynamicArray.h"
 	"Course.h"
 	"CourseSystem.h"
+	<stdio.h>
+	<stdlib.h>
 
 1511435436 c:\users\yuvadius\desktop\github\matam\hw2\course.h
 	"DynamicArray.h"
@@ -29,7 +32,7 @@
 	"Course.h"
 	"DynamicArray.h"
 
-1511717109 source:c:\users\yuvadius\desktop\github\matam\hw2\test1.c
+1511717279 source:c:\users\yuvadius\desktop\github\matam\hw2\test1.c
 	<stdio.h>
 	"Course.h"
 	"CourseSystem.h"

@@ -202,13 +202,12 @@ SysResult sysUpdateCourseName(CourseSystem sys, char *course_id, char *new_name)
 	assert((sys != NULL) && (course_id != NULL) && (new_name != NULL));
 	for(int i = 0; i < sys->courses->len; ++i) {
 		if(strcmp(sys->courses->elements[i]->id, course_id) == 0) {
-			char *name = sys->courses->elements[i]->name;//save lines of code
-			free(name);
-			name = (char *)malloc(strlen(new_name) + 1);
-			if(name == NULL) {
+			free(sys->courses->elements[i]->name);
+			sys->courses->elements[i]->name = malloc(sizeof(char) * (strlen(new_name) + 1));
+			if(sys->courses->elements[i]->name == NULL) {
 				return SYS_MEMORY_PROBLEM;
 			}
-			strcpy(name, new_name);
+			strcpy(sys->courses->elements[i]->name, new_name);
 			return SYS_OK;
 		}
 	}
