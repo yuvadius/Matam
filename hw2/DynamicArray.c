@@ -102,14 +102,14 @@ DAResult removeElement(DynamicArray da, int index) {
     if(index < 0 || index >= da->len) { //if index is out of the array
         return DA_ILLEGAL_INDEX;
     }
-    free(da->elements[index]);
     for (int i = index; i < da->len - 1; i++) {
         da->elements[i] = da->elements[i + 1];
         da->elements[i + 1] = NULL;
     }
     da->len--;
     da->elements = realloc(da->elements,da->len * sizeof(Element));
-    if(da->elements == NULL) {
+    //if len is 0 then u are supposed to get a NULL pointer
+    if(da->elements == NULL && da->len > 0) {
         return DA_MEMORY_ERROR;
     }
     return DA_OK;

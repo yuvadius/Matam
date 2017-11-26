@@ -95,24 +95,25 @@ SysResult sysRemoveCourse(CourseSystem sys, char *course_id) {
 
 SysResult sysIsPreCourse(CourseSystem sys, char *course_id1 , char *course_id2, int *ans) {
 	assert((sys != NULL) && (course_id1 != NULL) && (course_id2 != NULL) && (ans != NULL));
-	*ans = 0;
 	bool isCourse1InSystem = false, isCourse2InSystem = false;
+	int temp_ans = 0;
 	for(int i = 0; i < sys->courses->len; ++i) {
-		if(strcmp(sys->courses->elements[i]->id, course_id1)) {
+		if(strcmp(sys->courses->elements[i]->id, course_id1) == 0) {
 			isCourse1InSystem = true;
 			DynamicArray preCourses = sys->courses->elements[i]->preCourses;
 			for(int j = 0; j < preCourses->len; ++j) {
-				if(strcmp(preCourses->elements[i]->id, course_id2)) {
-					*ans = 1;
+				if(strcmp(preCourses->elements[j]->id, course_id2) == 0) {
+					temp_ans = 1;
 					break;
 				}
 			}
 		}
-		else if(strcmp(sys->courses->elements[i]->id, course_id2)) {
+		else if(strcmp(sys->courses->elements[i]->id, course_id2) == 0) {
 			isCourse2InSystem = true;
 		}
 	}
 	if (isCourse1InSystem && isCourse2InSystem) {
+        *ans = temp_ans;
 		return SYS_OK;
 	}
 	else {
@@ -142,10 +143,10 @@ SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2)
 	else {
 		Course course1, course2;
 		for(int i = 0; i < sys->courses->len; ++i) {
-			if(strcmp(sys->courses->elements[i]->id, course_id1)) {
+			if(strcmp(sys->courses->elements[i]->id, course_id1) == 0) {
 				course1 = sys->courses->elements[i];
 			}
-			else if(strcmp(sys->courses->elements[i]->id, course_id2)) {
+			else if(strcmp(sys->courses->elements[i]->id, course_id2) == 0) {
 				course2 = sys->courses->elements[i];
 			}
 		}
@@ -175,10 +176,10 @@ SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_i
 	else {
 		Course course1, course2;
 		for(int i = 0; i < sys->courses->len; ++i) {
-			if(strcmp(sys->courses->elements[i]->id, course_id1)) {
+			if(strcmp(sys->courses->elements[i]->id, course_id1) == 0) {
 				course1 = sys->courses->elements[i];
 			}
-			else if(strcmp(sys->courses->elements[i]->id, course_id2)) {
+			else if(strcmp(sys->courses->elements[i]->id, course_id2) == 0) {
 				course2 = sys->courses->elements[i];
 			}
 		}
@@ -198,7 +199,7 @@ SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_i
 SysResult sysUpdateCourseName(CourseSystem sys, char *course_id, char *new_name) {
 	assert((sys != NULL) && (course_id != NULL) && (new_name != NULL));
 	for(int i = 0; i < sys->courses->len; ++i) {
-		if(strcmp(sys->courses->elements[i]->id, course_id)) {
+		if(strcmp(sys->courses->elements[i]->id, course_id) == 0) {
 			char *name = sys->courses->elements[i]->name;//save lines of code
 			free(name);
 			name = (char *)malloc(strlen(new_name) + 1);

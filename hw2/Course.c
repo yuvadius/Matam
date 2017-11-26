@@ -155,5 +155,5 @@ void destroyCourse(Course course1) {
 	free(course1->id);
 	free(course1->name);
 	destroyDynamicArray(course1->preCourses);
-	free(course1);
+    free(course1);
 }

@@ -31,7 +31,19 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Unit filename="Course.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Course.h" />
+		<Unit filename="CourseSystem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CourseSystem.h" />
+		<Unit filename="DynamicArray.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="DynamicArray.h" />
+		<Unit filename="test1.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
