@@ -4,6 +4,7 @@
 #include "DynamicArray.h"
 #include "Course.h"
 #include "CourseSystem.h"
+#include <stdio.h>
 
 //------------------------------------------------------------------------------------------
 // create a new empty system whose name is the parameter name.
