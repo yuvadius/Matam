@@ -143,7 +143,7 @@ SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2)
 		return SYS_ALREADY_PRE_COURSE;
 	}
 	else {
-		Course course1, course2;
+		Course course1 = NULL, course2 = NULL;
 		for(int i = 0; i < sys->courses->len; ++i) {
 			if(strcmp(sys->courses->elements[i]->id, course_id1) == 0) {
 				course1 = sys->courses->elements[i];
@@ -152,7 +152,7 @@ SysResult sysAddPreCourse(CourseSystem sys, char *course_id1 , char *course_id2)
 				course2 = sys->courses->elements[i];
 			}
 		}
-		assert(addPreCourse(course1, course2) == COURSE_OK);
+		addPreCourse(course1, course2);
 		return SYS_OK;
 	}
 }
@@ -185,7 +185,7 @@ SysResult sysRemovePreCourse(CourseSystem sys, char *course_id1 , char *course_i
 				course2 = sys->courses->elements[i];
 			}
 		}
-		assert(removePreCourse(course1, course2) == COURSE_OK);
+		removePreCourse(course1, course2);
 		return SYS_OK;
 	}
 }

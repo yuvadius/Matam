@@ -20,6 +20,7 @@ CourseResult createCourse(char *id, char *name, double credits, Course *course) 
 	if(credits < 0) {
 		return COURSE_ILLEGAL_PARAMETER;
 	}
+	//free(*course);
 	*course = malloc(sizeof(**course));
 	if((*course) == NULL) {
         return COURSE_MEMORY_ERROR;
