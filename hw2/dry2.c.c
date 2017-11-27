@@ -35,6 +35,7 @@ bool isPalindromeUtil(struct node_t **left, struct node_t *right)
 // A wrapper over isPalindromeUtil()
 bool isPalindrome(struct node_t *head)
 {
+
     isPalindromeUtil(&head, head);
 }
 
@@ -71,8 +72,8 @@ int main()
 {
 	/* Start with the empty list */
 	struct node* head = NULL;
-	int str[] = {1,0,3,3,0,1};
-	for (int i = 0; i < 6; i++)
+	int str[] = {1,0,1};
+	for (int i = 0; i < 3; i++)
 	{
         push(&head, str[i]);
 	}
