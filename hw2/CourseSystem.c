@@ -79,7 +79,7 @@ SysResult sysRemoveCourse(CourseSystem sys, char *course_id) {
 	for(int i = 0; i < sys->courses->len; ++i) {
 		sysRemovePreCourse(sys, sys->courses->elements[i]->id, course_id);
 		if(strcmp(sys->courses->elements[i]->id, course_id) == 0) {
-			assert(removeElement(sys->courses, i) == DA_OK);
+			removeElement(sys->courses, i);
 			result = SYS_OK;
 		}
 	}

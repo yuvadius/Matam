@@ -123,7 +123,7 @@ CourseResult removePreCourse(Course course1, Course course2) {
 			return COURSE_NOT_EXIST;
 		}
 		else {
-			assert(removeElement(course1->preCourses, result_index) == DA_OK);
+			removeElement(course1->preCourses, result_index);
 			return COURSE_OK;
 		}
 	}
