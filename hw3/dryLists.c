@@ -52,15 +52,18 @@ Node listCopy(Node list) {
     }
 }
 
+//pushes the "lastNode", to the end of the "list"
+//param1 - Node lastNode: the node to be pushed to the end of "list"
+//param2 - Node list: the list that the "lastNode" will be pushed into
 void pushNodeToTheEndOfList(Node lastNode, Node list) {
-    if(list == NULL) {
+    if(list == NULL) { //if the list is empty exit the function
         return;
     }
     Node tempNode = list;
-    while(tempNode->next != NULL) {
-        tempNode = tempNode->next;
+    while(tempNode->next != NULL) { //loop until the end of the list
+        tempNode = tempNode->next; //iterate to the next element in the list
     }
-    tempNode->next = lastNode;
+    tempNode->next = lastNode; //push the lastNode to the end of the list
 }
 
 //deep copies a list into a newly created list in reversed order
@@ -70,13 +73,14 @@ Node listCopyReversed(Node list) {
     if(list == NULL) { //if the list is empty the return an empty list(NULL)
         return NULL; //return an empty list
     }
-    else if(list->next == NULL) {
+    else if(list->next == NULL) { //if the end of the original list was reached
+        //make the last node in list the new first node in the list
         Node lastNode = createNode(list->n);
         if(lastNode == NULL) { //if memory allocation failed
             destroyList(lastNode); //destroy new node
             return NULL; //return an empty list
         }
-        return lastNode;
+        return lastNode; //return the head of the list
     }
     else {
         Node return_node = listCopyReversed(list->next);
@@ -90,7 +94,7 @@ Node listCopyReversed(Node list) {
             return NULL; //return an empty list
         }
         pushNodeToTheEndOfList(lastNode, return_node);
-        return return_node;
+        return return_node; //return the head of the list
     }
 }
 
