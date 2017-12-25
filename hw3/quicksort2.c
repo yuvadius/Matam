@@ -46,7 +46,7 @@ void qsort2(void *array, size_t nitems, size_t size, int (*cmp)(void*,void*))
     sort(array, size, cmp, 0, nitems*size);
 }
 
-typedef double type;
+typedef int type;
 
 int type_cmp(void *a, void *b)
 {
@@ -55,7 +55,7 @@ int type_cmp(void *a, void *b)
 
 int main(void)
 { /* simple test case for type=int */
-    double num_list[]={5,4.4,3,2,1};
+    int num_list[]={5,4,3,2,1};
     int len=sizeof(num_list)/sizeof(type);
     char *sep="";
     int i;

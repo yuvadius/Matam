@@ -1,4 +1,4 @@
-#include <stdio.h>\
+#include <stdio.h>
 
 // A utility function to swap two elements
 static void swap(void *x, void *y, size_t l)
@@ -15,7 +15,7 @@ static void swap(void *x, void *y, size_t l)
 int cmpInt(void *a, void *b) {
     int *x = (int *)a;
     int *y = (int *)b;
-    if (*x > *y) {
+    if ((*x) > (*y)) {
         return 1;
     }
     else {
@@ -23,6 +23,16 @@ int cmpInt(void *a, void *b) {
     }
 }
 
+double cmpDbl(void *a, void *b) {
+    double *x = (double *)a;
+    double *y = (double *)b;
+    if ((*x) > (*y)) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 
 /* This function takes last element as pivot, places
    the pivot element at its correct position in sorted
@@ -31,20 +41,20 @@ int cmpInt(void *a, void *b) {
    of pivot */
 int partition (void* arr, int low, int high, size_t size, int (*cmp)(void*,void*))
 {
-    void* pivot = arr[high];    // pivot
+    void* pivot = arr + size*high;    // pivot
     int i = (low - 1);  // Index of smaller element
 
     for (int j = low; j <= high- 1; j++)
     {
         // If current element is smaller than or
         // equal to pivot
-        if (cmp(pivot, arr[j]))
+        if (cmp(pivot, arr + size*j))
         {
             i++;    // increment index of smaller element
-            swap(arr[i], arr[j], size);
+            swap(arr + size*i, arr + size*j, size);
         }
     }
-    swap(arr[i + 1], arr[high], size);
+    swap(arr + size*(i+1), arr + size*high, size);
     return (i + 1);
 }
 
@@ -68,21 +78,21 @@ void quickSort(void* arr, int low, int high, size_t size, int (*cmp)(void*,void*
 }
 
 /* Function to print an array */
-void printArray(int arr[], int size)
+void printArray(double arr[], int size)
 {
     int i;
     for (i=0; i < size; i++)
-        printf("%d ", arr[i]);
+        printf("%lf ", arr[i]);
     printf("n");
 }
 
 // Driver program to test above functions
 int main()
 {
-    int arr[] = {10, 7, 8, 9, 1, 5};
+    double arr[] = {10, 7, 8, 9, 1, 5};
     int n = sizeof(arr)/sizeof(arr[0]);
-    quickSort(arr, 0, n-1, sizeof(int), cmpInt);
-    //printf("Sorted array: n");
-    //printArray(arr, n);
+    quickSort(arr, 0, n-1, sizeof(double), cmpDbl);
+    printf("Sorted array: n");
+    printArray(arr, n);
     return 0;
 }
