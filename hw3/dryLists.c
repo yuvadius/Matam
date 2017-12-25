@@ -112,17 +112,28 @@ Node listCopyReversed(Node list) {
 Node listJoinAlternating(Node array_of_lists[], int n) {
     Node return_list = NULL; //start with an empty list
     for(int i = 0; i < n; ++i) { //loop over the array
-        if(i % 2 == 0) { //if i is even(odd if you start counting from 1)
-            //retrieve the reversed list "array_of_lists[i]"
-            Node temp_node = listCopyReversed(array_of_lists[i]);
-            //concatenate the list to the end
-            return_list = pushNodeToTheEndOfList(temp_node, return_list);
-        }
-        else {
-            //retrieve a copy of the list "array_of_lists[i]"
-            Node temp_node = listCopy(array_of_lists[i]);
-            //concatenate the list to the end
-            return_list = pushNodeToTheEndOfList(temp_node, return_list);
+        //no need to concatenate if the list is empty
+        if(array_of_lists[i] != NULL) {
+            if(i % 2 == 0) { //if i is even(odd if you start counting from 1)
+                //retrieve the reversed list "array_of_lists[i]"
+                Node temp_node = listCopyReversed(array_of_lists[i]);
+                if(temp_node == NULL) { //if memory allocation failed
+                    destroyList(return_list); //destroy all new nodes
+                    return NULL; //return an empty list
+                }
+                //concatenate the list to the end
+                return_list = pushNodeToTheEndOfList(temp_node, return_list);
+            }
+            else {
+                //retrieve a copy of the list "array_of_lists[i]"
+                Node temp_node = listCopy(array_of_lists[i]);
+                if(temp_node == NULL) { //if memory allocation failed
+                    destroyList(return_list); //destroy all new nodes
+                    return NULL; //return an empty list
+                }
+                //concatenate the list to the end
+                return_list = pushNodeToTheEndOfList(temp_node, return_list);
+            }
         }
     }
     return return_list; //return the head of the list
