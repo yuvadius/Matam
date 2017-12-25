@@ -55,5 +55,25 @@ int main()
     node4->next = node5;
     node5->data = 17;
     node5->next = NULL;
-    return 0;
+    
+
+
+
+    Node new_node= listCopy(node1); //testing.
+    printNode(node1); 
+    printNode(new_node); //should print the same lists.
+
+
+
+    void printNode(Node list)
+    {
+        if(list!=NULL) {
+            printf("The List: %d",list->n); // print the first node
+            while(list->next!=NULL) { // while NOT the last node
+                list=list->next;  // moving to the next node
+                printf("%d ",list->n); // print the node
+            }
+        }
+
+    }
 }
