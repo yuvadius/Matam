@@ -27,9 +27,9 @@ void destroyList(Node ptr) {
     }
 }
 
-//deep copies a list into a newly created list
+//deep copies a list into a newly created list in the same order
 //param1 - Node list: the list to be copied
-//return: a list that is a deep copy of the parameter list
+//return: a list that is a deep copy of the parameter "list"
 Node listCopy(Node list) {
     if(list == NULL) { //if the list is empty the return an empty list(NULL)
         return NULL; //return an empty list
@@ -49,6 +49,48 @@ Node listCopy(Node list) {
 
         }
         return return_node; //return the new list
+    }
+}
+
+void pushNodeToTheEndOfList(Node lastNode, Node list) {
+    if(list == NULL) {
+        return;
+    }
+    Node tempNode = list;
+    while(tempNode->next != NULL) {
+        tempNode = tempNode->next;
+    }
+    tempNode->next = lastNode;
+}
+
+//deep copies a list into a newly created list in reversed order
+//param1 - Node list: the list to be copied
+//return: a list that is a reversed deep copy of the parameter "list"
+Node listCopyReversed(Node list) {
+    if(list == NULL) { //if the list is empty the return an empty list(NULL)
+        return NULL; //return an empty list
+    }
+    else if(list->next == NULL) {
+        Node lastNode = createNode(list->n);
+        if(lastNode == NULL) { //if memory allocation failed
+            destroyList(lastNode); //destroy new node
+            return NULL; //return an empty list
+        }
+        return lastNode;
+    }
+    else {
+        Node return_node = listCopyReversed(list->next);
+        if(return_node == NULL) { //memory allocation failed
+            return NULL; //return an empty list
+        }
+        Node lastNode = createNode(list->n);
+        if(lastNode == NULL) { //if memory allocation failed
+            destroyList(lastNode); //destroy new node
+            destroyList(return_node); //destroy all new nodes
+            return NULL; //return an empty list
+        }
+        pushNodeToTheEndOfList(lastNode, return_node);
+        return return_node;
     }
 }
 
@@ -84,7 +126,7 @@ int main()
     node5->n = 17;
     node5->next = NULL;
 
-    Node new_node= listCopy(node1); //testing.
+    Node new_node= listCopyReversed(node1); //testing.
     printNode(node1);
     printNode(new_node); //should print the same lists.
     return 0;
