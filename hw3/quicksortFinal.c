@@ -1,11 +1,15 @@
 #include <stdio.h>
 
 // A utility function to swap two elements
-static void swap(double *x, double *y, size_t l)
+static void swap(void *x, void *y, size_t l)
 {
-    double t = *x;
-    *x = *y;
-    *y = t;
+    char *a = x, *b = y, c;
+    while(l--)
+    {
+        c = *a;
+        *a++ = *b;
+        *b++ = c;
+    }
 }
 
 int cmpInt(void *a, void *b) {
@@ -76,14 +80,16 @@ void quickSort(void* arr, int low, int high, size_t size, int (*cmp)(void*,void*
 // Driver program to test above functions
 int main()
 {
-    double arr[] = {10.0f, 7.0f, 8.0f, 9.0f, 1.0f, 5.0f};
+    int arr[] = {10.0f, 7.0f, 8.0f, 9.0f, 1.0f, 5.0f};
     int n = sizeof(arr)/sizeof(arr[0]);
-    quickSort(arr, 0, n-1, sizeof(double), cmpDbl);
-    printf("%lf ", &arr[0]);
-    printf("%lf ", arr[1]);
-    printf("%lf ", arr[2]);
-    printf("%lf ", arr[3]);
-    printf("%lf ", arr[4]);
-    printf("%lf ", arr[5]);
+    quickSort(arr, 0, n-1, sizeof(int), cmpInt);
+    printf("%d ", arr[0]);
+    printf("%d ", arr[1]);
+    printf("%d ", arr[2]);
+    printf("%d ", arr[3]);
+    printf("%d ", arr[4]);
+    printf("%d ", arr[5]);
+
+	scanf("%d", &n);
     return 0;
 }
