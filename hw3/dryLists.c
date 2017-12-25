@@ -52,7 +52,7 @@ Node listCopy(Node list) {
     }
 }
 
-void pushNodeToTheEndOfList(Node lastNode, Node list) {
+void pushNodeToTheEndOfList(Node last_node, Node list) {
     if(list == NULL) {
         return;
     }
@@ -60,7 +60,7 @@ void pushNodeToTheEndOfList(Node lastNode, Node list) {
     while(tempNode->next != NULL) {
         tempNode = tempNode->next;
     }
-    tempNode->next = lastNode;
+    tempNode->next = last_node;
 }
 
 //deep copies a list into a newly created list in reversed order
@@ -71,25 +71,25 @@ Node listCopyReversed(Node list) {
         return NULL; //return an empty list
     }
     else if(list->next == NULL) {
-        Node lastNode = createNode(list->n);
-        if(lastNode == NULL) { //if memory allocation failed
-            destroyList(lastNode); //destroy new node
+        Node last_node = createNode(list->n);
+        if(last_node == NULL) { //if memory allocation failed
+            destroyList(last_node); //destroy new node
             return NULL; //return an empty list
         }
-        return lastNode;
+        return last_node;
     }
     else {
         Node return_node = listCopyReversed(list->next);
         if(return_node == NULL) { //memory allocation failed
             return NULL; //return an empty list
         }
-        Node lastNode = createNode(list->n);
-        if(lastNode == NULL) { //if memory allocation failed
-            destroyList(lastNode); //destroy new node
+        Node last_node = createNode(list->n);
+        if(last_node == NULL) { //if memory allocation failed
+            destroyList(last_node); //destroy new node
             destroyList(return_node); //destroy all new nodes
             return NULL; //return an empty list
         }
-        pushNodeToTheEndOfList(lastNode, return_node);
+        pushNodeToTheEndOfList(last_node, return_node);
         return return_node;
     }
 }
