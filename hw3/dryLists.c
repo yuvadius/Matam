@@ -55,15 +55,18 @@ Node listCopy(Node list) {
 //pushes the "lastNode", to the end of the "list"
 //param1 - Node lastNode: the node to be pushed to the end of "list"
 //param2 - Node list: the list that the "lastNode" will be pushed into
-void pushNodeToTheEndOfList(Node lastNode, Node list) {
-    if(list == NULL) { //if the list is empty exit the function
-        return;
+//return: the head of the new list with the last_node at the end of the list
+Node pushNodeToTheEndOfList(Node last_node, Node list) {
+    if(list == NULL) { //if the list is empty then return the "last_node"
+        return last_node;
     }
-    Node tempNode = list;
-    while(tempNode->next != NULL) { //loop until the end of the list
-        tempNode = tempNode->next; //iterate to the next element in the list
+    Node temp_node = list;
+    while(temp_node->next != NULL) { //loop until the end of the list
+        temp_node = temp_node->next; //iterate to the next element in the list
     }
-    tempNode->next = lastNode; //push the lastNode to the end of the list
+    //if last_node is NULL then the list will stay the same
+    temp_node->next = last_node; //push the lastNode to the end of the list
+    return list;
 }
 
 //deep copies a list into a newly created list in reversed order
@@ -75,27 +78,54 @@ Node listCopyReversed(Node list) {
     }
     else if(list->next == NULL) { //if the end of the original list was reached
         //make the last node in list the new first node in the list
-        Node lastNode = createNode(list->n);
-        if(lastNode == NULL) { //if memory allocation failed
-            destroyList(lastNode); //destroy new node
+        Node last_node = createNode(list->n);
+        if(last_node == NULL) { //if memory allocation failed
+            destroyList(last_node); //destroy new node
             return NULL; //return an empty list
         }
-        return lastNode; //return the head of the list
+        return last_node; //return the head of the list
     }
     else {
         Node return_node = listCopyReversed(list->next);
         if(return_node == NULL) { //memory allocation failed
             return NULL; //return an empty list
         }
-        Node lastNode = createNode(list->n);
-        if(lastNode == NULL) { //if memory allocation failed
-            destroyList(lastNode); //destroy new node
+        Node last_node = createNode(list->n);
+        if(last_node == NULL) { //if memory allocation failed
+            destroyList(last_node); //destroy new node
             destroyList(return_node); //destroy all new nodes
             return NULL; //return an empty list
         }
-        pushNodeToTheEndOfList(lastNode, return_node);
+        return_node = pushNodeToTheEndOfList(last_node, return_node);
         return return_node; //return the head of the list
     }
+}
+
+//summary: this function receives an array of lists and concatenates them
+//one after the other, while lists in even indexes in the array will be
+//concatenated in reversed order whill lists in odd indexes in the array will
+//be concatenated in regular order 
+//NOTE: the lists will be deep copied
+//param1 - Node array_of_lists[]: an array of lists(lists will be concatenated)
+//param2 - int n: size of the array "array_of_lists"
+//return: the new concatenated list
+Node listJoinAlternating(Node array_of_lists[], int n) {
+    Node return_list = NULL; //start with an empty list
+    for(int i = 0; i < n; ++i) { //loop over the array
+        if(i % 2 == 0) { //if i is even(odd if you start counting from 1)
+            //retrieve the reversed list "array_of_lists[i]"
+            Node temp_node = listCopyReversed(array_of_lists[i]);
+            //concatenate the list to the end
+            return_list = pushNodeToTheEndOfList(temp_node, return_list);
+        }
+        else {
+            //retrieve a copy of the list "array_of_lists[i]"
+            Node temp_node = listCopy(array_of_lists[i]);
+            //concatenate the list to the end
+            return_list = pushNodeToTheEndOfList(temp_node, return_list);
+        }
+    }
+    return return_list; //return the head of the list
 }
 
 void printNode(Node list)
@@ -119,19 +149,29 @@ int main()
     Node node3 = malloc(sizeof(*node3));
     Node node4 = malloc(sizeof(*node4));
     Node node5 = malloc(sizeof(*node5));
+    Node node6 = malloc(sizeof(*node3));
+    Node node7 = malloc(sizeof(*node4));
+    Node node8 = malloc(sizeof(*node5));
     node1->n = 1;
     node1->next = node2;
-    node2->n = 3;
-    node2->next = node3;
-    node3->n = 0;
+    node2->n = 2;
+    node2->next = NULL;
+    node3->n = 3;
     node3->next = node4;
-    node4->n = -2;
-    node4->next = node5;
-    node5->n = 17;
-    node5->next = NULL;
+    node4->n = 4;
+    node4->next = NULL;
+    node5->n = 5;
+    node5->next = node6;
+    node6->n = 6;
+    node6->next = NULL;
+    node7->n = 7;
+    node7->next = node8;
+    node8->n = 8;
+    node8->next = NULL;
+    Node arr[] = {node1, node3, node5, node7};
 
-    Node new_node= listCopyReversed(node1); //testing.
-    printNode(node1);
+    Node new_node= listJoinAlternating(arr, 4); //testing.
+    //printNode(node1);
     printNode(new_node); //should print the same lists.
     return 0;
 }
