@@ -6,14 +6,17 @@ typedef struct node_t* Node;
     Node next;
 };
 
+//suumary: dynamically allocate a new node and copy the data into it
+//param1 - int n: the data to be inserted into the new node
+//return: the new node
 Node createNode(int n) {
-    Node ptr = malloc(sizeof(*ptr));
-    if(!ptr) {
+    Node ptr = malloc(sizeof(*ptr)); //create node
+    if(!ptr) { //if the allocation failed then return NULL
         return NULL;
     }
-    ptr->n = n;
-    ptr->next = NULL;
-    return ptr;
+    ptr->n = n; //set the data of the new node
+    ptr->next = NULL; //set the next node to NULL for safety
+    return ptr; //return the new node
 }
 
 void destroyList(Node ptr) {
@@ -49,6 +52,18 @@ Node listCopy(Node list) {
     }
 }
 
+void printNode(Node list)
+{
+    if(list!=NULL) {
+        printf("The List: %d ",list->n); // print the first node
+        while(list->next!=NULL) { // while NOT the last node
+            list=list->next;  // moving to the next node
+            printf("%d ",list->n); // print the node
+        }
+    }
+
+}
+
 
 // Driver program to test above functions
 int main()
@@ -58,35 +73,19 @@ int main()
     Node node3 = malloc(sizeof(*node3));
     Node node4 = malloc(sizeof(*node4));
     Node node5 = malloc(sizeof(*node5));
-    node1->data = 1;
+    node1->n = 1;
     node1->next = node2;
-    node2->data = 3;
+    node2->n = 3;
     node2->next = node3;
-    node3->data = 0;
+    node3->n = 0;
     node3->next = node4;
-    node4->data = -2;
+    node4->n = -2;
     node4->next = node5;
-    node5->data = 17;
+    node5->n = 17;
     node5->next = NULL;
-    
-
-
 
     Node new_node= listCopy(node1); //testing.
-    printNode(node1); 
+    printNode(node1);
     printNode(new_node); //should print the same lists.
-
-
-
-    void printNode(Node list)
-    {
-        if(list!=NULL) {
-            printf("The List: %d",list->n); // print the first node
-            while(list->next!=NULL) { // while NOT the last node
-                list=list->next;  // moving to the next node
-                printf("%d ",list->n); // print the node
-            }
-        }
-
-    }
+    return 0;
 }
