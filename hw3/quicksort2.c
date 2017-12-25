@@ -41,22 +41,25 @@ static void sort(char *array, size_t size, int (*cmp)(void*,void*), int begin, i
     }
 }
 
-void qsort(void *array, size_t nitems, size_t size, int (*cmp)(void*,void*))
+void qsort2(void *array, size_t nitems, size_t size, int (*cmp)(void*,void*))
 {
     sort(array, size, cmp, 0, nitems*size);
 }
 
-typedef int type;
+typedef double type;
 
-int type_cmp(void *a, void *b){ return (*(type*)a)-(*(type*)b); }
+int type_cmp(void *a, void *b)
+{
+    return (*(type*)a)-(*(type*)b);
+}
 
 int main(void)
 { /* simple test case for type=int */
-    int num_list[]={5,4,3,2,1};
+    double num_list[]={5,4.4,3,2,1};
     int len=sizeof(num_list)/sizeof(type);
     char *sep="";
     int i;
-    qsort(num_list,len,sizeof(type),type_cmp);
+    qsort2(num_list,len,sizeof(type),type_cmp);
     printf("sorted_num_list={");
     for(i=0; i<len; i++){
         printf("%s%d",sep,num_list[i]);

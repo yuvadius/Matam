@@ -1,10 +1,9 @@
-/* C implementation QuickSort */
 #include<stdio.h>
 
 // A utility function to swap two elements
-void swap(int* a, int* b)
+void swap(void** a, void** b)
 {
-    int t = *a;
+    void* t = *a;
     *a = *b;
     *b = t;
 }
@@ -14,9 +13,9 @@ void swap(int* a, int* b)
     array, and places all smaller (smaller than pivot)
    to left of pivot and all greater elements to right
    of pivot */
-int partition (int arr[], int low, int high)
+int partition (void** arr, int low, int high)
 {
-    int pivot = arr[high];    // pivot
+    void *pivot = arr[high];    // pivot
     int i = (low - 1);  // Index of smaller element
 
     for (int j = low; j <= high- 1; j++)
@@ -37,7 +36,7 @@ int partition (int arr[], int low, int high)
  arr[] --> Array to be sorted,
   low  --> Starting index,
   high  --> Ending index */
-void quickSort(int arr[], int low, int high)
+void quickSort(void** arr, int low, int high)
 {
     if (low < high)
     {
