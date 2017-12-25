@@ -12,27 +12,40 @@ Node createNode(int n) {
         return NULL;
     }
     ptr->n = n;
+    ptr->next = NULL;
     return ptr;
 }
 
+void destroyList(Node ptr) {
+    while(ptr) {
+        Node toDelete = ptr;
+        ptr = ptr->next;
+        free(toDelete);
+    }
+}
+
+//deep copies a list into a newly created list
+//param1 - Node list: the list to be copied
+//return: a list that is a deep copy of the parameter list
 Node listCopy(Node list) {
-    if(list == NULL) {
-        return NULL;
+    if(list == NULL) { //if the list is empty the return an empty list(NULL)
+        return NULL; //return an empty list
     }
     else {
-        Node returnNode = malloc(sizeof(*node));
-        returnNode->n = list->n;
-        returnNode->next = NULL;
-        Node nextNewNode = returnNode;
-        Node nextOldNode = list;
-        while(nextOldNode->next != NULL) {
-            nextNewNode->next = malloc(sizeof(*node));
-            nextNewNode = nextNewNode->next;
-            nextOldNode = nextOldNode->next;
-            nextNewNode->n = nextOldNode->n;
+        Node return_node = createNode(list->n); //the head of the list
+        Node next_new_node = return_node; //iterator for the new nodes
+        Node next_old_node = list; //the iterator for the old nodes
+        while(next_old_node->next != NULL) { //if end of the list was reached
+            next_old_node = next_old_node->next; //go to next node
+            next_new_node->next = createNode(next_old_node->n); //copy old node
+            if(next_new_node->next == NULL) { //if memory allocation failed
+                destroyList(return_node); //destroy all new nodes
+                return NULL; //return an empty list
+            }
+            next_new_node = next_new_node->next; //go to next node
 
         }
-        return returnNode;
+        return return_node; //return the new list
     }
 }
 
