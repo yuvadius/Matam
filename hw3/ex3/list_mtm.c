@@ -36,7 +36,7 @@ struct List_t {
  * A new List in case of success.
  */
 List listCreate(CopyListElement copyElement, FreeListElement freeElement) {
-	if (!copyFunction || !freeFunction) { //if one of the parameters is NULL
+	if (!copyElement || !freeElement) { //if one of the parameters is NULL
 		return NULL;
 	}
 	List list = malloc(sizeof(*list)); //create a new List
@@ -47,4 +47,27 @@ List listCreate(CopyListElement copyElement, FreeListElement freeElement) {
 	list->copyElement = copyElement;
 	list->freeElement = freeElement;
 	return stack;
+}
+
+/**
+ * Creates a copy of target list.
+ *
+ * The new copy will contain all the elements from the source list in the same
+ * order and will use the same functions as the original list for copying and
+ * freeing elements.
+ *
+ * The iterator of the new list should point to the same element that the
+ * original iterator is pointing to in the original list.
+ *
+ * @param list The target list to copy
+ * @return
+ * NULL if a NULL was sent or a memory allocation failed.
+ * A List containing the same elements with same order as list otherwise.
+ */
+List listCopy(List list) {
+	//if a NULL was sent then return a NULL
+	if(list == NULL) {
+		return NULL;
+	}
+	
 }
