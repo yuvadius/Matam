@@ -275,21 +275,20 @@ ListResult listClear(List list) {
 	if(list==NULL)
 		return LIST_NULL_ARGUMENT;
 	listGetFirst(list); //moves the iterator to the first element.
-	iterator_next = listGetNext(list); // iterator points to the second element.
+	iterator_next = listGetNext(list); // iterator moves to the second element.
 	listGetFirst(list); //moves the iterator to the first element.
 	while(iterator_next!=NULL) {
 		listRemoveCurrent(list); // First element removed. iterator=NULL.
-		list->iterator = iterator_next; // The iterator points to the first 
+		list->iterator = iterator_next; // The iterator moves to the first 
 										// element.
-		iterator_next= listGetNext(list); // iterator points to the second 
+		iterator_next= listGetNext(list); // iterator moves to the second 
 										  // element.
 		listGetFirst(list); //moves the iterator to the first element.
 	}
 	listRemoveCurrent(list); // first(and last) element removed. iterator=NULL.
 	return LIST_SUCCESS; // empty list. Iterator=NULL.
-
-
 	}
+
 
 
 /**
@@ -347,3 +346,31 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
 
 }
 
+
+
+/**
+ * Returns the number of elements in a list
+ *
+ * The iterator should not change.
+ *
+ * @param list The target list which size is requested.
+ * @return
+ * -1 if a NULL pointer was sent.
+ * Otherwise the number of elements in the list.
+ */
+int listGetSize(List list) {
+	if(list==NULL)
+		return -1; // if the list is NULL we`ll return -1.
+	Node original_iterator = list->iterator; // saving the original iterator.
+	int count=0; // counting from 0.
+	LIST_FOREACH(ListElement,element_data,list) { 
+		if(list->iterator!== NULL) // if iterator ISN`T the last Node.
+			++count; // increment the count var.
+		else { // else iterator IS the last Node
+			break; // then break the LIST_FOREACH loop.
+		}
+	}
+	list->iterator=original_iterator; // currently iterator points to NULL.
+	// So we give it the original value back.
+	return count;
+}
