@@ -165,10 +165,23 @@ List listCopy(List list) {
  * LIST_INVALID_CURRENT if the current pointer of the list points to NULL
  * LIST_SUCCESS the current element was removed successfully
  */
-ListResult listRemoveCurrent(List list) {
-	if(list==NULL)
+ListResult listRemoveCurrent(List list) { //The iterator points to the element
+	if(list==NULL)                        // we would like to remove.
 		return LIST_NULL_ARGUMENT;
-	if()
+	if(listGetCurrent==NULL)
+		return LIST_INVALID_CURRENT;
+	listElement remove_element=listGetCurrent(list); //this is the element 
+							//pointed by the iterator that we want to remove.
+							//the iterator DOESNT CHANGE
+	listElement first_element=listGetFirst(list); //this is the first element.
+							//The iterator CHANGES. Now it points to the first
+							//element of the list.  
+	if(first_element==NULL) {
+		return LIST_NULL_ARGUMENT; // in case that listGetFirst failed
+	}
+	listElement current_element = first_element; // current_element will inc.
+	while(current_element != remove_element) //stops 
+
 
 }
 
