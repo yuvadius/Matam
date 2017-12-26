@@ -2,6 +2,34 @@
 #include <assert.h>
 #include "list_mtm.h"
 
+/**
+ * Creates a Node.
+ *
+ * The new node will contain the "data" and the "next" given as parameters
+ *
+ * @param data The target data to copy into the new node
+ * @param next The target next to copy into the new node 
+ * @return
+ * NULL if data is NULL or a memory allocation failed.
+ * otherwise return the new node
+ */
+static Node CreateNode(ListElement data, Node next) {
+	//if the data is NULL the retrun NULL
+	if(data == NULL) {
+		return NULL;
+	}
+	Node node = malloc(sizeof(*node)); //create a new node
+	//if there was a memory allocation error then return NULL
+	if(node == NULL) {
+		return NULL;
+	}
+	//set the node's data to the parameter "data"
+	node->data = data;
+	//set the node's next to the parameter "next"
+	node->next = next;
+	return node; //return the new node
+}
+
 /** The List is implemented as a List of Elements.
 * With iterator as an index to the current Element or NULL
 */
@@ -344,6 +372,18 @@ ListResult listInsertLast(List list, ListElement element) {
  * LIST_SUCCESS the element has been inserted successfully
  */
 ListResult listInsertAfterCurrent(List list, ListElement element) {
+	//if a NULL was sent as list or element return LIST_NULL_ARGUMENT
+	if(list == NULL || element == NULL) {
+		return LIST_NULL_ARGUMENT;
+	}
+	//if the list's iterator points to NULL then return LIST_INVALID_CURRENT
+	if(listGetCurrent(list) == NULL) {
+		return LIST_INVALID_CURRENT;
+	}
+	//if the iterator is at the end of the list insert the element at the end
+	if(list->iterator->next == NULL) {
+		return listInsertLast(list, element);
+	}
 
 }
 
