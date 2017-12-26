@@ -289,6 +289,9 @@ ListResult listInsertLast(List list, ListElement element) {
 			return result;
 		}
 	}
+	//if we reached this place then the list is empty
+	//insert the element to the start of list(same as end because list is empty)
+	return listInsertFirst(list, element);
 }
 
 /**
