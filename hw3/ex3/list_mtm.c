@@ -383,6 +383,13 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
 	if(list->iterator->next == NULL) {
 		return listInsertLast(list, element);
 	}
-
+	Node node = CreateNode(element, list->iterator->next, list);
+	//if there was a memory allocation error then return LIST_OUT_OF_MEMORY
+	if(node == NULL) {
+		return LIST_OUT_OF_MEMORY;
+	}
+	//insert the node to the list after the current node
+	list->iterator->next = node;
+	return LIST_SUCCESS;
 }
 
