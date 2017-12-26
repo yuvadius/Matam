@@ -15,7 +15,7 @@
  * NULL if data is NULL or list is NULL or a memory allocation failed.
  * otherwise return the new node
  */
-static Node CreateNode(ListElement data, Node next, List list) {
+static Node createNode(ListElement data, Node next, List list) {
 	//if the data is NULL the retrun NULL
 	if(data == NULL || list == NULL) {
 		return NULL;
@@ -116,15 +116,26 @@ List listCopy(List list) {
 	}
 	//create a copy of the list with its copyElement/freeElement functions
 	List list_copy = listCreate(list->copyElement, list->freeElement);
-	//if there was a memory allcation failure then return NULL
+	//if there was a memory allocation failure then return NULL
 	if(list_copy == NULL) {
 		return NULL;
 	}
-	ListElement last_list_element = listGetCurrent(list);
+	Node original_iterator = list->iterator;
 	LIST_FOREACH(ListElement, element, list) {
-		printf("%s\\n", str);
+		//insert the current node in list to be the last node in list_copy
+		ListResult result = listInsertLast(list_copy, element);
+		assert(result == LIST_NULL_ARGUMENT);//should never happen
+		//if there was a memory allocation failure
+		if(result == LIST_OUT_OF_MEMORY) {
+			//reset the iterator to its original value
+			list->iterator = original_iterator;
+			listDestroy(listCopy);
+			return NULL;
+		}
 	}
-	return NULL;
+	//reset the iterator to its original value
+	list->iterator = original_iterator;
+	return list_copy;
 }
 
 /**
@@ -276,7 +287,7 @@ ListResult listInsertFirst(List list, ListElement element) {
 	if(list == NULL || element == NULL) {
 		return LIST_NULL_ARGUMENT;
 	}
-	Node first_node = CreateNode(element, list->head, list); //create Node
+	Node first_node = createNode(element, list->head, list); //create Node
 	//if there was a memory allocation error then return LIST_OUT_OF_MEMORY
 	if(first_node == NULL) {
 		return LIST_OUT_OF_MEMORY;
@@ -383,7 +394,7 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
 	if(list->iterator->next == NULL) {
 		return listInsertLast(list, element);
 	}
-	Node node = CreateNode(element, list->iterator->next, list);
+	Node node = createNode(element, list->iterator->next, list);
 	//if there was a memory allocation error then return LIST_OUT_OF_MEMORY
 	if(node == NULL) {
 		return LIST_OUT_OF_MEMORY;
@@ -426,7 +437,7 @@ ListResult listInsertBeforeCurrent(List list, ListElement element) {
 	LIST_FOREACH(ListElement, list_element, list) {
 		//the LIST_FOREACH ensures that the list->iterator != NULL
 		if(list->iterator->next == original_iterator) {
-			Node node = CreateNode(element, original_iterator, list);
+			Node node = createNode(element, original_iterator, list);
 			if(node == NULL) { //if there was a memory allocation error
 				//reset the iterator to its original value
 				list->iterator = original_iterator;
