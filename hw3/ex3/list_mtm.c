@@ -86,3 +86,85 @@ List listCopy(List list) {
 	//ListElement lastListElement = listGetCurrent(list);
 	return NULL;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Removes the currently pointed element of the list using the stored freeing
+ * function
+ *
+ * The iterator should be set to NULL.
+ *
+ * @param list The list for which the current element will be removed
+ * @return
+ * LIST_NULL_ARGUMENT if list is NULL
+ * LIST_INVALID_CURRENT if the current pointer of the list points to NULL
+ * LIST_SUCCESS the current element was removed successfully
+ */
+ListResult listRemoveCurrent(List list) {
+	if(list==NULL)
+		return LIST_NULL_ARGUMENT;
+	if()
+
+}
