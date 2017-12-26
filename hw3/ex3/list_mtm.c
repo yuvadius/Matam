@@ -5,8 +5,13 @@
 /** The List is implemented as a List of Elements.
 * With iterator as an index to the current Element or NULL
 */
+typedef struct node {
+	ListElement data;
+	struct node* next;
+} *Node;
 struct List_t {
-	ListElement iterator;
+	Node head;
+	Node iterator;
 	CopyListElement copyElement;
 	FreeListElement freeElement;
 };
@@ -45,6 +50,7 @@ List listCreate(CopyListElement copyElement, FreeListElement freeElement) {
 	if (list == NULL) { //if memory allocation failed
 		return NULL;
 	}
+	list->head = NULL;
 	list->iterator = NULL;
 	list->copyElement = copyElement;
 	list->freeElement = freeElement;
@@ -71,5 +77,12 @@ List listCopy(List list) {
 	if(list == NULL) {
 		return NULL;
 	}
+	//create a copy of the list with its copyElement/freeElement functions
+	List listCopy = listCreate(list->copyElement, list->freeElement);
+	//if there was a memory allcation failure then return a NULL
+	if(listCopy == NULL) {
+		return NULL;
+	}
+	//ListElement lastListElement = listGetCurrent(list);
 	return NULL;
 }
