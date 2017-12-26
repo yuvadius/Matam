@@ -78,13 +78,13 @@ List listCopy(List list) {
 		return NULL;
 	}
 	//create a copy of the list with its copyElement/freeElement functions
-	List listCopy = listCreate(list->copyElement, list->freeElement);
+	List list_copy = listCreate(list->copyElement, list->freeElement);
 	//if there was a memory allcation failure then return NULL
-	if(listCopy == NULL) {
+	if(list_copy == NULL) {
 		return NULL;
 	}
-	ListElement lastListElement = listGetCurrent(list);
-	LIST_FOREACH(ListElement, element, list) {
+	ListElement last_list_element = listGetCurrent(list);
+	LIST_FOREACH(last_list_element, element, list) {
 		printf("%s\\n", str);
 	}
 	return NULL;
@@ -200,4 +200,43 @@ ListElement listGetNext(List list) {
 
 	//will return the current Element in the list
 	return listGetCurrent(list);
+}
+
+/**
+ * Adds a new element to the list, the new element will be the first element.
+ *
+ * The iterator should not change.
+ *
+ * @param list The list for which to add an element in its start
+ * @param element The element to insert. A copy of the element will be
+ * inserted as supplied by the copying function which is stored in the list
+ * @return
+ * LIST_NULL_ARGUMENT if a NULL was sent as list or element
+ * LIST_OUT_OF_MEMORY if an allocation failed (Meaning the function for copying
+ * an element failed)
+ * LIST_SUCCESS the element has been inserted successfully
+ */
+ListResult listInsertFirst(List list, ListElement element) {
+	//if a NULL was sent as list or element return LIST_NULL_ARGUMENT
+	if(list == NULL || element == NULL) {
+		return LIST_NULL_ARGUMENT;
+	}
+	//make a copy of the "element" using the list's copy function
+	ListElement new_element = list->copyElement(element);
+	//if there was a memory error in the copy function return LIST_OUT_OF_MEMORY
+	if(new_element == NULL) {
+		return LIST_OUT_OF_MEMORY;
+	}
+	Node first_node = malloc(sizeof(*first_node)); //create a new Node
+	//if there was a memory allocation error then return LIST_OUT_OF_MEMORY
+	if(first_node == NULL) {
+		return LIST_OUT_OF_MEMORY;
+	}
+	//set the node's data to the new_element
+	first_node->data = new_element;
+	//set the node's next to the current first element in the list
+	first_node->next = list->head;
+	//insert the first node to the start of the list
+	list->head = first_node;
+	return LIST_SUCCESS;
 }
