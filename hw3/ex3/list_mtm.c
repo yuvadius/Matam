@@ -8,19 +8,28 @@
  * The new node will contain the "data" and the "next" given as parameters
  *
  * @param data The target data to copy into the new node
+ * a copy of data(using list->copyElement) will be copied into the new node
  * @param next The target next to copy into the new node 
+ * @param list The list's copy function will be used to create a copy of "data"
  * @return
- * NULL if data is NULL or a memory allocation failed.
+ * NULL if data is NULL or list is NULL or a memory allocation failed.
  * otherwise return the new node
  */
-static Node CreateNode(ListElement data, Node next) {
+static Node CreateNode(ListElement data, Node next, List list) {
 	//if the data is NULL the retrun NULL
-	if(data == NULL) {
+	if(data == NULL || list == NULL) {
 		return NULL;
 	}
 	Node node = malloc(sizeof(*node)); //create a new node
 	//if there was a memory allocation error then return NULL
 	if(node == NULL) {
+		return NULL;
+	}
+	//make a copy of the "element" using the list's copy function
+	ListElement new_element = list->copyElement(element);
+	//if there was a memory error in the copy function then return NULL
+	if(new_element == NULL) {
+		free(node); //free the previously allocated node
 		return NULL;
 	}
 	//set the node's data to the parameter "data"
@@ -267,21 +276,11 @@ ListResult listInsertFirst(List list, ListElement element) {
 	if(list == NULL || element == NULL) {
 		return LIST_NULL_ARGUMENT;
 	}
-	//make a copy of the "element" using the list's copy function
-	ListElement new_element = list->copyElement(element);
-	//if there was a memory error in the copy function return LIST_OUT_OF_MEMORY
-	if(new_element == NULL) {
-		return LIST_OUT_OF_MEMORY;
-	}
-	Node first_node = malloc(sizeof(*first_node)); //create a new Node
+	Node first_node = CreateNode(element, list->head, list); //create Node
 	//if there was a memory allocation error then return LIST_OUT_OF_MEMORY
 	if(first_node == NULL) {
 		return LIST_OUT_OF_MEMORY;
 	}
-	//set the node's data to the new_element
-	first_node->data = new_element;
-	//set the node's next to the current first element in the list
-	first_node->next = list->head;
 	//insert the first node to the start of the list
 	list->head = first_node;
 	return LIST_SUCCESS;
