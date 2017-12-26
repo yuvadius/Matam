@@ -151,28 +151,36 @@ List listCopy(List list) {
  * LIST_SUCCESS the current element was removed successfully
  */
 ListResult listRemoveCurrent(List list) { //The iterator points to the element
-	if(list==NULL)                        // we would like to remove.
+	if(list==NULL)                       // we would like to remove.
 		return LIST_NULL_ARGUMENT;
-	if(listGetCurrent==NULL)
+	if(listGetCurrent(list)==NULL)
 		return LIST_INVALID_CURRENT;
-	listElement remove_element=listGetCurrent(list); //this is the element 
-							//pointed by the iterator that we want to remove.
-							//the iterator DOESNT CHANGE
-	listElement after_removed_element = listGetNext(list);
-	if(after_removed_element==NULL) //TO TAKE CARE OF.
-	listElement first_element=listGetFirst(list); //this is the first element.
-							//The iterator CHANGES. Now it points to the first
-							//element of the list.  
-	if(first_element==NULL) {
-		return LIST_NULL_ARGUMENT; // in case that listGetFirst failed
+	Node remove_iterator = list->iterator; // the iterator of the element we
+										  // are willing to remove from the list
+	if(list->head == remove_iterator || remove_iterator->next == NULL) { 
+										 // if the element we are willing to 
+										// remove is the first\last element of  
+									   // the list.
+		freeElement(remove_iterator->data); // the element is freed.
+		list->iterator=NULL; 
+		return LIST_SUCCESS; //GREAT SUCCESS! 👍
 	}
-	listElement current_element = first_element; // current_element will inc.
-	LIST_FOREACH(listElement, current_element ,list) {
-		if(current_element->next==)
+
+	list->iterator = list->head; // the iterator is the first element of 
+								// the list.
+
+	LIST_FOREACH(ListElement,element,list) {
+		if(list->iterator->next==remove_iterator) { // if the next element
+										// is the one we are willing to remove
+			list->iterator->next = remove_iterator->next; // then the next
+			// element of the iterator is the element after the element we are
+			// removing. It shouldn`t be NULL.
+			freeElement(remove_iterator->data); // the element is freed.
+			list->iterator = NULL;
+			return LIST_SUCCESS; //GREAT SUCCESS! 👍
+		}
 	}
-	
-
-
+	// Shouldn`t get here because the element we are removing isn`t the last one
 }
 
 /**
