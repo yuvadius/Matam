@@ -258,3 +258,50 @@ ListResult listInsertFirst(List list, ListElement element) {
 	list->head = first_node;
 	return LIST_SUCCESS;
 }
+
+
+
+
+
+
+
+
+
+
+/**
+ * Removes all elements from target list.
+ * The elements are deallocated using the stored freeing function.
+ *
+ * The iterator should be set to NULL.
+ *
+ * @param list Target list to remove all element from
+ * @return
+ * LIST_NULL_ARGUMENT - if a NULL pointer was sent.
+ * LIST_SUCCESS - Otherwise.
+ */
+ListResult listClear(List list) {
+	if(list==NULL)
+		return LIST_NULL_ARGUMENT;
+	listGetFirst(list); //moves the iterator to the first element.
+	iterator_next = listGetNext(list); // iterator points to the second element.
+	listGetFirst(list); //moves the iterator to the first element.
+	while(iterator_next!=NULL) {
+		listRemoveCurrent(list); // First element removed. iterator=NULL.
+		list->iterator = iterator_next; // The iterator points to the first 
+										// element.
+		iterator_next= listGetNext(list); // iterator points to the second 
+										  // element.
+		listGetFirst(list); //moves the iterator to the first element.
+	}
+	listRemoveCurrent(list); // first(and last) element removed. iterator=NULL.
+	return LIST_SUCCESS; // empty list. Iterator=NULL.
+
+
+	}
+
+		
+
+
+
+return LIST_SUCCESS
+}
