@@ -393,3 +393,51 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
 	return LIST_SUCCESS;
 }
 
+/**
+ * Adds a new element to the list, the new element will be place right before
+ * the current element (as pointed by the inner iterator of the list)
+ *
+ * The iterator should not change.
+ *
+ * @param list The list for which to add an element before its current element
+ * @param element The element to insert. A copy of the element will be
+ * inserted as supplied by the copying function which is stored in the list
+ * @return
+ * LIST_NULL_ARGUMENT if a NULL was sent as list or element
+ * LIST_INVALID_CURRENT if the list's iterator points to NULL
+ * LIST_OUT_OF_MEMORY if an allocation failed (Meaning the function for copying
+ * an element failed)
+ * LIST_SUCCESS the element has been inserted successfully
+ */
+ListResult listInsertBeforeCurrent(List list, ListElement element) {
+	//if a NULL was sent as list or element return LIST_NULL_ARGUMENT
+	if(list == NULL || element == NULL) {
+		return LIST_NULL_ARGUMENT;
+	}
+	//if the list's iterator points to NULL then return LIST_INVALID_CURRENT
+	if(listGetCurrent(list) == NULL) {
+		return LIST_INVALID_CURRENT;
+	}
+	//if the current node equals to head node insert to the start of the list
+	if(list->iterator == list->head) {
+		return listInsertFirst(list, element);
+	}
+	Node original_iterator = list->iterator; //save the iterator location
+	LIST_FOREACH(ListElement, list_element, list) {
+		//the LIST_FOREACH ensures that the list->iterator != NULL
+		if(list->iterator->next == original_iterator) {
+			Node node = CreateNode(element, original_iterator, list);
+			if(node == NULL) { //if there was a memory allocation error
+				//reset the iterator to its original value
+				list->iterator = original_iterator;
+				return LIST_OUT_OF_MEMORY;
+			}
+			//insert the node to the list after the current node
+			list->iterator->next = node;
+			break;
+		}
+	}
+	//reset the iterator to its original value
+	list->iterator = original_iterator;
+	return LIST_SUCCESS;
+}
