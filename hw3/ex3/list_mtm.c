@@ -110,6 +110,8 @@ ListResult listRemoveCurrent(List list) { //The iterator points to the element
 	listElement remove_element=listGetCurrent(list); //this is the element 
 							//pointed by the iterator that we want to remove.
 							//the iterator DOESNT CHANGE
+	listElement after_removed_element = listGetNext(list);
+	if(after_removed_element==NULL) //TO TAKE CARE OF.
 	listElement first_element=listGetFirst(list); //this is the first element.
 							//The iterator CHANGES. Now it points to the first
 							//element of the list.  
@@ -117,7 +119,10 @@ ListResult listRemoveCurrent(List list) { //The iterator points to the element
 		return LIST_NULL_ARGUMENT; // in case that listGetFirst failed
 	}
 	listElement current_element = first_element; // current_element will inc.
-	while(current_element != remove_element) //stops 
+	LIST_FOREACH(listElement, current_element ,list) {
+		if(current_element->next==)
+	}
+	
 
 
 }
