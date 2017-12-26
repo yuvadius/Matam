@@ -159,7 +159,7 @@ ListResult listRemoveCurrent(List list) { //The iterator points to the element
 										  // are willing to remove from the list
 	if(list->head == remove_iterator || remove_iterator->next == NULL) { 
 										 // if the element we are willing to 
-										// remove is the first\last element of  
+										// remove is the first\last element of
 									   // the list.
 		freeElement(remove_iterator->data); // the element is freed.
 		list->iterator=NULL; 
@@ -334,6 +334,22 @@ ListResult listClear(List list) {
 	listRemoveCurrent(list); // first(and last) element removed. iterator=NULL.
 	return LIST_SUCCESS; // empty list. Iterator=NULL.
 	}
+
+
+	/**
+ * Deallocates an existing list. Clears all elements by using the stored free
+ * function.
+ *
+ * @param list Target list to be deallocated. If list is NULL nothing will be
+ * done
+ */
+void listDestroy(List list) {
+	if(list!=NULL) {
+		if(listClear(list)==LIST_SUCCESS) {
+			free(*list);
+		}
+	}
+}
 
 
 
