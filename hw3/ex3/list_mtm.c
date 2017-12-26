@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <assert.h>
 #include "list_mtm.h"
 
 /** The List is implemented as a List of Elements.
@@ -46,7 +48,7 @@ List listCreate(CopyListElement copyElement, FreeListElement freeElement) {
 	list->iterator = NULL;
 	list->copyElement = copyElement;
 	list->freeElement = freeElement;
-	return stack;
+	return list;
 }
 
 /**
@@ -69,5 +71,5 @@ List listCopy(List list) {
 	if(list == NULL) {
 		return NULL;
 	}
-	
+	return NULL;
 }
