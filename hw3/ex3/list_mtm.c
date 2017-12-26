@@ -16,7 +16,7 @@
  * otherwise return the new node
  */
 static Node createNode(ListElement data, Node next, List list) {
-	//if the data is NULL the retrun NULL
+	//if the data is NULL the return NULL
 	if(data == NULL || list == NULL) {
 		return NULL;
 	}
@@ -120,6 +120,7 @@ List listCopy(List list) {
 	if(list_copy == NULL) {
 		return NULL;
 	}
+	int counter = 0; //the number of times the foreach was executed
 	Node original_iterator = list->iterator;
 	LIST_FOREACH(ListElement, element, list) {
 		//insert the current node in list to be the last node in list_copy
@@ -132,6 +133,20 @@ List listCopy(List list) {
 			listDestroy(listCopy);
 			return NULL;
 		}
+		//if the original iterator location was reached in list
+		if(list->iterator == original_iterator) {
+			//The iterator of the new list will point to the same element 
+			//that the original iterator is pointing to in the original list
+			int temp_counter = counter;
+			LIST_FOREACH(ListElement, list_copy_element, list_copy) {
+				//if the appropriate iterator was reached, break
+				if(temp_counter == 0) {
+					break;
+				}
+				--temp_counter;
+			}
+		}
+		++counter;
 	}
 	//reset the iterator to its original value
 	list->iterator = original_iterator;
@@ -488,4 +503,65 @@ ListResult listInsertBeforeCurrent(List list, ListElement element) {
 	list->iterator = original_iterator;
 	return LIST_SUCCESS;
 
+}
+
+/**
+ * Creates a new filtered copy of a list.
+ *
+ * This creates a new list with only the elements for which the filtering
+ * function returned true.
+ *
+ * For example, the following code creates a new list, given a list of strings
+ * containing only the strings which are longer than 10 characters.
+ * @code
+ *
+ * bool isLongerThan(ListElement string, ListFilterKey key) {
+ *   return strlen(string) > *(int*)key;
+ * }
+ *
+ * List createFilteredList(List listOfStrings) {
+ *   int key = 10;
+ *   return listFilter(listOfStrings, isLongerThan, &key);
+ * }
+ * @endcode
+ *
+ * The iterator of the new list should point to NULL. The iterator of the
+ * source list should not change.
+ *
+ * @param list The list for which a filtered copy will be made
+ * @param filterElement The function used for determining whether a given
+ * element should be in the resulting list or not.
+ * @param key Any extra values that need to be sent to the filtering function
+ * when called
+ * @return
+ * NULL if list or filterElement are NULL or a memory allocation failed.
+ * A List containing only elements from list which filterElement returned true
+ * for.
+ */
+List listFilter(List list, FilterListElement filterElement, ListFilterKey key) {
+	//if a NULL was sent as list or filterElement return NULL
+	if(list == NULL || filterElement == NULL) {
+		return NULL;
+	}
+	List new_list = listCopy(list); //copy the list into new_list
+	//if there was a memory allocation failure then return NULL
+	if(new_list == NULL) {
+		return NULL;
+	}
+	//remove all elements that don't pass the filter test in the new_list
+	bool removed_element = false; //bool to check if an element was removed
+	do {
+		removed_element = false;
+		//loop over all elements in the new_list
+		LIST_FOREACH(ListElement, element, new_list) {
+			//if the element didn't pass the filter test then remove the element
+			if(filterElement(element, key) == false) {
+				ListResult result = listRemoveCurrent(new_list);//remove element
+				assert(result != LIST_SUCCESS); //this shouldn't happen
+				removed_element = true; //an element was removed
+				break; //restart iteration of the new_list
+			}
+		}
+	} while(removed_element == true);
+	return new_list;
 }
