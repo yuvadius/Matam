@@ -90,69 +90,6 @@ List listCopy(List list) {
 	return NULL;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Removes the currently pointed element of the list using the stored freeing
  * function
@@ -232,5 +169,35 @@ ListElement listGetFirst(List list) {
 
 	//if the list is empty then this will return NULL;
 	//else this will return the current Element, which is the first Element
+	return listGetCurrent(list);
+}
+
+/**
+ * Advances the list's iterator to the next element and returns it. If the
+ * iterator points to the last element, the iterator should be set to NULL and
+ * returned.
+ *
+ * Note: the element which is stored in the list is returned, not a copy.
+ *
+ * @param list The list for which to advance the iterator
+ * @return
+ * NULL if reached the end of the list, the iterator points to NULL or a NULL
+ * sent as argument
+ * The next element on the list in case of success
+ */
+ListElement listGetNext(List list) {
+	//if a NULL was sent then return NULL
+	if(list == NULL) {
+		return NULL;
+	}
+	//if the iterator points to NULL then return NULL
+	if(list->iterator == NULL) {
+		return NULL;
+	}
+	//set the list iterator to the next Node
+	//if the iterator points to the last element then the iterator will be NULL
+	list->iterator = list->iterator->next;
+
+	//will return the current Element in the list
 	return listGetCurrent(list);
 }
