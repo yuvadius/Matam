@@ -73,16 +73,44 @@ List listCreate(CopyListElement copyElement, FreeListElement freeElement) {
  * A List containing the same elements with same order as list otherwise.
  */
 List listCopy(List list) {
-	//if a NULL was sent then return a NULL
+	//if a NULL was sent then return NULL
 	if(list == NULL) {
 		return NULL;
 	}
 	//create a copy of the list with its copyElement/freeElement functions
 	List listCopy = listCreate(list->copyElement, list->freeElement);
-	//if there was a memory allcation failure then return a NULL
+	//if there was a memory allcation failure then return NULL
 	if(listCopy == NULL) {
 		return NULL;
 	}
-	//ListElement lastListElement = listGetCurrent(list);
+	ListElement lastListElement = listGetCurrent(list);
+	LIST_FOREACH(char*, str, listOfStrings) {
+		printf("%s\\n", str);
+	}
 	return NULL;
+}
+
+/**
+ * Returns the current element (pointed by the iterator).
+ *
+ * Note: the element which is stored in the list is returned, not a copy.
+ *
+ * The iterator should not change.
+ *
+ * @param list The list for which to get the iterator
+ * @return
+ * NULL if the iterator points to NULL or a NULL sent as argument
+ * The current element on the list in case of success
+ */
+ListElement listGetCurrent(List list) {
+	//if a NULL was sent then return NULL
+	if(list == NULL) {
+		return NULL;
+	}
+	//if the iterator points to NULL then return NULL
+	if(list->iterator == NULL) {
+		return NULL;
+	}
+	//return the current element on the list
+	return list->iterator->data;
 }
