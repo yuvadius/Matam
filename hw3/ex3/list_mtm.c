@@ -84,7 +84,7 @@ List listCopy(List list) {
 		return NULL;
 	}
 	ListElement lastListElement = listGetCurrent(list);
-	LIST_FOREACH(char*, str, listOfStrings) {
+	LIST_FOREACH(ListElement, element, list) {
 		printf("%s\\n", str);
 	}
 	return NULL;
@@ -195,4 +195,42 @@ ListElement listGetCurrent(List list) {
 	}
 	//return the current element on the list
 	return list->iterator->data;
+}
+
+/**
+ * Sets the internal iterator to the first element and retrieves it.
+ *
+ * The list has an internal iterator (also called current element) to allow
+ * iteration over the list's elements. This function sets the iterator to point
+ * to the first element in the list and return it.
+ * Use this to start iteraing over the list, searching from the beginning of
+ * the list and/or get the first element in the list.
+ * (To continue iteration use listGetNext)
+ * @code
+ * void f(List list) {
+ *   ListElement first = listGetFirst(list);
+ *   printf("The first element is at address %x\n", first);
+ * }
+ * @endcode
+ *
+ * Note: the element which is stored in the list is returned, not a copy.
+ *
+ * @param list The list for which to set the iterator and return the first
+ * element.
+ * @return
+ * NULL is a NULL pointer was sent or the list is empty.
+ * The first element of the list otherwise
+ */
+ListElement listGetFirst(List list) {
+	//if a NULL was sent then return NULL
+	if(list == NULL) {
+		return NULL;
+	}
+	//sets the iterator to the first element of the list
+	//if the list is empty then the iterator/head will be NULL
+	list->iterator = list->head;
+
+	//if the list is empty then this will return NULL;
+	//else this will return the current Element, which is the first Element
+	return listGetCurrent(list);
 }
