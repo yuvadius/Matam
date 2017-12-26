@@ -2,6 +2,20 @@
 #include <assert.h>
 #include "list_mtm.h"
 
+/** The List is implemented as a List of Elements.
+* With iterator as an index to the current Element or NULL
+*/
+typedef struct node {
+	ListElement data;
+	struct node* next;
+} *Node;
+struct List_t {
+	Node head;
+	Node iterator;
+	CopyListElement copyElement;
+	FreeListElement freeElement;
+};
+
 /**
  * Creates a Node.
  *
@@ -25,8 +39,8 @@ static Node createNode(ListElement data, Node next, List list) {
 	if(node == NULL) {
 		return NULL;
 	}
-	//make a copy of the "element" using the list's copy function
-	ListElement new_element = list->copyElement(element);
+	//make a copy of the "data" using the list's copy function
+	ListElement new_element = list->copyElement(data);
 	//if there was a memory error in the copy function then return NULL
 	if(new_element == NULL) {
 		free(node); //free the previously allocated node
@@ -39,19 +53,17 @@ static Node createNode(ListElement data, Node next, List list) {
 	return node; //return the new node
 }
 
-/** The List is implemented as a List of Elements.
-* With iterator as an index to the current Element or NULL
-*/
-typedef struct node {
-	ListElement data;
-	struct node* next;
-} *Node;
-struct List_t {
-	Node head;
-	Node iterator;
-	CopyListElement copyElement;
-	FreeListElement freeElement;
-};
+/**
+ * Swaps between the ListElements in the two Nodes
+ *
+ * @param node1 A Node to be swapped with node2
+ * @param node2 A Node to be swapped with node1
+ */
+static void swapElements(Node node1, Node node2) {
+	ListElement temp = node1->data; //save the node1 list element
+	node1->data = node2->data;
+	node2->data = temp;
+}
 
 /**
  * Allocates a new List.
@@ -564,4 +576,67 @@ List listFilter(List list, FilterListElement filterElement, ListFilterKey key) {
 		}
 	} while(removed_element == true);
 	return new_list;
+}
+
+/**
+ * Sorts the list according to the given function.
+ *
+ * For example, the following code will sort a list of integers according to
+ * their distance from 0.
+ * @code
+ * int closerTo(ListElement num1, ListElement num2, ListSortKey value) {
+ *   int distance1 = abs(*(int*)num1 - *(int*)value);
+ *   int distance2 = abs(*(int*)num2 - *(int*)value);
+ *   return distance1 - distance2;
+ * }
+ *
+ * void sortInts(List listOfInts) {
+ *   int key = 0;
+ *   listSort(listOfInts, closerTo, &key);
+ * }
+ * @endcode
+ *
+ * Elements which are treated as equal by the comparison function don't have a
+ * defined order.
+ *
+ * After sorting, the iterator points to the same node in order. That is, if the
+ * list before sorting was (1, 5, 2, 6), and the iterator pointed to "5", after
+ * the sorting, (1, 2, 5, 6), the iterator will still point to the second
+ * element in the list, which is "2".
+ *
+ * @param list the target list to sort
+ * @param compareElement A comparison function as defined in the type
+ * CompareListElements. This function should return an integer indicating the
+ * relation between two elements in the list
+ *
+ * @return
+ * LIST_NULL_ARGUMENT if list or compareElement are NULL
+ * LIST_OUT_OF_MEMORY if a memory allocation failed, the list will be intact
+ * in this case.
+ * LIST_SUCCESS if sorting completed successfully.
+ */
+ListResult listSort(List list, CompareListElements compareElement,
+	ListSortKey key) {
+	//if a NULL was sent as list or compareElement return LIST_NULL_ARGUMENT
+	if(list == NULL || compareElement == NULL) {
+		return LIST_NULL_ARGUMENT;
+	}
+	//sort the new_list in ascending order according to compareElement
+	//this sort algorithim works like bubble sort
+	bool swapped = false; //bool to check if an element was swapped
+	do {
+		swapped = false;
+		//loop over all elements in the new_list
+		LIST_FOREACH(ListElement, element, list) {
+			if(list->iterator->next != NULL) { //if not at last element
+				//if the elements aren't in ascending order
+				if(compareElement(element, list->next->data, key) == false) {
+					swap(list->iterator, list->iterator->next);
+					swapped = true; //the elements were swapped
+					break; //restart the sort algorithim
+				}
+			}
+		}
+	} while(removed_element == true);
+	return LIST_SUCCESS;
 }
