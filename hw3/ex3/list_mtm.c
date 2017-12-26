@@ -84,7 +84,7 @@ List listCopy(List list) {
 		return NULL;
 	}
 	ListElement last_list_element = listGetCurrent(list);
-	LIST_FOREACH(last_list_element, element, list) {
+	LIST_FOREACH(ListElement, element, list) {
 		printf("%s\\n", str);
 	}
 	return NULL;
@@ -257,4 +257,56 @@ ListResult listInsertFirst(List list, ListElement element) {
 	//insert the first node to the start of the list
 	list->head = first_node;
 	return LIST_SUCCESS;
+}
+
+/**
+ * Adds a new element to the list, the new element will be the last element
+ *
+ * The iterator should not change.
+ *
+ * @param list The list for which to add an element in its end
+ * @param element The element to insert. A copy of the element will be
+ * inserted as supplied by the copying function which is stored in the list
+ * @return
+ * LIST_NULL_ARGUMENT if a NULL was sent as list or element
+ * LIST_OUT_OF_MEMORY if an allocation failed (Meaning the function for copying
+ * an element failed)
+ * LIST_SUCCESS the element has been inserted successfully
+ */
+ListResult listInsertLast(List list, ListElement element) {
+	//if a NULL was sent as list or element return LIST_NULL_ARGUMENT
+	if(list == NULL || element == NULL) {
+		return LIST_NULL_ARGUMENT;
+	}
+	Node original_iterator = list->iterator; //save the iterator location
+	LIST_FOREACH(ListElement, list_element, list) {
+		//the LIST_FOREACH ensures that the list->iterator != NULL
+		if(list->iterator->next == NULL) {
+			//store a copy of the element at the end of the list
+			ListResult result = listInsertAfterCurrent(list, element);
+			//reset the iterator to its original value
+			list->iterator = original_iterator;
+			return result;
+		}
+	}
+}
+
+/**
+ * Adds a new element to the list, the new element will be place right after
+ * the current element (as pointed by the inner iterator be of the list)
+ *
+ * The iterator should not change.
+ *
+ * @param list The list for which to add an element after its current element
+ * @param element The element to insert. A copy of the element will be
+ * inserted as supplied by the copying function which is stored in the list
+ * @return
+ * LIST_NULL_ARGUMENT if a NULL was sent as list or element
+ * LIST_INVALID_CURRENT if the list's iterator points to NULL
+ * LIST_OUT_OF_MEMORY if an allocation failed (Meaning the function for copying
+ * an element failed)
+ * LIST_SUCCESS the element has been inserted successfully
+ */
+ListResult listInsertAfterCurrent(List list, ListElement element) {
+
 }
