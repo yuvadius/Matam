@@ -36,5 +36,15 @@ struct List_t {
  * A new List in case of success.
  */
 List listCreate(CopyListElement copyElement, FreeListElement freeElement) {
-	CopyListElement = copyElement;
+	if (!copyFunction || !freeFunction) { //if one of the parameters is NULL
+		return NULL;
+	}
+	List list = malloc(sizeof(*list)); //create a new List
+	if (list == NULL) { //if memory allocation failed
+		return NULL;
+	}
+	list->iterator = NULL;
+	list->copyElement = copyElement;
+	list->freeElement = freeElement;
+	return stack;
 }
