@@ -164,7 +164,7 @@ static bool testListRemoveCurrent() {
 	return true;
 }
 
-static bool testListSort() {/*
+static bool testListSort() {
 	char* arr[3] = {"ccc","aaa","bbb",};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<3; i++){
@@ -172,15 +172,15 @@ static bool testListSort() {/*
 	}
 	ASSERT_TEST(listSort(list,compareStrings, NULL)==LIST_SUCCESS);
 	list->iterator=list->head;
-	ASSERT_TEST(compareStrings(list->iterator,"aaa",NULL);// aaa should be the 
+	ASSERT_TEST(compareStrings(list->iterator,"aaa",NULL));// aaa should be the 
 	//first element.
 	list->iterator=list->iterator->next;
-	ASSERT_TEST(compareStrings(list->iterator,"bbb",NULL); // bbb should be the
+	ASSERT_TEST(compareStrings(list->iterator,"bbb",NULL)); // bbb should be the
 	// second element.
 	list->iterator=list->iterator->next;
-	ASSERT_TEST(compareStrings(list->iterator,"ccc",NULL); // ccc should be the
+	ASSERT_TEST(compareStrings(list->iterator,"ccc",NULL)); // ccc should be the
 	// third and last element.
-	*/
+	
 	return true; 
 }
 
