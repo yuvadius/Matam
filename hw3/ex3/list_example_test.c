@@ -19,6 +19,9 @@
  	key = NULL; // no need in the key for compartign strings.
  	return strcmp(str1, str2);
  }
+ bool isLongerThan(ListElement string, ListFilterKey key) {
+    return strlen(string) > *(int*)key;
+ }
 
 
 /**
@@ -195,6 +198,20 @@ static bool testListDestroy() {
 	return true;
 }
 
+static bool testListFilter() {
+    char* arr[5] = {"hello world","bye","true","more then 10","less"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i < 5; i++){
+		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
+	}
+	int key = 10;
+	List filtered = listFilter(list,isLongerThan,&key);
+	ASSERT_TEST(filtered != LIST_SUCCESS);
+	ASSERT_TEST(!compareStrings("hello world",listGetFirst(filtered),NULL));
+	ASSERT_TEST(!compareStrings(listGetNext(filtered),"more then 10",NULL));
+	return true;
+}
+
 int main() {
 	RUN_TEST(testListCreate);
 	RUN_TEST(testListInsertFirst);
@@ -209,5 +226,6 @@ int main() {
 	RUN_TEST(testListSort);
 	RUN_TEST(testListClear);
 	RUN_TEST(testListDestroy);
+	RUN_TEST(testListFilter);
 	return 0;
 }
