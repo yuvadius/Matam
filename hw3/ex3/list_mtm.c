@@ -23,7 +23,7 @@ struct List_t {
  *
  * @param data The target data to copy into the new node
  * a copy of data(using list->copyElement) will be copied into the new node
- * @param next The target next to copy into the new node 
+ * @param next The target next to copy into the new node
  * @param list The list's copy function will be used to create a copy of "data"
  * @return
  * NULL if data is NULL or list is NULL or a memory allocation failed.
@@ -53,7 +53,7 @@ static Node createNode(ListElement data, Node next, List list) {
 	return node; //return the new node
 }
 
-/** 
+/**
  * Type of function for deallocating a Node
  * @param1 node The node to be freed
  * @param2 list The list that contains the freeElement function to be used
@@ -147,15 +147,12 @@ List listCopy(List list) {
 	if(list_copy == NULL) {
 		return NULL;
 	}
-	//se the same functions as the original list for copying/freeing elements
-	list_copy->copyElement = list->copyElement;
-	list_copy->freeElement = list->freeElement;
 	int counter = 0; //the number of times the foreach was executed
 	Node original_iterator = list->iterator;
 	LIST_FOREACH(ListElement, element, list) {
 		//insert the current node in list to be the last node in list_copy
 		ListResult result = listInsertLast(list_copy, element);
-		assert(result == LIST_NULL_ARGUMENT);//should never happen
+		assert(result == LIST_SUCCESS);
 		//if there was a memory allocation failure
 		if(result == LIST_OUT_OF_MEMORY) {
 			//reset the iterator to its original value
@@ -165,7 +162,7 @@ List listCopy(List list) {
 		}
 		//if the original iterator location was reached in list
 		if(list->iterator == original_iterator) {
-			//The iterator of the new list will point to the same element 
+			//The iterator of the new list will point to the same element
 			//that the original iterator is pointing to in the original list
 			int temp_counter = counter;
 			LIST_FOREACH(ListElement, list_copy_element, list_copy) {
