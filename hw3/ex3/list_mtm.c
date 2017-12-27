@@ -2,6 +2,20 @@
 #include <assert.h>
 #include "list_mtm.h"
 
+/** The List is implemented as a List of Elements.
+* With iterator as an index to the current Element or NULL
+*/
+typedef struct node {
+	ListElement data;
+	struct node* next;
+} *Node;
+struct List_t {
+	Node head;
+	Node iterator;
+	CopyListElement copyElement;
+	FreeListElement freeElement;
+};
+
 /**
  * Creates a Node.
  *
@@ -25,33 +39,46 @@ static Node createNode(ListElement data, Node next, List list) {
 	if(node == NULL) {
 		return NULL;
 	}
-	//make a copy of the "element" using the list's copy function
-	ListElement new_element = list->copyElement(element);
+	//make a copy of the "data" using the list's copy function
+	ListElement new_element = list->copyElement(data);
 	//if there was a memory error in the copy function then return NULL
 	if(new_element == NULL) {
 		free(node); //free the previously allocated node
 		return NULL;
 	}
 	//set the node's data to the parameter "data"
-	node->data = data;
+	node->data = new_element;
 	//set the node's next to the parameter "next"
 	node->next = next;
 	return node; //return the new node
 }
 
-/** The List is implemented as a List of Elements.
-* With iterator as an index to the current Element or NULL
-*/
-typedef struct node {
-	ListElement data;
-	struct node* next;
-} *Node;
-struct List_t {
-	Node head;
-	Node iterator;
-	CopyListElement copyElement;
-	FreeListElement freeElement;
-};
+/** 
+ * Type of function for deallocating a Node
+ * @param1 node The node to be freed
+ * @param2 list The list that contains the freeElement function to be used
+ * for freeing the node->data */
+static void freeNode(Node node, List list) {
+	//if the node is NULL then there is nothing to free
+	//if the list is NULL then there is no freeElement function
+	if(node == NULL || list == NULL) {
+		return;
+	}
+	list->freeElement(node->data); //free the list element of the node
+	free(node); //free the node
+}
+
+/**
+ * Swaps between the ListElements in the two Nodes
+ *
+ * @param node1 A Node to be swapped with node2
+ * @param node2 A Node to be swapped with node1
+ */
+static void swapElements(Node node1, Node node2) {
+	ListElement temp = node1->data; //save the node1 list element
+	node1->data = node2->data;
+	node2->data = temp;
+}
 
 /**
  * Allocates a new List.
@@ -120,6 +147,9 @@ List listCopy(List list) {
 	if(list_copy == NULL) {
 		return NULL;
 	}
+	//se the same functions as the original list for copying/freeing elements
+	list_copy->copyElement = list->copyElement;
+	list_copy->freeElement = list->freeElement;
 	int counter = 0; //the number of times the foreach was executed
 	Node original_iterator = list->iterator;
 	LIST_FOREACH(ListElement, element, list) {
@@ -130,7 +160,7 @@ List listCopy(List list) {
 		if(result == LIST_OUT_OF_MEMORY) {
 			//reset the iterator to its original value
 			list->iterator = original_iterator;
-			listDestroy(listCopy);
+			listDestroy(list_copy);
 			return NULL;
 		}
 		//if the original iterator location was reached in list
@@ -165,11 +195,15 @@ List listCopy(List list) {
  * LIST_INVALID_CURRENT if the current pointer of the list points to NULL
  * LIST_SUCCESS the current element was removed successfully
  */
-ListResult listRemoveCurrent(List list) { //The iterator points to the element
-	if(list==NULL)                       // we would like to remove.
+ListResult listRemoveCurrent(List list) {
+	//if a NULL was sent then return NULL
+	if(list==NULL) {
 		return LIST_NULL_ARGUMENT;
-	if(listGetCurrent(list)==NULL)
+	}
+	//if the current pointer of the list points to NULL return NULL
+	if(listGetCurrent(list) == NULL) {
 		return LIST_INVALID_CURRENT;
+<<<<<<< HEAD
 	Node remove_iterator = list->iterator; // the iterator of the element we
 										  // are willing to remove from the list
 	if(list->head == remove_iterator || remove_iterator->next == NULL) { 
@@ -178,24 +212,32 @@ ListResult listRemoveCurrent(List list) { //The iterator points to the element
 									   // the list.
 		freeElement(remove_iterator->data); // the element is freed.
 		list->iterator=NULL; 
+=======
+	}
+	//the iterator of the element we are removing from the list
+	Node remove_iterator = list->iterator;
+	//if the element we are removing is the first element of the list
+	if(list->head == remove_iterator) {
+		list->head = list->head->next; //move the head to the next element
+		freeNode(remove_iterator, list); //free the node
+		list->iterator = NULL; //set the iterator to NULL
+>>>>>>> 9e02288e4fcb6415a35deb3ee923eac618f6b011
 		return LIST_SUCCESS; //GREAT SUCCESS! 👍
 	}
-
-	list->iterator = list->head; // the iterator is the first element of 
-								// the list.
-
-	LIST_FOREACH(ListElement,element,list) {
-		if(list->iterator->next==remove_iterator) { // if the next element
-										// is the one we are willing to remove
-			list->iterator->next = remove_iterator->next; // then the next
-			// element of the iterator is the element after the element we are
-			// removing. It shouldn`t be NULL.
-			freeElement(remove_iterator->data); // the element is freed.
-			list->iterator = NULL;
+	LIST_FOREACH(ListElement, element, list) {
+		//if the next element is the one we are removing
+		if(list->iterator->next == remove_iterator) {
+			//remove_iterator isn't NULL because listGetCurrent(list) != NULL
+			//link between the two nodes that sandwich the remove_iterator node
+			list->iterator->next = remove_iterator->next;
+			freeNode(remove_iterator, list); //remove the Node
+			list->iterator = NULL; //set the iterator to NULL
 			return LIST_SUCCESS; //GREAT SUCCESS! 👍
 		}
 	}
-	// Shouldn`t get here because the element we are removing isn`t the last one
+	//Shouldn't get here
+	assert(false); //if this code was reached then there was an error
+	return LIST_SUCCESS; //placed so there wouldn't be a compilation error
 }
 
 /**
@@ -336,7 +378,8 @@ ListResult listClear(List list) {
 	if(list==NULL)
 		return LIST_NULL_ARGUMENT;
 	listGetFirst(list); //moves the iterator to the first element.
-	iterator_next = listGetNext(list); // iterator moves to the second element.
+	// iterator moves to the second element.
+	ListElement iterator_next = listGetNext(list);
 	listGetFirst(list); //moves the iterator to the first element.
 	while(iterator_next!=NULL) {
 		listRemoveCurrent(list); // First element removed. iterator=NULL.
@@ -461,7 +504,7 @@ int listGetSize(List list) {
 	Node original_iterator = list->iterator; // saving the original iterator.
 	int count=0; // counting from 0.
 	LIST_FOREACH(ListElement,element_data,list) { 
-		if(list->iterator!== NULL) // if iterator ISN`T the last Node.
+		if(list->iterator != NULL) // if iterator ISN`T the last Node.
 			++count; // increment the count var.
 		else { // else iterator IS the last Node
 			break; // then break the LIST_FOREACH loop.
@@ -470,6 +513,7 @@ int listGetSize(List list) {
 	list->iterator=original_iterator; // currently iterator points to NULL.
 	// So we give it the original value back.
 	return count;
+}
 
 /**
  * Adds a new element to the list, the new element will be place right before
@@ -572,12 +616,74 @@ List listFilter(List list, FilterListElement filterElement, ListFilterKey key) {
 		LIST_FOREACH(ListElement, element, new_list) {
 			//if the element didn't pass the filter test then remove the element
 			if(filterElement(element, key) == false) {
-				ListResult result = listRemoveCurrent(new_list);//remove element
-				assert(result != LIST_SUCCESS); //this shouldn't happen
+				listRemoveCurrent(new_list);//remove element
 				removed_element = true; //an element was removed
 				break; //restart iteration of the new_list
 			}
 		}
 	} while(removed_element == true);
 	return new_list;
+}
+
+/**
+ * Sorts the list according to the given function.
+ *
+ * For example, the following code will sort a list of integers according to
+ * their distance from 0.
+ * @code
+ * int closerTo(ListElement num1, ListElement num2, ListSortKey value) {
+ *   int distance1 = abs(*(int*)num1 - *(int*)value);
+ *   int distance2 = abs(*(int*)num2 - *(int*)value);
+ *   return distance1 - distance2;
+ * }
+ *
+ * void sortInts(List listOfInts) {
+ *   int key = 0;
+ *   listSort(listOfInts, closerTo, &key);
+ * }
+ * @endcode
+ *
+ * Elements which are treated as equal by the comparison function don't have a
+ * defined order.
+ *
+ * After sorting, the iterator points to the same node in order. That is, if the
+ * list before sorting was (1, 5, 2, 6), and the iterator pointed to "5", after
+ * the sorting, (1, 2, 5, 6), the iterator will still point to the second
+ * element in the list, which is "2".
+ *
+ * @param list the target list to sort
+ * @param compareElement A comparison function as defined in the type
+ * CompareListElements. This function should return an integer indicating the
+ * relation between two elements in the list
+ *
+ * @return
+ * LIST_NULL_ARGUMENT if list or compareElement are NULL
+ * LIST_OUT_OF_MEMORY if a memory allocation failed, the list will be intact
+ * in this case.
+ * LIST_SUCCESS if sorting completed successfully.
+ */
+ListResult listSort(List list, CompareListElements compareElement,
+	ListSortKey key) {
+	//if a NULL was sent as list or compareElement return LIST_NULL_ARGUMENT
+	if(list == NULL || compareElement == NULL) {
+		return LIST_NULL_ARGUMENT;
+	}
+	//sort the new_list in ascending order according to compareElement
+	//this sort algorithim works like bubble sort
+	bool swapped = false; //bool to check if an element was swapped
+	do {
+		swapped = false;
+		//loop over all elements in the new_list
+		LIST_FOREACH(ListElement, element, list) {
+			if(list->iterator->next != NULL) { //if not at last element
+				//if the elements aren't in ascending order
+				if(!compareElement(element, list->iterator->next->data, key)) {
+					swapElements(list->iterator, list->iterator->next);
+					swapped = true; //the elements were swapped
+					break; //restart the sort algorithim
+				}
+			}
+		}
+	} while(swapped == true);
+	return LIST_SUCCESS;
 }
