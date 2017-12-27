@@ -47,10 +47,25 @@ static Node createNode(ListElement data, Node next, List list) {
 		return NULL;
 	}
 	//set the node's data to the parameter "data"
-	node->data = data;
+	node->data = new_element;
 	//set the node's next to the parameter "next"
 	node->next = next;
 	return node; //return the new node
+}
+
+/** 
+ * Type of function for deallocating a Node
+ * @param1 node The node to be freed
+ * @param2 list The list that contains the freeElement function to be used
+ * for freeing the node->data */
+static void freeNode(Node node, List list) {
+	//if the node is NULL then there is nothing to free
+	//if the list is NULL then there is no freeElement function
+	if(node == NULL || list == NULL) {
+		return;
+	}
+	list->freeElement(node->data); //free the list element of the node
+	free(node); //free the node
 }
 
 /**
@@ -132,6 +147,9 @@ List listCopy(List list) {
 	if(list_copy == NULL) {
 		return NULL;
 	}
+	//se the same functions as the original list for copying/freeing elements
+	list_copy->copyElement = list->copyElement;
+	list_copy->freeElement = list->freeElement;
 	int counter = 0; //the number of times the foreach was executed
 	Node original_iterator = list->iterator;
 	LIST_FOREACH(ListElement, element, list) {
@@ -142,7 +160,7 @@ List listCopy(List list) {
 		if(result == LIST_OUT_OF_MEMORY) {
 			//reset the iterator to its original value
 			list->iterator = original_iterator;
-			listDestroy(listCopy);
+			listDestroy(list_copy);
 			return NULL;
 		}
 		//if the original iterator location was reached in list
@@ -177,37 +195,38 @@ List listCopy(List list) {
  * LIST_INVALID_CURRENT if the current pointer of the list points to NULL
  * LIST_SUCCESS the current element was removed successfully
  */
-ListResult listRemoveCurrent(List list) { //The iterator points to the element
-	if(list==NULL)                       // we would like to remove.
+ListResult listRemoveCurrent(List list) {
+	//if a NULL was sent then return NULL
+	if(list==NULL) {
 		return LIST_NULL_ARGUMENT;
-	if(listGetCurrent(list)==NULL)
+	}
+	//if the current pointer of the list points to NULL return NULL
+	if(listGetCurrent(list) == NULL) {
 		return LIST_INVALID_CURRENT;
-	Node remove_iterator = list->iterator; // the iterator of the element we
-										  // are willing to remove from the list
-	if(list->head == remove_iterator || remove_iterator->next == NULL) { 
-										 // if the element we are willing to 
-										// remove is the first\last element of  
-									   // the list.
-		freeElement(remove_iterator->data); // the element is freed.
-		list->iterator=NULL; 
+	}
+	//the iterator of the element we are removing from the list
+	Node remove_iterator = list->iterator;
+	//if the element we are removing is the first element of the list
+	if(list->head == remove_iterator) {
+		list->head = list->head->next; //move the head to the next element
+		freeNode(remove_iterator, list); //free the node
+		list->iterator = NULL; //set the iterator to NULL
 		return LIST_SUCCESS; //GREAT SUCCESS! 👍
 	}
-
-	list->iterator = list->head; // the iterator is the first element of 
-								// the list.
-
-	LIST_FOREACH(ListElement,element,list) {
-		if(list->iterator->next==remove_iterator) { // if the next element
-										// is the one we are willing to remove
-			list->iterator->next = remove_iterator->next; // then the next
-			// element of the iterator is the element after the element we are
-			// removing. It shouldn`t be NULL.
-			freeElement(remove_iterator->data); // the element is freed.
-			list->iterator = NULL;
+	LIST_FOREACH(ListElement, element, list) {
+		//if the next element is the one we are removing
+		if(list->iterator->next == remove_iterator) {
+			//remove_iterator isn't NULL because listGetCurrent(list) != NULL
+			//link between the two nodes that sandwich the remove_iterator node
+			list->iterator->next = remove_iterator->next;
+			freeNode(remove_iterator, list); //remove the Node
+			list->iterator = NULL; //set the iterator to NULL
 			return LIST_SUCCESS; //GREAT SUCCESS! 👍
 		}
 	}
-	// Shouldn`t get here because the element we are removing isn`t the last one
+	//Shouldn't get here
+	assert(false); //if this code was reached then there was an error
+	return LIST_SUCCESS; //placed so there wouldn't be a compilation error
 }
 
 /**
@@ -348,7 +367,8 @@ ListResult listClear(List list) {
 	if(list==NULL)
 		return LIST_NULL_ARGUMENT;
 	listGetFirst(list); //moves the iterator to the first element.
-	iterator_next = listGetNext(list); // iterator moves to the second element.
+	// iterator moves to the second element.
+	ListElement iterator_next = listGetNext(list);
 	listGetFirst(list); //moves the iterator to the first element.
 	while(iterator_next!=NULL) {
 		listRemoveCurrent(list); // First element removed. iterator=NULL.
@@ -457,7 +477,7 @@ int listGetSize(List list) {
 	Node original_iterator = list->iterator; // saving the original iterator.
 	int count=0; // counting from 0.
 	LIST_FOREACH(ListElement,element_data,list) { 
-		if(list->iterator!== NULL) // if iterator ISN`T the last Node.
+		if(list->iterator != NULL) // if iterator ISN`T the last Node.
 			++count; // increment the count var.
 		else { // else iterator IS the last Node
 			break; // then break the LIST_FOREACH loop.
@@ -466,6 +486,7 @@ int listGetSize(List list) {
 	list->iterator=original_iterator; // currently iterator points to NULL.
 	// So we give it the original value back.
 	return count;
+}
 
 /**
  * Adds a new element to the list, the new element will be place right before
@@ -568,8 +589,7 @@ List listFilter(List list, FilterListElement filterElement, ListFilterKey key) {
 		LIST_FOREACH(ListElement, element, new_list) {
 			//if the element didn't pass the filter test then remove the element
 			if(filterElement(element, key) == false) {
-				ListResult result = listRemoveCurrent(new_list);//remove element
-				assert(result != LIST_SUCCESS); //this shouldn't happen
+				listRemoveCurrent(new_list);//remove element
 				removed_element = true; //an element was removed
 				break; //restart iteration of the new_list
 			}
@@ -630,13 +650,13 @@ ListResult listSort(List list, CompareListElements compareElement,
 		LIST_FOREACH(ListElement, element, list) {
 			if(list->iterator->next != NULL) { //if not at last element
 				//if the elements aren't in ascending order
-				if(compareElement(element, list->next->data, key) == false) {
-					swap(list->iterator, list->iterator->next);
+				if(!compareElement(element, list->iterator->next->data, key)) {
+					swapElements(list->iterator, list->iterator->next);
 					swapped = true; //the elements were swapped
 					break; //restart the sort algorithim
 				}
 			}
 		}
-	} while(removed_element == true);
+	} while(swapped == true);
 	return LIST_SUCCESS;
 }
