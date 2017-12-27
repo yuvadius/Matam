@@ -393,7 +393,7 @@ ListResult listClear(List list) {
 void listDestroy(List list) {
 	if(list!=NULL) {
 		if(listClear(list)==LIST_SUCCESS) {
-			free(*list);
+			free(list);
 		}
 	}
 }
