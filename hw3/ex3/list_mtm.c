@@ -351,7 +351,6 @@ ListResult listInsertFirst(List list, ListElement element) {
 	return LIST_SUCCESS;
 }
 
-
 /**
  * Removes all elements from target list.
  * The elements are deallocated using the stored freeing function.
@@ -364,26 +363,19 @@ ListResult listInsertFirst(List list, ListElement element) {
  * LIST_SUCCESS - Otherwise.
  */
 ListResult listClear(List list) {
-	if(list==NULL)
+	//if a NULL was sent as list return LIST_NULL_ARGUMENT
+	if(list == NULL) {
 		return LIST_NULL_ARGUMENT;
-	listGetFirst(list); //moves the iterator to the first element.
-	// iterator moves to the second element.
-	ListElement iterator_next = listGetNext(list);
-	listGetFirst(list); //moves the iterator to the first element.
-	while(iterator_next!=NULL) {
-		listRemoveCurrent(list); // First element removed. iterator=NULL.
-		list->iterator = iterator_next; // The iterator moves to the first 
-										// element.
-		iterator_next= listGetNext(list); // iterator moves to the second 
-										  // element.
-		listGetFirst(list); //moves the iterator to the first element.
 	}
-	listRemoveCurrent(list); // first(and last) element removed. iterator=NULL.
-	return LIST_SUCCESS; // empty list. Iterator=NULL.
-	}
+	//loop while there are elements to remove
+	do {
+		listGetFirst(list); //set the iterator to the first element
+	} while(listRemoveCurrent(list) == LIST_SUCCESS);
+	//the list is now empty therefor the iterator is NULL
+	return LIST_SUCCESS;
+}
 
-
-	/**
+/**
  * Deallocates an existing list. Clears all elements by using the stored free
  * function.
  *
@@ -391,14 +383,12 @@ ListResult listClear(List list) {
  * done
  */
 void listDestroy(List list) {
-	if(list!=NULL) {
-		if(listClear(list)==LIST_SUCCESS) {
-			free(list);
-		}
+	//if a NULL was sent do nothing
+	if(list != NULL) {
+		listClear(list); //clear all the list's nodes
+		free(list); //free the list
 	}
 }
-
-
 
 /**
  * Adds a new element to the list, the new element will be the last element
@@ -460,10 +450,7 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
 	if(listGetCurrent(list) == NULL) {
 		return LIST_INVALID_CURRENT;
 	}
-	//if the iterator is at the end of the list insert the element at the end
-	if(list->iterator->next == NULL) {
-		return listInsertLast(list, element);
-	}
+	//create a node and put it between the current node and the next node
 	Node node = createNode(element, list->iterator->next, list);
 	//if there was a memory allocation error then return LIST_OUT_OF_MEMORY
 	if(node == NULL) {
@@ -473,9 +460,6 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
 	list->iterator->next = node;
 	return LIST_SUCCESS;
 }
-
-
-
 
 /**
  * Returns the number of elements in a list
@@ -488,20 +472,19 @@ ListResult listInsertAfterCurrent(List list, ListElement element) {
  * Otherwise the number of elements in the list.
  */
 int listGetSize(List list) {
-	if(list==NULL)
-		return -1; // if the list is NULL we`ll return -1.
-	Node original_iterator = list->iterator; // saving the original iterator.
-	int count=0; // counting from 0.
-	LIST_FOREACH(ListElement,element_data,list) { 
-		if(list->iterator != NULL) // if iterator ISN`T the last Node.
-			++count; // increment the count var.
-		else { // else iterator IS the last Node
-			break; // then break the LIST_FOREACH loop.
-		}
+	//if the list is NULL we'll return -1.
+	if(list == NULL) {
+		return -1;
 	}
-	list->iterator=original_iterator; // currently iterator points to NULL.
-	// So we give it the original value back.
-	return count;
+	Node original_iterator = list->iterator; //save the original iterator
+	int counter = 0; //start counting from 0
+	//loop over all the list elements
+	LIST_FOREACH(ListElement, element_data, list) {
+		++counter; //increment the counter
+	}
+	//reset the iterator to its original value
+	list->iterator = original_iterator;
+	return counter; //return the number of elements in the list
 }
 
 /**
@@ -533,25 +516,19 @@ ListResult listInsertBeforeCurrent(List list, ListElement element) {
 	if(list->iterator == list->head) {
 		return listInsertFirst(list, element);
 	}
+	ListResult result;
 	Node original_iterator = list->iterator; //save the iterator location
 	LIST_FOREACH(ListElement, list_element, list) {
 		//the LIST_FOREACH ensures that the list->iterator != NULL
 		if(list->iterator->next == original_iterator) {
-			Node node = createNode(element, original_iterator, list);
-			if(node == NULL) { //if there was a memory allocation error
-				//reset the iterator to its original value
-				list->iterator = original_iterator;
-				return LIST_OUT_OF_MEMORY;
-			}
-			//insert the node to the list after the current node
-			list->iterator->next = node;
+			//insert the element to its appropriate position
+			result = listInsertAfterCurrent(list, element);
 			break;
 		}
 	}
 	//reset the iterator to its original value
 	list->iterator = original_iterator;
-	return LIST_SUCCESS;
-
+	return result;
 }
 
 /**
