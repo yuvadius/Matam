@@ -147,9 +147,6 @@ List listCopy(List list) {
 	if(list_copy == NULL) {
 		return NULL;
 	}
-	//se the same functions as the original list for copying/freeing elements
-	list_copy->copyElement = list->copyElement;
-	list_copy->freeElement = list->freeElement;
 	int counter = 0; //the number of times the foreach was executed
 	Node original_iterator = list->iterator;
 	LIST_FOREACH(ListElement, element, list) {
