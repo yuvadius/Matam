@@ -89,9 +89,7 @@ static bool testListCopy() {
 	list1->iterator = list1->head; // the iterator is the head of the list
 	list2->iterator = list2->head; // the iterator is the head of the list
 	for (int i=0; i<4; i++){
-		ASSERT_TEST(compareStrings(list1->iterator->data, list2->iterator->data, NULL)==0);
-		list1->iterator = list1->iterator->next;
-		list2->iterator = list2->iterator->next;
+		ASSERT_TEST(compareStrings(getNext(list1),getNext(list2),NULL)==0);
 	}
 	// checks if all the elements are identical.
 	return true;
@@ -127,7 +125,8 @@ static bool testListGetNext() {
 		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
 	}
 	ASSERT_TEST(listGetNext(list)==NULL); //should be NULL because iterator=NULL
-	list->iterator = list->head->next; // iterator is the second element(world)
+	ASSERT_TEST(listGetFirst(list)!=NULL); // iterator is the first element
+	ASSERT_TEST(listGetNext(list)!=NULL); //iterator is second element
 	ASSERT_TEST(compareStrings("world", listGetNext(list), NULL)==0);
 	// listGetNext should return the next iterator, i.e. "2017".
 	return true;
@@ -157,10 +156,11 @@ static bool testListRemoveCurrent() {
 		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
 	}
 	ASSERT_TEST(listRemoveCurrent(list)==LIST_INVALID_CURRENT); //iterator=NULL
-	list->iterator = list->head;
+	listGetFirst(list); // iterator = head
 	ASSERT_TEST(listRemoveCurrent(list)==LIST_SUCCESS);
 	ASSERT_TEST(list->iterator==NULL); //should be NULL after calling the func.
-	ASSERT_TEST(compareStrings(list->head->data, "world", NULL)==0);// after removing
+	ASSERT_TEST(compareStrings(listGetFirst(list), "world",
+													 NULL)==0);// after removing
 	// the first element the head should be "world".
 	return true;
 }
@@ -172,26 +172,16 @@ static bool testListSort() {
 		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
 	}
 	ASSERT_TEST(listSort(list,compareStrings, NULL)==LIST_SUCCESS);
-	list->iterator=list->head;
-	ASSERT_TEST(compareStrings(list->iterator->data,"aaa",NULL));// aaa should be the
-
-	//first element.
-	list->iterator=list->iterator->next;
-	ASSERT_TEST(compareStrings(list->iterator->data,"bbb",NULL)); // bbb should be the
-	// second element.
-	list->iterator=list->iterator->next;
-	ASSERT_TEST(compareStrings(list->iterator->data,"ccc",NULL)); // ccc should be the
-	// third and last element.
-	return true;
-}
-
-
-
-static bool testListClear() {
-	return true;
-}
-
-static bool testListDestroy() {
+	ASSERT_TEST(listGetFirst(list)!=NULL); // iterator=head
+	ASSERT_TEST(compareStrings(listGetCurrent(list),"aaa",NULL));
+													// aaa should be the first
+	//element.
+	ASSERT_TEST(testListGetNext!=NULL);
+	ASSERT_TEST(compareStrings(listGetCurrent(list),"bbb",NULL)); // bbb should
+	// be the second element.
+	ASSERT_TEST(testListGetNext!=NULL);
+	ASSERT_TEST(compareStrings(listGetCurrent(list),"ccc",NULL)); // ccc should
+	// be the third and last element.
 	return true;
 }
 
@@ -215,7 +205,6 @@ static bool testListDestroy() {
 	}
 	testListDestroy(list);
 	ASSERT(list==NULL);
-
 	return true;
 }
 
