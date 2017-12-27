@@ -203,16 +203,6 @@ ListResult listRemoveCurrent(List list) {
 	//if the current pointer of the list points to NULL return NULL
 	if(listGetCurrent(list) == NULL) {
 		return LIST_INVALID_CURRENT;
-<<<<<<< HEAD
-	Node remove_iterator = list->iterator; // the iterator of the element we
-										  // are willing to remove from the list
-	if(list->head == remove_iterator || remove_iterator->next == NULL) { 
-										 // if the element we are willing to 
-										// remove is the first\last element of
-									   // the list.
-		freeElement(remove_iterator->data); // the element is freed.
-		list->iterator=NULL; 
-=======
 	}
 	//the iterator of the element we are removing from the list
 	Node remove_iterator = list->iterator;
@@ -221,7 +211,6 @@ ListResult listRemoveCurrent(List list) {
 		list->head = list->head->next; //move the head to the next element
 		freeNode(remove_iterator, list); //free the node
 		list->iterator = NULL; //set the iterator to NULL
->>>>>>> 9e02288e4fcb6415a35deb3ee923eac618f6b011
 		return LIST_SUCCESS; //GREAT SUCCESS! 👍
 	}
 	LIST_FOREACH(ListElement, element, list) {
