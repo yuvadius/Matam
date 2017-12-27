@@ -195,6 +195,44 @@ static bool testListDestroy() {
 	return true;
 }
 
+static bool testListClear() {
+	char* arr[4] = {"hello","world","2017","2018"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
+	}
+	ASSERT_TEST(listClear(NULL)== LIST_NULL_ARGUMENT);
+	ASSERT_TEST(listClear(list)== LIST_SUCCESS);
+	ASSERT_TEST(listGetSize(list)==0);
+	return true;
+}
+
+static bool testListDestroy() {
+		char* arr[4] = {"hello","world","2017","2018"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
+	}
+	testListDestroy(list);
+	ASSERT(list==NULL);
+
+	return true;
+}
+
+static bool testListGetCurrent() {
+			char* arr[4] = {"hello","world","2017","2018"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
+	}
+	listGetFirst(list); // iterator= list->head
+	ASSERT_TEST(compareStrings(listGetCurrent(list), "hello", NULL)==0);
+	return true;
+}
+
+
+
+
 int main() {
 	RUN_TEST(testListCreate);
 	RUN_TEST(testListInsertFirst);
@@ -209,5 +247,6 @@ int main() {
 	RUN_TEST(testListSort);
 	RUN_TEST(testListClear);
 	RUN_TEST(testListDestroy);
+	RUN_TEST(testListGetCurrent)
 	return 0;
 }
