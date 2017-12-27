@@ -6,23 +6,20 @@
 #include "list_mtm.h"
 #include "list_mtm.c"
 
-
  ListElement copyString(ListElement str) {
    assert(str);
    char* copy = malloc(strlen(str) + 1);
    return copy ? strcpy(copy, str) : NULL;
  }
- listElement
+
  void destroyString(ListElement str) {
  	free(str); // frees the string element.
  }
- int compareStrings(ListElement str1, ListElement str2, listSortKey key) {
+ int compareStrings(ListElement str1, ListElement str2, ListSortKey key) {
  	key = NULL; // no need in the key for compartign strings.
- 	return strcmp(*str1, *str2);
+ 	return strcmp(str1, str2);
  }
  
-
-
 
 /**
  * List of tests, one for each function is usually a good thumb rule.
@@ -30,64 +27,163 @@
 static bool testListCreate() {
 	List list= listCreate(copyString, destroyString);
 	ASSERT_TEST(list != NULL);
-// if the list has been successfully created, then TRUE.
+	// if the list has been successfully created, then TRUE.
+	ASSERT_TEST(listCreate(copyString,NULL) == NULL);
+	ASSERT_TEST(listCreate(NULL,destroyString) == NULL);
 	return true;
 }
 
 static bool testListInsertFirst() {
-	List list = listCreate(copyString, destroyString);
-	ASSERT_TEST(list != NULL); // if the list was successfully created.
-	ListElement element = char* "HELLO WORLD"
-	ASSERT_TEST(testListInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
+	List list= listCreate(copyString, destroyString);
+	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
 	//if the element was successfully inserted to list->head
-	ASSERT_TEST(compareStrings("HELLO WORLD" , list->head->data)==0);
-	return true;
-}
-
-static bool testListCopy() {
-	List list1 = listCreate(copyString, destroyString);
-	ASSERT_TEST(list1 != NULL);
-	List list2 = listCreate(copyString, destroyString);
-	ASSERT_TEST(list2 != NULL);
-
-	return true;
-}
-
-static bool testListGetSize() {
-	return true;
-}
-
-static bool testListGetFirst() {
-	return true;
-}
-
-static bool testListGetNext() {
-	return true;
-}
-
-static bool testListInsertFirst() {
+	ASSERT_TEST(compareStrings("HELLO WORLD" , list->head->data, NULL)==0);
+	// checking if the first element indeed is as expected.
 	return true;
 }
 
 static bool testListInsertLast() {
-	return true;
-}
-
-static bool testListInsertBeforeCurrent() {
+	List list= listCreate(copyString, destroyString);
+	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
+	list->iterator = list->head; // the iterator is the head node.
+	ASSERT_TEST(listInsertLast(list, "last element") == LIST_SUCCESS);
+	// checking if the function returned success.
+	ASSERT_TEST(compareStrings("last element",list->head->next->data, NULL)==0);
+	// checking if the new element indeed is the last one(second element);
+	ASSERT_TEST(listInsertLast(list, NULL) == LIST_NULL_ARGUMENT);
+	// the function should fail because a NULL element was sent.
+	ASSERT_TEST(list->iterator == list->head); // the iterator shouldn`t change;
+	// checking if it still is the head node.
 	return true;
 }
 
 static bool testListInsertAfterCurrent() {
+	List list= listCreate(copyString, destroyString);
+	ASSERT_TEST(listInsertAfterCurrent(list,"hello") == LIST_INVALID_CURRENT);
+	// should fail because iterator=NULL.
+	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
+	list->iterator = list->head; // the iterator is the head of the list.
+	ASSERT_TEST(listInsertAfterCurrent(list,"hello") == LIST_SUCCESS);
+	// should pass.
+	list->iterator = list->iterator->next; // the iterator is the second element
+	ASSERT_TEST(listInsertLast(list, "last element") == LIST_SUCCESS);
+	// this is the last element. iterator should be the second element
+	ASSERT_TEST(listInsertAfterCurrent(list,"middle") == LIST_SUCCESS);
+	// this element should be "hello" element. therefore "middle" is between
+	// "hello" and "last element".
+	list->iterator = list->iterator->next; // the iterator should be "middle"
+	ASSERT_TEST(compareStrings(list->iterator->data, "middle", NULL)==0);
+	// checking if the iterator indeed is "middle".
 	return true;
 }
+
+
+static bool testListCopy() {
+	char* arr[5] = {"hello","hi","hey","world"};
+	List list1 = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertFirst(list1,arr[i])==LIST_SUCCESS);
+	}
+	List list2 = listCopy(list1);
+	ASSERT_TEST(list2!=NULL); // if the function indeed returned the new list
+	list1->iterator = list1->head; // the iterator is the head of the list
+	list2->iterator = list2->head; // the iterator is the head of the list
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(compareStrings(list1->iterator, list2->iterator, NULL)==0);
+		list1->iterator = list1->iterator->next;
+		list2->iterator = list2->iterator->next;
+	}
+	// checks if all the elements are identical.
+	return true;
+}
+
+static bool testListGetSize() {
+	char* arr[4] = {"hello","hi","hey","world"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+	}
+	ASSERT_TEST(listGetSize(NULL)==-1); // should return -1.
+	ASSERT_TEST(listGetSize(list)==4); // sould return 4.
+	return true;
+}
+
+static bool testListGetFirst() {
+	char* arr[4] = {"hello","hi","hey","world"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+	}
+	ASSERT_TEST(listGetFirst(NULL)==NULL);
+	ASSERT_TEST(compareStrings(list->head,listGetFirst(list),NULL)==0);
+	// if list->head and listGetFirst(list) are the same.
+	return true;
+}
+
+static bool testListGetNext() {
+	char* arr[4] = {"hello","world","2017","2018"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+	}
+	ASSERT_TEST(listGetNext(list)==NULL); //should be NULL because iterator=NULL
+	list->iterator = list->head->next; // iterator is the second element(world)
+	ASSERT_TEST(compareStrings("2017", listGetNext(list), NULL)==0);
+	// listGetNext should return the next iterator, i.e. "2017".
+	return true;
+}
+
+static bool testListInsertBeforeCurrent() {
+		char* arr[1] = {"MATAM"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<1; i++){
+		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+	}
+	Node starting_iterator= list->head; // it shouldn`t change. points on MATAM
+	ASSERT_TEST(listInsertBeforeCurrent(list,"INFI")==LIST_SUCCESS);
+	ASSERT_TEST(listInsertBeforeCurrent(list,"ALGEBRA")==LIST_SUCCESS);
+	ASSERT_TEST(listInsertBeforeCurrent(list,"ATAM")==LIST_SUCCESS);
+	ASSERT_TEST(compareStrings("INFI",list->head,NULL)==0);
+	ASSERT_TEST(compareStrings("MATAM",starting_iterator->data,NULL)==0);
+	return true;
+}
+
 
 static bool testListRemoveCurrent() {
+	char* arr[4] = {"hello","world","2017","2018"};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<4; i++){
+		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+	}
+	ASSERT_TEST(listRemoveCurrent(list)==LIST_INVALID_CURRENT); //iterator=NULL
+	list->iterator = list->head;
+	ASSERT_TEST(listRemoveCurrent(list)==LIST_SUCCESS);
+	ASSERT_TEST(list->iterator==NULL); //should be NULL after calling the func.
+	ASSERT_TEST(compareStrings(list->head, "world", NULL)==0);// after removing
+	// the first element the head should be "world".
 	return true;
 }
 
-static bool testListSort() {
-	return true;
+static bool testListSort() {/*
+	char* arr[3] = {"ccc","aaa","bbb",};
+	List list = listCreate(copyString,destroyString);
+	for (int i=0; i<3; i++){
+		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+	}
+	ASSERT_TEST(listSort(list,compareStrings, NULL)==LIST_SUCCESS);
+	list->iterator=list->head;
+	ASSERT_TEST(compareStrings(list->iterator,"aaa",NULL);// aaa should be the 
+	//first element.
+	list->iterator=list->iterator->next;
+	ASSERT_TEST(compareStrings(list->iterator,"bbb",NULL); // bbb should be the
+	// second element.
+	list->iterator=list->iterator->next;
+	ASSERT_TEST(compareStrings(list->iterator,"ccc",NULL); // ccc should be the
+	// third and last element.
+	*/
+	return true; 
 }
+
 
 static bool testListClear() {
 	return true;
@@ -100,13 +196,13 @@ static bool testListDestroy() {
 int main() {
 	RUN_TEST(testListCreate);
 	RUN_TEST(testListInsertFirst);
+	RUN_TEST(testListInsertLast);
+	RUN_TEST(testListInsertAfterCurrent);
 	RUN_TEST(testListCopy);
 	RUN_TEST(testListGetSize);
 	RUN_TEST(testListGetFirst);
 	RUN_TEST(testListGetNext);
-	RUN_TEST(testListInsertLast);
 	RUN_TEST(testListInsertBeforeCurrent);
-	RUN_TEST(testListInsertAfterCurrent);
 	RUN_TEST(testListRemoveCurrent);
 	RUN_TEST(testListSort);
 	RUN_TEST(testListClear);
