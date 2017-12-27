@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1514411017 source:c:\users\yuvadius\desktop\github\matam\hw3\ex3\list_example_test.c
+	<stdlib.h>
+	<stdio.h>
+	<assert.h>
+	<string.h>
+	"test_utilities.h"
+	"list_mtm.h"
+	"list_mtm.c"
+
+1510176862 c:\users\yuvadius\desktop\github\matam\hw3\ex3\test_utilities.h
+	<stdbool.h>
+	<stdio.h>
+
+1510177061 c:\users\yuvadius\desktop\github\matam\hw3\ex3\list_mtm.h
+	<stdbool.h>
+
+1514399719 c:\users\yuvadius\desktop\github\matam\hw3\ex3\list_mtm.c
+	<stdlib.h>
+	<assert.h>
+	"list_mtm.h"
+

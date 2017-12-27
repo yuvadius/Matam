@@ -19,7 +19,7 @@
  	key = NULL; // no need in the key for compartign strings.
  	return strcmp(str1, str2);
  }
- 
+
 
 /**
  * List of tests, one for each function is usually a good thumb rule.
@@ -89,7 +89,7 @@ static bool testListCopy() {
 	list1->iterator = list1->head; // the iterator is the head of the list
 	list2->iterator = list2->head; // the iterator is the head of the list
 	for (int i=0; i<4; i++){
-		ASSERT_TEST(compareStrings(list1->iterator, list2->iterator, NULL)==0);
+		ASSERT_TEST(compareStrings(list1->iterator->data, list2->iterator->data, NULL)==0);
 		list1->iterator = list1->iterator->next;
 		list2->iterator = list2->iterator->next;
 	}
@@ -115,7 +115,7 @@ static bool testListGetFirst() {
 		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
 	}
 	ASSERT_TEST(listGetFirst(NULL)==NULL);
-	ASSERT_TEST(compareStrings(list->head,listGetFirst(list),NULL)==0);
+	ASSERT_TEST(compareStrings(list->head->data,listGetFirst(list),NULL)==0);
 	// if list->head and listGetFirst(list) are the same.
 	return true;
 }
@@ -128,7 +128,7 @@ static bool testListGetNext() {
 	}
 	ASSERT_TEST(listGetNext(list)==NULL); //should be NULL because iterator=NULL
 	list->iterator = list->head->next; // iterator is the second element(world)
-	ASSERT_TEST(compareStrings("2017", listGetNext(list), NULL)==0);
+	ASSERT_TEST(compareStrings("world", listGetNext(list), NULL)==0);
 	// listGetNext should return the next iterator, i.e. "2017".
 	return true;
 }
@@ -137,13 +137,14 @@ static bool testListInsertBeforeCurrent() {
 		char* arr[1] = {"MATAM"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<1; i++){
-		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
 	}
 	Node starting_iterator= list->head; // it shouldn`t change. points on MATAM
+	ASSERT_TEST(compareStrings("MATAM", listGetFirst(list), NULL)==0);
 	ASSERT_TEST(listInsertBeforeCurrent(list,"INFI")==LIST_SUCCESS);
 	ASSERT_TEST(listInsertBeforeCurrent(list,"ALGEBRA")==LIST_SUCCESS);
 	ASSERT_TEST(listInsertBeforeCurrent(list,"ATAM")==LIST_SUCCESS);
-	ASSERT_TEST(compareStrings("INFI",list->head,NULL)==0);
+	ASSERT_TEST(compareStrings("INFI",list->head->data,NULL)==0);
 	ASSERT_TEST(compareStrings("MATAM",starting_iterator->data,NULL)==0);
 	return true;
 }
@@ -153,13 +154,13 @@ static bool testListRemoveCurrent() {
 	char* arr[4] = {"hello","world","2017","2018"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<4; i++){
-		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
+		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
 	}
 	ASSERT_TEST(listRemoveCurrent(list)==LIST_INVALID_CURRENT); //iterator=NULL
 	list->iterator = list->head;
 	ASSERT_TEST(listRemoveCurrent(list)==LIST_SUCCESS);
 	ASSERT_TEST(list->iterator==NULL); //should be NULL after calling the func.
-	ASSERT_TEST(compareStrings(list->head, "world", NULL)==0);// after removing
+	ASSERT_TEST(compareStrings(list->head->data, "world", NULL)==0);// after removing
 	// the first element the head should be "world".
 	return true;
 }
@@ -172,7 +173,7 @@ static bool testListSort() {/*
 	}
 	ASSERT_TEST(listSort(list,compareStrings, NULL)==LIST_SUCCESS);
 	list->iterator=list->head;
-	ASSERT_TEST(compareStrings(list->iterator,"aaa",NULL);// aaa should be the 
+	ASSERT_TEST(compareStrings(list->iterator,"aaa",NULL);// aaa should be the
 	//first element.
 	list->iterator=list->iterator->next;
 	ASSERT_TEST(compareStrings(list->iterator,"bbb",NULL); // bbb should be the
@@ -181,7 +182,7 @@ static bool testListSort() {/*
 	ASSERT_TEST(compareStrings(list->iterator,"ccc",NULL); // ccc should be the
 	// third and last element.
 	*/
-	return true; 
+	return true;
 }
 
 
