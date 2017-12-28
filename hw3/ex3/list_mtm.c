@@ -384,7 +384,6 @@ void listDestroy(List list) {
 	if(list != NULL) {
 		listClear(list); //clear all the list's nodes
 		free(list); //free the list
-		list = NULL; //set the list to NULL for safety
 	}
 }
 

@@ -6,23 +6,21 @@
 #include "list_mtm.h"
 #include "list_mtm.c"
 
- ListElement copyString(ListElement str) {
-   assert(str);
-   char* copy = malloc(strlen(str) + 1);
-   return copy ? strcpy(copy, str) : NULL;
- }
-
- void destroyString(ListElement str) {
- 	free(str); // frees the string element.
- }
- int compareStrings(ListElement str1, ListElement str2, ListSortKey key) {
- 	key = NULL; // no need in the key for compartign strings.
- 	return strcmp(str1, str2);
- }
- bool isLongerThan(ListElement string, ListFilterKey key) {
-    return strlen(string) > *(int*)key;
- }
-
+ListElement copyString(ListElement str) {
+	assert(str);
+	char* copy = malloc(strlen(str) + 1);
+	return copy ? strcpy(copy, str) : NULL;
+}
+void destroyString(ListElement str) {
+	free(str); // frees the string element.
+}
+int compareStrings(ListElement str1, ListElement str2, ListSortKey key) {
+	key = NULL; // no need in the key for compartign strings.
+	return strcmp(str1, str2);
+}
+bool isLongerThan(ListElement string, ListFilterKey key) {
+	return strlen(string) > *(int*)key;
+}
 
 /**
  * List of tests, one for each function is usually a good thumb rule.
@@ -48,7 +46,7 @@ static bool testListInsertFirst() {
 static bool testListInsertLast() {
 	List list= listCreate(copyString, destroyString);
 	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
-	list->iterator = list->head; // the iterator is the head node.
+	ASSERT_TEST(listGetFirst(list)!=NULL); // the iterator is the head node.
 	ASSERT_TEST(listInsertLast(list, "last element") == LIST_SUCCESS);
 	// checking if the function returned success.
 	ASSERT_TEST(compareStrings("last element",list->head->next->data, NULL)==0);
@@ -62,6 +60,9 @@ static bool testListInsertLast() {
 
 static bool testListInsertAfterCurrent() {
 	List list= listCreate(copyString, destroyString);
+	ASSERT_TEST(listInsertAfterCurrent(NULL,NULL) == LIST_NULL_ARGUMENT);
+	ASSERT_TEST(listInsertAfterCurrent(NULL,"hello") == LIST_NULL_ARGUMENT);
+	ASSERT_TEST(listInsertAfterCurrent(list,NULL) == LIST_NULL_ARGUMENT);
 	ASSERT_TEST(listInsertAfterCurrent(list,"hello") == LIST_INVALID_CURRENT);
 	// should fail because iterator=NULL.
 	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
@@ -82,6 +83,7 @@ static bool testListInsertAfterCurrent() {
 
 
 static bool testListCopy() {
+	ASSERT_TEST(listCopy(NULL)==NULL);
 	char* arr[4] = {"hello","hi","hey","world"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<4; i++){
