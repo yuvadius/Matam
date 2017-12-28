@@ -217,6 +217,7 @@ static bool testListClear() {
 }
 
 static bool testListDestroy() {
+	listDestroy(NULL); // should work
     char* arr[4] = {"hello","world","2017","2018"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<4; i++){
