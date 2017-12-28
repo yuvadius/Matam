@@ -113,4 +113,18 @@ bool addStudent(CourseManager course_manager, char* student_id,
 bool facultyRequest(CourseManager course_manager, char* student_id,
 					FacultyRequest requst);
 
+
+/**
+ * return the last "error" produced by one of the funcs.
+ *
+ * @param1 course_manager CourseManager that we take the error from.
+ * @return 
+ * returns course_manager->error.
+ * NULL if something went wrong.
+
+ */
+MtmErrorCode getCourseManagerError(CourseManager course_manager);
+
+
+
 #endif /* LIST_H_ */
