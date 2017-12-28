@@ -115,7 +115,7 @@ static bool testLogoutStudent() {
 static bool testFacultyRequest() {
 	CourseManager course_manager = courseManagerCreate();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
-	ASSERT_TEST(!facultyRequest(course_manager,"121212",REMOVE_COURSE)); //FALSE
+	ASSERT_TEST(!facultyRequest(course_manager,"0210",REMOVE_COURSE)); //FALSE
 	ASSERT_TEST(getCourseManagerError(course_manager) == 
 				MTM_NOT_LOGGED_IN); // this error is expected.
 	// if getCourseManagerError func failed, it will return NULL such that
@@ -126,9 +126,15 @@ static bool testFacultyRequest() {
 		ASSERT_TEST(!facultyRequest(course_manager,"121212",REMOVE_COURSE)); 
 		// FALSE
 	ASSERT_TEST(getCourseManagerError(course_manager) == 
-				MTM_NOT_LOGGED_IN); // this error is expected.
+				MTM_COURSE_DOES_NOT_EXIST); // this error is expected.
 	// if getCourseManagerError func failed, it will return NULL such that
 	// ASSERT_TEST fails.
+
+
+
+
+	//???????DO NOT FORGET TO ADD TESTS FOR THE THIRD ERROR MTM_INVALID_PARAMETERS?????????????
+	// +CORRECT TESTS FOR TRUE
 
 
 
