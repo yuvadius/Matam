@@ -15,6 +15,22 @@ static bool testCourseManagerCreate() {
 	return true;
 }
 
+static bool testHandleInput() {
+
+	return true;
+}
+
+static bool testLoginStudent() {
+	CourseManager course_manager = courseManagerCreate();
+	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
+	ASSERT_TEST(!loginStudent(course_manager, NULL)); //should return FALSE
+	// because illegal ID was sent.
+	ASSERT_TEST(getCourseManagerError(course_manager)==
+
+
+	return true;
+}
+
 
 
 
@@ -25,7 +41,8 @@ static bool testCourseManagerCreate() {
 
 int main() {
 	RUN_TEST(testCourseManagerCreate);
-	RUN_TEST()
+	RUN_TEST(testHandleInput);
+	RUN_TEST(testLoginStudent);
 
 	return 0;
 }
