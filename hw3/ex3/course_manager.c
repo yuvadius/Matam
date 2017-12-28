@@ -9,6 +9,6 @@ struct course_manager_t {
 	MtmErrorCode error;
 };
 
-static FacultyRequest GetFacultyRequst(char* request) {
+static FacultyRequest getFacultyRequst(char* request) {
 	
 }
