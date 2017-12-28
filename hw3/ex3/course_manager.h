@@ -62,13 +62,12 @@ bool loginStudent(CourseManager course_manager, char* student_id);
  * Logs out a student from the system
  *
  * @param1 course_manager CourseManager that the student will be logged out of
- * @param2 student_id the students ID
  * @return 
  * false if there was an error. The error will be written to
  * course_manager->error.
  * true if there was no error
  */
-bool logoutStudent(CourseManager course_manager, char* student_id);
+bool logoutStudent(CourseManager course_manager);
 
 /**
  * Remove the student from the system
@@ -101,7 +100,7 @@ bool addStudent(CourseManager course_manager, char* student_id,
  * Ignore the student faculty request
  *
  * @param1 course_manager CourseManager that the student will be removed from
- * @param2 student_id the students ID
+ * @param2 student_id the course ID
  * @param3 requst the request of the student which can be "remove_course" or
  * "register_course" or "cancel_course"
  * @return 
@@ -109,7 +108,7 @@ bool addStudent(CourseManager course_manager, char* student_id,
  * course_manager->error.
  * true if there was no error
  */
-bool facultyRequest(CourseManager course_manager, char* student_id,
+bool facultyRequest(CourseManager course_manager, char* course_id,
 					char* request);
 
 
