@@ -16,6 +16,12 @@
 /** Type for defining the student */
 typedef struct student_t *Student;
 
+/** Type used for actions for the requests */
+typedef enum action_t {
+	ACCEPT,
+	REJECT,
+} Action;
+
 /**
  * Creates a student
  *
@@ -42,28 +48,27 @@ bool friendRequest(CourseManager course_manager, char* id);
 /**
  * Terminate a friendship between two students
  *
- * @param1 course_manager the CourseManager that the student is in
- * @param2 student the student that is logged in
- * @param3 id the student, which is being unfriended, ID
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 id the student, which is being unfriended, ID
  * @return
  * false if there was an error. The error will be written to
  * course_manager->error.
  * true if there was no error
  */
-bool unFriend(CourseManager course_manager, Student student, char* id);
+bool unFriend(CourseManager course_manager, char* id);
 
 /**
- * Terminate a friendship between two students
+ * Handle the request with the id
  *
- * @param1 course_manager the CourseManager that the student is in
- * @param2 student the student that is logged in
- * @param3 id the student, which is being unfriended, ID
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 id the student, which is sent the friend request, ID
+ * @param3 action if is "accept" then the two become friends, if "reject" then
+ * decline the friend request
  * @return
  * false if there was an error. The error will be written to
  * course_manager->error.
  * true if there was no error
  */
-bool handleFriendRequest(CourseManager course_manager, char* student_id, 
-						 char* request);
+bool handleFriendRequest(CourseManager course_manager, char* id, char* action);
 
 #endif /* STUDENT_H_ */

@@ -11,3 +11,7 @@ struct student_t {
 	char* last_name;
 	List grades;
 };
+
+static Action getAction(char* action) {
+	
+}
