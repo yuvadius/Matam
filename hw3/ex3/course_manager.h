@@ -7,7 +7,7 @@
  *
  * The following functions are available:
  *
- *   courseManagerCreate      - Creates an instance of CourseManager
+ *   createCourseManager      - Creates an instance of CourseManager
  *   handleInput              - Receives an input command and processes it
  *   loginStudent             - Logs in a student into the system
  *   logoutStudent            - Logs out a student from the system
@@ -31,9 +31,8 @@ typedef enum FacultyRequest_t {
  *
  * @return
  * The CourseManager created. if there was an allocation error return NULL
- * course_manager->error.
  */
-CourseManager courseManagerCreate();
+CourseManager createCourseManager();
 
 /**
  * Processes an input line command
@@ -111,6 +110,6 @@ bool addStudent(CourseManager course_manager, char* student_id,
  * true if there was no error
  */
 bool facultyRequest(CourseManager course_manager, char* student_id,
-					FacultyRequest requst);
+					char* request);
 
-#endif /* LIST_H_ */
+#endif /* COURSE_MANAGER_H_ */
