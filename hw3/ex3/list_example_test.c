@@ -26,7 +26,7 @@ bool isLongerThan(ListElement string, ListFilterKey key) {
  * List of tests, one for each function is usually a good thumb rule.
  */
 static bool testListCreate() {
-	List list= listCreate(copyString, destroyString);
+	List list = listCreate(copyString, destroyString);
 	ASSERT_TEST(list != NULL);
 	// if the list has been successfully created, then TRUE.
 	ASSERT_TEST(listCreate(copyString,NULL) == NULL);
@@ -138,7 +138,7 @@ static bool testListGetNext() {
 }
 
 static bool testListInsertBeforeCurrent() {
-		char* arr[1] = {"MATAM"};
+    char* arr[1] = {"MATAM"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<1; i++){
 		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
@@ -217,18 +217,18 @@ static bool testListClear() {
 }
 
 static bool testListDestroy() {
-		char* arr[4] = {"hello","world","2017","2018"};
+    char* arr[4] = {"hello","world","2017","2018"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<4; i++){
 		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
 	}
 	listDestroy(list);
-	ASSERT_TEST(list==NULL);
+	//ASSERT_TEST(list==NULL);
 	return true;
 }
 
 static bool testListGetCurrent() {
-			char* arr[4] = {"hello","world","2017","2018"};
+    char* arr[4] = {"hello","world","2017","2018"};
 	List list = listCreate(copyString,destroyString);
 	for (int i=0; i<4; i++){
 		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
