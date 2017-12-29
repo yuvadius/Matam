@@ -3,6 +3,9 @@
 #include "set.h"
 #include "student.h"
 
+#define COURSE_ID_MIN 1
+#define COURSE_ID_MAX 999999
+
 struct course_manager_t {
 	Set students;
 	Student current_student;
@@ -86,9 +89,9 @@ bool loginStudent(CourseManager course_manager, char* student_id) {
 	if(course_manager == NULL) {
 		return false;
 	}
-	//if the parameters aren't valid return MTM_INVALID_PARAMETERS
-	if(student_id == NULL) {
-		course_manager->error = MTM_INVALID_PARAMETERS;
+	//if the parameters aren't valid return MTM_STUDENT_DOES_NOT_EXIST
+	if(isValidStudentID(student_id) == false) {
+		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
 		return false;
 	}
 	//if a student is logged in return MTM_ALREADY_LOGGED_IN
@@ -149,12 +152,15 @@ bool removeStudent(CourseManager course_manager, char* student_id) {
 	if(course_manager == NULL) {
 		return false;
 	}
-	//if the parameters aren't valid return MTM_INVALID_PARAMETERS
-	if(student_id == NULL) {
-		course_manager->error = MTM_INVALID_PARAMETERS;
+	//if the parameters aren't valid return MTM_STUDENT_DOES_NOT_EXIST
+	if(isValidStudentID(student_id) == false) {
+		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
 		return false;
 	}
-	logoutStudent(course_manager); //log out the student if he is logged in
+	//log out the student if the student is logged in
+	if(strcmp(course_manager->current_student->id, student_id) == 0) {
+		logoutStudent(course_manager);
+	}
 	//find the student in the set
 	SET_FOREACH(Student, student, course_manager->students) {
 		//if the student was found
@@ -189,7 +195,7 @@ bool addStudent(CourseManager course_manager, char* student_id,
 		return false;
 	}
 	//if the parameters aren't valid return MTM_INVALID_PARAMETERS
-	if(student_id == NULL || first_name == NULL || last_name == NULL) {
+	if(isValidStudentID(student_id) == false) {
 		course_manager->error = MTM_INVALID_PARAMETERS;
 		return false;
 	}
@@ -237,7 +243,7 @@ bool facultyRequest(CourseManager course_manager, char* course_id,
 		return false;
 	}
 	//if the parameters aren't valid return MTM_INVALID_PARAMETERS
-	if(course_id == NULL || request == NULL) {
+	if(!isValidCourseID(course_id) || getFacultyRequst(request) == NO_REQUEST) {
 		course_manager->error = MTM_INVALID_PARAMETERS;
 		return false;
 	}
@@ -262,7 +268,6 @@ bool facultyRequest(CourseManager course_manager, char* course_id,
  * @return 
  * returns course_manager->error.
  * NULL if something went wrong.
-
  */
 MtmErrorCode getCourseManagerError(CourseManager course_manager) {
 	//can't do anything if course_manager isn't set
@@ -270,6 +275,23 @@ MtmErrorCode getCourseManagerError(CourseManager course_manager) {
 		return false;
 	}
 	return course_manager->errorl
+}
+
+/**
+ * Checks if the course id is valid
+ *
+ * @param1 course_id the course id that will be checked
+ * @return
+ * true if the course id is valid false otherwise
+ */
+bool isValidCourseID(char* course_id) {
+	int course_id_int = atoi(course_id); //string to int function
+	if(course_id_int >= COURSE_ID_MIN && course_id_int <= COURSE_ID_MAX) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 /**

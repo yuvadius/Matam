@@ -15,6 +15,7 @@
  *   addStudent               - Add a student to the system
  *   facultyRequest           - Ignore the student faculty request
  *   getCourseManagerError    - Return the last "error" in the course manager
+ *   isValidCourseID          - Checks if the course id is valid
  *   destroyCourseManager     - Destroy an instance of CourseManager
  */
 
@@ -128,6 +129,15 @@ bool facultyRequest(CourseManager course_manager, char* course_id,
  * returns course_manager->error.
  */
 MtmErrorCode getCourseManagerError(CourseManager course_manager);
+
+/**
+ * Checks if the course id is valid
+ *
+ * @param1 course_id the course id that will be checked
+ * @return
+ * true if the course id is valid false otherwise
+ */
+bool isValidCourseID(char* course_id);
 
 /**
  * Destroy an instance of CourseManager

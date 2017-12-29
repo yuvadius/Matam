@@ -14,6 +14,7 @@
  *   copyStudent             - Copys a student
  *   compareStudents         - Compare two students's ids
  *   getGrade                - Get the student's valid grade for clean report
+ *   isValidStudentID        - Checks if a student id is valid
  *   destroyStudent          - Destroys an instance of student
  */
 
@@ -107,6 +108,15 @@ int compareStudents(Student student1, Student student2);
  * if there is no grade then return -1
  */
 int getGrade(CourseManager course_manager, char* course_id);
+
+/**
+ * Checks if a student id is valid
+ *
+ * @param1 student_id the id of the student that is checked
+ * @return
+ * true if the id is valid, false otherwise
+ */
+bool isValidStudentID(char* student_id);
 
 /**
  * Destroys an instance of student
