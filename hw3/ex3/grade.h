@@ -7,7 +7,7 @@
  *
  * The following functions are available:
  *
- *   createGrade             - Creates an instance of a grade
+ *   createGrade             - Creates an instance of grade
  *   addGrade                - Adds a grade to the logged in student
  *   removeGrade             - Removes a grade from the logged in student
  *   updateGrade             - Update a grade for the logged in student
@@ -16,6 +16,7 @@
  *   reportBest              - Print the best grades
  *   reportWorst             - Print the worst grades
  *   reportReference         - Print students with highest the grades for course
+ *   destroyGrade            - Destroys an instance of grade
  */
 
 /** Type for defining the grade */
@@ -31,7 +32,7 @@ typedef struct grade_t *Grade;
  * @return
  * The grade created. if there was an allocation error return NULL
  */
-Grade createGrade(int semester, char* course_id, char* points, int grade);
+Grade createGrade(char* semester, char* course_id, char* points, char* grade);
 
 /**
  * Adds a grade to the current student's semester
@@ -46,8 +47,8 @@ Grade createGrade(int semester, char* course_id, char* points, int grade);
  * course_manager->error.
  * true if there was no error
  */
-bool addGrade(CourseManager course_manager, int semester, char* course_id,
-				 char* points, int grade);
+bool addGrade(CourseManager course_manager, char* semester, char* course_id,
+				 char* points, char* grade);
 
 /**
  * Removes a grade from the logged in student
@@ -60,7 +61,7 @@ bool addGrade(CourseManager course_manager, int semester, char* course_id,
  * course_manager->error.
  * true if there was no error
  */
-bool removeGrade(CourseManager course_manager, int semester, char* course_id);
+bool removeGrade(CourseManager course_manager, char* semester, char* course_id);
 
 /**
  * Update a grade for the logged in student
@@ -73,7 +74,7 @@ bool removeGrade(CourseManager course_manager, int semester, char* course_id);
  * course_manager->error.
  * true if there was no error
  */
-bool updateGrade(CourseManager course_manager, char* course_id, int grade);
+bool updateGrade(CourseManager course_manager, char* course_id, char* grade);
 
 /**
  * Print the whole matriculation
@@ -107,7 +108,7 @@ bool reportClean(CourseManager course_manager);
  * course_manager->error.
  * true if there was no error
  */
-bool reportBest(CourseManager course_manager, int amount);
+bool reportBest(CourseManager course_manager, char* amount);
 
 /**
  * Print the worst grades
@@ -119,7 +120,7 @@ bool reportBest(CourseManager course_manager, int amount);
  * course_manager->error.
  * true if there was no error
  */
-bool reportWorst(CourseManager course_manager, int amount);
+bool reportWorst(CourseManager course_manager, char* amount);
 
 /**
  * Print students with highest the grades for course
@@ -132,6 +133,14 @@ bool reportWorst(CourseManager course_manager, int amount);
  * course_manager->error.
  * true if there was no error
  */
-bool reportReference(CourseManager course_manager, char* course_id, int amount);
+bool reportReference(CourseManager course_manager, char* course_id, 
+					 char* amount);
+
+/**
+ * Destroys an instance of grade
+ *
+ * @param1 grade the grade we destroy
+ */
+void destroyGrade(Grade grade);
 
 #endif /* GRADE_H_ */

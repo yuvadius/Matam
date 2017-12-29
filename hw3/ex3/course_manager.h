@@ -14,6 +14,8 @@
  *   removeStudent            - Remove a student from the system
  *   addStudent               - Add a student to the system
  *   facultyRequest           - Ignore the student faculty request
+ *   getCourseManagerError    - Return the last "error" in the course manager
+ *   destroyCourseManager     - Destroy an instance of CourseManager
  */
 
 /** Type for defining the system */
@@ -24,6 +26,7 @@ typedef enum FacultyRequest_t {
 	REMOVE_COURSE,
 	REGISTER_COURSE,
 	CANCEL_COURSE,
+	NO_REQUEST,
 } FacultyRequest;
 
 /**
@@ -38,7 +41,7 @@ CourseManager createCourseManager();
  * Processes an input line command
  *
  * @param1 course_manager the CourseManager that the student will be logged into
- * @param2 input_line A line received from the input stream
+ * @param2 input_line a line received from the input stream
  * @return
  * false if there was an error. The error will be written to
  * course_manager->error.
@@ -54,6 +57,8 @@ bool handleInput(CourseManager course_manager, char* input_line);
  * @return 
  * false if there was an error. The error will be written to
  * course_manager->error.
+ * Possible Non Critical Errors: MTM_ALREADY_LOGGED_IN, 
+ * MTM_STUDENT_DOES_NOT_EXIST
  * true if there was no error
  */
 bool loginStudent(CourseManager course_manager, char* student_id);
@@ -65,6 +70,7 @@ bool loginStudent(CourseManager course_manager, char* student_id);
  * @return 
  * false if there was an error. The error will be written to
  * course_manager->error.
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
  * true if there was no error
  */
 bool logoutStudent(CourseManager course_manager);
@@ -77,6 +83,7 @@ bool logoutStudent(CourseManager course_manager);
  * @return 
  * false if there was an error. The error will be written to
  * course_manager->error.
+ * Possible Non Critical Errors: MTM_STUDENT_DOES_NOT_EXIST
  * true if there was no error
  */
 bool removeStudent(CourseManager course_manager, char* student_id);
@@ -90,7 +97,9 @@ bool removeStudent(CourseManager course_manager, char* student_id);
  * @param4 last_name the last name of the student
  * @return 
  * false if there was an error. The error will be written to
- * course_manager->error.
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_STUDENT_ALREADY_EXISTS,
+ * MTM_INVALID_PARAMETERS
  * true if there was no error
  */
 bool addStudent(CourseManager course_manager, char* student_id, 
@@ -111,18 +120,20 @@ bool addStudent(CourseManager course_manager, char* student_id,
 bool facultyRequest(CourseManager course_manager, char* course_id,
 					char* request);
 
-
 /**
  * return the last "error" produced by one of the funcs.
  *
  * @param1 course_manager CourseManager that we take the error from.
  * @return 
  * returns course_manager->error.
- * NULL if something went wrong.
-
  */
 MtmErrorCode getCourseManagerError(CourseManager course_manager);
 
+/**
+ * Destroy an instance of CourseManager
+ *
+ * @param1 course_manager the CourseManager we destroy
+ */
+void destroyCourseManager(CourseManager course_manager);
 
-
-#endif /* LIST_H_ */
+#endif /* COURSE_MANAGER_H_ */

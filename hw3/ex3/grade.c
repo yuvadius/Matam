@@ -4,8 +4,8 @@
 #include "student.h"
 
 struct grade_t {
-	int grade;
+	char* grade;
 	char* course_id;
 	char* points;
-	int semester;
+	char* semester;
 };

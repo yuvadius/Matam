@@ -6,7 +6,7 @@
 struct student_t {
 	Set freinds;
 	Set studentRequests;
-	int id;
+	char* id;
 	char* first_name;
 	char* last_name;
 	List grades;

@@ -11,6 +11,10 @@
  *   friendRequest           - Send a friend request from one student to another
  *   unFriend                - End a student's friendship with another student
  *   handleFriendRequest     - Logs in a student into the system
+ *   copyStudent             - Copys a student
+ *   compareStudents         - Compare two students's ids
+ *   getGrade                - Get the student's valid grade for clean report
+ *   destroyStudent          - Destroys an instance of student
  */
 
 /** Type for defining the student */
@@ -70,5 +74,45 @@ bool unFriend(CourseManager course_manager, char* id);
  * true if there was no error
  */
 bool handleFriendRequest(CourseManager course_manager, char* id, char* action);
+
+/**
+ * Copys a student
+ *
+ * @param1 student the student we want to copy
+ * @return
+ * NULL if there was an allocation failure
+ * otherwise the student
+ */
+Student copyStudent(Student student);
+
+/**
+ * Compare two students's ids
+ *
+ * @param1 student the student we want to compare
+ * @param2 student the student we want to compare
+ * @return
+ * 		A positive integer if the first student id is greater;
+ * 		0 if they're equal;
+ * 		A negative integer if the second student id is greater.
+ */
+int compareStudents(Student student1, Student student2);
+
+/**
+ * Get the student's valid grade for clean report
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 course_id the course ID of the grade
+ * @return
+ * the valid grade of the course
+ * if there is no grade then return -1
+ */
+int getGrade(CourseManager course_manager, char* course_id);
+
+/**
+ * Destroys an instance of student
+ *
+ * @param1 student the student we destroy
+ */
+void destroyStudent(Student student);
 
 #endif /* STUDENT_H_ */
