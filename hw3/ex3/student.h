@@ -99,7 +99,7 @@ bool handleFriendRequest(CourseManager course_manager, char* id, char* action);
  * NULL if there was an allocation failure or student = NULL
  * otherwise the student
  */
-Student copyStudent(Student student);
+void* copyStudent(void* student);
 
 /**
  * Compare two students's ids
@@ -111,7 +111,7 @@ Student copyStudent(Student student);
  * 		0 if they're equal or if one of the parameters is NULL;
  * 		A negative integer if the second student id is greater.
  */
-int compareStudents(Student student1, Student student2);
+int compareStudents(void* student1, void* student2);
 
 /**
  * Get the logged in student's valid grade for clean report
@@ -187,6 +187,6 @@ Student getStudent(CourseManager course_manager, char* student_id);
  *
  * @param1 student the student we destroy
  */
-void destroyStudent(Student student);
+void destroyStudent(void* student);
 
 #endif /* STUDENT_H_ */
