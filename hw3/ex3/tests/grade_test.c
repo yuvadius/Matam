@@ -35,10 +35,6 @@ static bool testAddGrade() {
 	ASSERT_TEST(addGrade(course_manager, "1","2","4.5","12"));// true expected.
 	ASSERT_TEST(addGrade(course_manager, "1","2","4.5","12"));// true expected:
 	// added the same grade twice. it should NOT be a problem.
-	ASSERT_TEST(listGetcourse_manager->current_student->grades)
-
-														
-
 	return true;
 }
 
