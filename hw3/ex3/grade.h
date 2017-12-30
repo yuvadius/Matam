@@ -312,16 +312,15 @@ int getEffectivePointsX2(List grades, char* semester);
 int getEffectiveGradeSumX2(List grades, char* semester);
 
 /**
- * Compare between two course ids
+ * Compare between two course ids and semesters
  *
- * @param1 course_id1 the course id we want to compare with course_id2
- * @param2 course_id2 the course id we want to compare with course_id1
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
  * @return
- * 		A positive integer if the first course id is greater;
- * 		0 if they're equal or if one of the parameters is NULL;
- * 		A negative integer if the second course id is greater.
+ * 		if the courses are not equal return compareCourses
+ * 		else return compareSemesters
  */
-int compareCourses(char* course_id1, char* course_id2);
+int compareCoursesSemesters(Grade grade1, Grade grade2);
 
 /**
  * Destroys an instance of grade
