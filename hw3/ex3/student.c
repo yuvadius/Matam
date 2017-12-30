@@ -326,13 +326,113 @@ bool isValidStudentID(char* student_id) {
  * @return
  * false if there was an error. The error will be written to
  * course_manager->error
- * Possible Non Critical Errors:
+ * Possible Non Critical Errors: MTM_INVALID_PARAMETERS, MTM_NOT_LOGGED_IN,
+ * MTM_ALREADY_FRIEND
  * true if there was no error
  */
 bool addFriendship(CourseManager course_manager, Student student) {
 	//can't do anything if course_manager or student are not set
-	if(course_manager == NULL || student == NULL) {
+	if(course_manager == NULL) {
 		return false;
 	}
-	
+	if(student == NULL) {
+		course_manager->error = MTM_INVALID_PARAMETERS;
+		return false;
+	}
+	if(course_manager->current_student == NULL) { //if student is logged in
+		course_manager->error = MTM_NOT_LOGGED_IN;
+		return false;
+	}
+	//add "student" as friend to logged in student
+	SetResult result = addSet(course_manager->current_student->friends,student);
+	if(result == SET_OUT_OF_MEMORY) {
+		course_manager->error = MTM_OUT_OF_MEMORY;
+		return false;
+	}
+	else if(result == SET_ITEM_ALREADY_EXISTS) { //if already friends
+		course_manager->error = MTM_ALREADY_FRIEND;
+		return false;
+	}
+	//add logged in student as friend to "student"
+	result = addSet(student->friends, course_manager->current_student);
+	if(result == SET_OUT_OF_MEMORY) {
+		course_manager->error = MTM_OUT_OF_MEMORY;
+		return false;
+	}
+	else if(result == SET_ITEM_ALREADY_EXISTS) { //if already friends
+		course_manager->error = MTM_ALREADY_FRIEND;
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+/**
+ * Terminate a friendship between two students, the logged in student and the
+ * student sent in the parameters
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student the student that will cease to be friends with the logged in
+ * student
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_INVALID_PARAMETERS, MTM_NOT_LOGGED_IN,
+ * MTM_NOT_FRIEND
+ * true if there was no error
+ */
+bool removeFriendship(CourseManager course_manager, Student student) {
+	//can't do anything if course_manager or student are not set
+	if(course_manager == NULL) {
+		return false;
+	}
+	if(student == NULL) {
+		course_manager->error = MTM_INVALID_PARAMETERS;
+		return false;
+	}
+	if(course_manager->current_student == NULL) { //if student is logged in
+		course_manager->error = MTM_NOT_LOGGED_IN;
+		return false;
+	}
+	//remove "student" as friend from logged in student
+	SetResult result = setRemove(course_manager->current_student->friends, 
+								 student);
+	if(result == SET_OUT_OF_MEMORY) {
+		course_manager->error = MTM_OUT_OF_MEMORY;
+		return false;
+	}
+	else if(result == SET_ITEM_DOES_NOT_EXIST) {
+		course_manager->error = MTM_NOT_FRIEND;
+		return false;
+	}
+	//remove logged in student as friend from "student"
+	result = setRemove(student->friends, course_manager->current_student);
+	if(result == SET_OUT_OF_MEMORY) {
+		course_manager->error = MTM_OUT_OF_MEMORY;
+		return false;
+	}
+	else if(result == SET_ITEM_DOES_NOT_EXIST) {
+		course_manager->error = MTM_NOT_FRIEND;
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+/**
+ * Destroys an instance of student
+ *
+ * @param1 student the student we destroy
+ */
+void destroyStudent(Student student) {
+	//nothing to do if student isn't set
+	if(student == NULL) {
+		return;
+	}
+	listDestroy(student->grades):
+	setDestroy(student->requests);
+	setDestroy(student->friends);
+	free(student);
 }

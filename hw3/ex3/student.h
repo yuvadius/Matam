@@ -137,7 +137,8 @@ bool isValidStudentID(char* student_id);
  * @return
  * false if there was an error. The error will be written to
  * course_manager->error
- * Possible Non Critical Errors:
+ * Possible Non Critical Errors: MTM_INVALID_PARAMETERS, MTM_NOT_LOGGED_IN,
+ * MTM_ALREADY_FRIEND
  * true if there was no error
  */
 bool addFriendship(CourseManager course_manager, Student student);
