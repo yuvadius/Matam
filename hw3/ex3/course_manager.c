@@ -50,7 +50,7 @@ CourseManager createCourseManager() {
 										 compareStudents);
 	//if memory allocation failed
 	if(course_manager->students == NULL) {
-		free(course_manager);
+		destroyCourseManager(course_manager);
 		return NULL;
 	}
 	course_manager->current_student = NULL;
@@ -89,27 +89,22 @@ bool loginStudent(CourseManager course_manager, char* student_id) {
 	if(course_manager == NULL) {
 		return false;
 	}
-	//if the parameters aren't valid return MTM_STUDENT_DOES_NOT_EXIST
-	if(isValidStudentID(student_id) == false) {
-		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
-		return false;
-	}
 	//if a student is logged in return MTM_ALREADY_LOGGED_IN
 	if(course_manager->current_student != NULL) {
 		course_manager->error = MTM_ALREADY_LOGGED_IN;
 		return false;
 	}
 	//find the student in the set
-	SET_FOREACH(Student, student, course_manager->students) {
-		//if the student was found
-		if(strcmp(student->id, student_id) == 0) {
-			course_manager->current_student = student;
-			return true;
-		}
-	}
+	Student student = getStudent(course_manager, student_id);
 	//if the student wasn't found
-	course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
-	return false;
+	if(student == NULL) {
+		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
+		return false;
+	}
+	else {
+		course_manager->current_student = student;
+		return true;
+	}
 }
 
 /**
@@ -152,8 +147,10 @@ bool removeStudent(CourseManager course_manager, char* student_id) {
 	if(course_manager == NULL) {
 		return false;
 	}
-	//if the parameters aren't valid return MTM_STUDENT_DOES_NOT_EXIST
-	if(isValidStudentID(student_id) == false) {
+	//find the student in the set
+	Student student = getStudent(course_manager, student_id);
+	//if the student wasn't found
+	if(student == NULL) {
 		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
 		return false;
 	}
@@ -161,17 +158,8 @@ bool removeStudent(CourseManager course_manager, char* student_id) {
 	if(strcmp(course_manager->current_student->id, student_id) == 0) {
 		logoutStudent(course_manager);
 	}
-	//find the student in the set
-	SET_FOREACH(Student, student, course_manager->students) {
-		//if the student was found
-		if(strcmp(student->id, student_id) == 0) {
-			destroyStudent(student);
-			return true;
-		}
-	}
-	//if the student wasn't found
-	course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
-	return false;
+	destroyStudent(student);
+	return true;
 }
 
 /**
@@ -292,6 +280,29 @@ bool isValidCourseID(char* course_id) {
 	else {
 		return false;
 	}
+}
+
+/**
+ * Get a student with a certain id from the system
+ *
+ * @param1 student the student to retrieve from the system
+ * @return
+ * the student if he exists, false otherwise
+ */
+Student getStudent(CourseManager course_manager, char* student_id) {
+	//nothing to do if the student_id isn't set
+	if(student_id == NULL) {
+		return NULL;
+	}
+	//find the student in the set
+	SET_FOREACH(Student, student, course_manager->students) {
+		//if the student was found
+		if(strcmp(student->id, student_id) == 0) {
+			return student;
+		}
+	}
+	//student wasn't found
+	return NULL;
 }
 
 /**
