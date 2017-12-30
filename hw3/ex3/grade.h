@@ -3,6 +3,11 @@
 
 #define PASS_GRADE 55
 
+#include "set.h"
+#include "list.h"
+#include "mtm_ex3.h"
+#include "course_manager.h"
+#include "student.h"
 #include <stdbool.h>
 /**
  * Manages the student operations
@@ -316,11 +321,12 @@ int getEffectiveGradeSumX2(List grades, char* semester);
  *
  * @param1 grade1 the grade that contains the course_id/semester to compare
  * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key a pointless parameter so the listSort could work
  * @return
  * 		if the courses are not equal return compareCourses
  * 		else return compareSemesters
  */
-int compareCoursesSemesters(Grade grade1, Grade grade2);
+int compareCoursesSemesters(Grade grade1, Grade grade2, ListSortKey key);
 
 /**
  * Destroys an instance of grade
