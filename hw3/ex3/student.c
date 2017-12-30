@@ -37,7 +37,7 @@ static Action getAction(char* action) {
  * The student created. if there was an allocation error return NULL
  */
 Student createStudent(char* student_id, char* first_name, char* last_name) {
-	//create an instance of a course student
+	//create an instance of a student
 	Student student = malloc(sizeof(*student));
 	if(student == NULL) { //if there was a memory failure return NULL
 		return NULL;
@@ -55,7 +55,7 @@ Student createStudent(char* student_id, char* first_name, char* last_name) {
 	student->id = student_id;
 	student->first_name = first_name;
 	student->last_name = last_name;
-	student->grades = listCreate(copyStudent, destroyStudent);
+	student->grades = listCreate(copyGrade, destroyGrade);
 	if(student->grades == NULL) { //if memory allocation failed
 		destroyStudent(student);
 		return NULL;
@@ -313,6 +313,22 @@ bool isValidStudentID(char* student_id) {
 	}
 	else {
 		return true;
+	}
+}
+
+/**
+ * Get the students id
+ *
+ * @param1 student the student which contains the id
+ * @return
+ * the id if valid, -1 otherwise
+ */
+int getStudentID(Student student) {
+	if(student == NULL || isValidStudentID(student->id) == false) {
+		return -1;
+	}
+	else {
+		return atoi(student->id); //string to number
 	}
 }
 

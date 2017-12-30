@@ -15,6 +15,7 @@
  *   compareStudents         - Compare two students's ids
  *   getGrade                - Get the student's valid grade for clean report
  *   isValidStudentID        - Checks if a student id is valid
+ *   getStudentID            - Get the students id
  *   addFriendship           - Create a friendship between two students
  *   removeFriendship        - Terminate a friendship between two students
  *   destroyStudent          - Destroys an instance of student
@@ -126,6 +127,15 @@ int getGrade(CourseManager course_manager, char* course_id);
  * true if the id is valid, false otherwise
  */
 bool isValidStudentID(char* student_id);
+
+/**
+ * Get the students id
+ *
+ * @param1 student the student which contains the id
+ * @return
+ * the id if valid, -1 otherwise
+ */
+int getStudentID(Student student);
 
 /**
  * Create a friendship between two students, the logged in student and the
