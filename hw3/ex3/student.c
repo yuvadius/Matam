@@ -230,7 +230,7 @@ bool handleFriendRequest(CourseManager course_manager, char* id, char* action) {
  * NULL if there was an allocation failure or student = NULL
  * otherwise the student
  */
-Student copyStudent(Student student) {
+void* copyStudent(void* student) {
 	//can't do anything if student isn't set
 	if(student == NULL) {
 		return NULL;
@@ -466,7 +466,7 @@ Student getStudent(CourseManager course_manager, char* student_id) {
  *
  * @param1 student the student we destroy
  */
-void destroyStudent(Student student) {
+void destroyStudent(void* student) {
 	//nothing to do if student isn't set
 	if(student == NULL) {
 		return;
