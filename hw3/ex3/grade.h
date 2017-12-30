@@ -1,6 +1,8 @@
 #ifndef GRADE_H_
 #define GRADE_H_
 
+#define PASS_GRADE 55
+
 #include <stdbool.h>
 /**
  * Manages the student operations
@@ -26,6 +28,11 @@
  *   compareSemesters        - Compare between two semesters
  *   compareCourses          - Compare between two course ids
  *   copyGrade               - Copys a grade
+ *   getTotalPointsX2        - Get the total points for a semester times 2
+ *   getFailedPointsX2       - Get the failed points for a semester times 2
+ *   getEffectivePointsX2    - Get the effective points for a semester times 2
+ *   getEffectiveGradeSumX2  - Get the effective sum for a semester times 2
+ *   compareCoursesSemesters - Compare between two courses and two semesters
  *   destroyGrade            - Destroys an instance of grade
  */
 
@@ -108,7 +115,8 @@ bool reportFull(CourseManager course_manager);
  * @param1 course_manager the CourseManager that the logged in student is in
  * @return
  * false if there was an error. The error will be written to
- * course_manager->error.
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
  * true if there was no error
  */
 bool reportClean(CourseManager course_manager);
@@ -247,6 +255,73 @@ int compareCourses(char* course_id1, char* course_id2);
  * otherwise the grade
  */
 Grade copyGrade(Grade grade);
+
+/**
+ * Get The number of total course points multiplied by 2, for a semester
+ * Courses taken multiple times are counted multiple times
+ * if the semester isn't specified then all grades will be taken into account
+ *
+ * @param1 grades the list of grades that contains all the grades
+ * @param2 semester the semester of the grades. if semester is NULL then all
+ * the grades will be taken into account
+ * @return
+ * if there was an error then -1, otherwise the total points times 2
+ */
+int getTotalPointsX2(List grades, char* semester);
+
+/**
+ * Get the number of failed course points, multiplied by 2, for a semester
+ * A failed course is a course with a grade lower than PASS_GRADE
+ * Courses failed multiple times are counted multiple times
+ * if the semester isn't specified then all grades will be taken into account
+ *
+ * @param1 grades the list of grades that contains all the grades
+ * @param2 semester the semester of the grades. if semester is NULL then all
+ * the grades will be taken into account
+ * @return
+ * if there was an error then -1, otherwise the failed points times 2
+ */
+int getFailedPointsX2(List grades, char* semester);
+
+/**
+ * Get the number of total effective course points, multiplied by 2, for a
+ * semester. Effective points are points of courses whose grade counts.
+ * A grade doesn't count if another grade of the same course id appears later
+ * in the semester
+ * if the semester isn't specified then all grades will be taken into account
+ *
+ * @param1 grades the list of grades that contains all the grades
+ * @param2 semester the semester of the grades. if semester is NULL then all
+ * the grades will be taken into account
+ * @return
+ * if there was an error then -1, otherwise the effective points times 2
+ */
+int getEffectivePointsX2(List grades, char* semester);
+
+/**
+ * Get the sum of the effective course grades, when
+ * each grade is multiplied by the number of course points, multiplied by 2
+ * if the semester isn't specified then all grades will be taken into account
+ *
+ * @param1 grades the list of grades that contains all the grades
+ * @param2 semester the semester of the grades. if semester is NULL then all
+ * the grades will be taken into account
+ * @return
+ * if there was an error then -1, otherwise the effective grade sum times 2
+ */
+int getEffectiveGradeSumX2(List grades, char* semester);
+
+/**
+ * Compare between two course ids
+ *
+ * @param1 course_id1 the course id we want to compare with course_id2
+ * @param2 course_id2 the course id we want to compare with course_id1
+ * @return
+ * 		A positive integer if the first course id is greater;
+ * 		0 if they're equal or if one of the parameters is NULL;
+ * 		A negative integer if the second course id is greater.
+ */
+int compareCourses(char* course_id1, char* course_id2);
 
 /**
  * Destroys an instance of grade

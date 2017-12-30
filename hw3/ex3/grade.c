@@ -227,30 +227,118 @@ bool reportFull(CourseManager course_manager) {
 		course_manager->error = MTM_NOT_LOGGED_IN;
 		return false;
 	}
+	List grades = course_manager->current_student->grades; //shorter name
 	mtmPrintStudentInfo(course_manager->output_channel,
 						getStudentID(course_manager->current_student),
 						course_manager->current_student->first_name,
 						course_manager->current_student->last_name);
-	List reversed_grades = listCopyReversed(course_manager, 
-									course_manager->current_student->grades);
-	if(reversed_grades == NULL) { //if there was an allocation failure
-		course_manager->error = MTM_OUT_OF_MEMORY;
+	//if the list is empty then there is nothing to print
+	if(listGetSize(grades) != 0) {
+		//get the grades from smallest semester num to biggest semester num
+		List reversed_grades = listCopyReversed(course_manager, grades);
+		if(reversed_grades == NULL) { //if there was an allocation failure
+			course_manager->error = MTM_OUT_OF_MEMORY;
+			return false;
+		}
+		//get the first element(NOT A COPY)
+		Grade temp_grade = listGetFirst(reversed_grades);
+		char* semester = temp_grade->semester; //get the first semester
+		LIST_FOREACH(Grade, grade, reversed_grades) { //loop over all the grades
+			//if all grades of a semester have been printed print SemesterInfo
+			if(compareSemesters(semester, grade->semester) != 0) {
+				mtmPrintSemesterInfo(course_manager->output_channel, 
+									 getSemester(semester), 
+									 getTotalPointsX2(grades, semester),
+									 getFailedPointsX2(grades, semester),
+									 getEffectivePointsX2(grades, semester),
+									 getEffectiveGradeSumX2(grades, semester));
+				semester = grade->semester;
+			}
+			mtmPrintGradeInfo(course_manager->output_channel, 
+							getCourseID(grade->course_id), 
+							getPointsX2(grade->points), getGrade(grade->grade));
+		}
+		//print the last semester
+		mtmPrintSemesterInfo(course_manager->output_channel, 
+							 getSemester(semester), 
+							 getTotalPointsX2(grades, semester),
+							 getFailedPointsX2(grades, semester),
+							 getEffectivePointsX2(grades, semester),
+							 getEffectiveGradeSumX2(grades, semester));
+		listDestroy(reversed_grades); //destroy instance of reversed_grades
+	}
+	//print the grade summary
+	mtmPrintSummary(course_manager->output_channel, 
+					getTotalPointsX2(grades, NULL),
+					getFailedPointsX2(grades, NULL),
+					getEffectivePointsX2(grades, NULL),
+					getEffectiveGradeSumX2(grades, NULL));
+	return true;
+}
+
+/**
+ * Print the clean matriculation
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
+ * true if there was no error
+ */
+bool reportClean(CourseManager course_manager) {
+	//can't do anything if course_manager or output_channel isn't set
+	if(course_manager == NULL || course_manager->output_channel == NULL) {
 		return false;
 	}
-	//get the first element(NOT A COPY)
-	Grade temp_grade = listGetFirst(course_manager->current_student->grades);
-	char* semester = temp_grade->semester;
-
-	//update the newest grade of the course in the student's list of grades
-	LIST_FOREACH(Grade, grade, course_manager->current_student->grades) {
-		mtmPrintGradeInfo(course_manager->output_channel, 
-						  getCourseID(grade->course_id), 
-						  getPointsX2(grade->points), getGrade(grade->grade));
-		//if the course_id is equal to the current course id in the list 
-		if(compareSemesters(semester, grade->semester) != 0) {
-			mtmPrintSemesterInfo(course_manager->output_channel, 
-								 getSemester(semester), )
-			semester = grade->semester;
-		}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(course_manager->current_student == NULL) {
+		course_manager->error = MTM_NOT_LOGGED_IN;
+		return false;
 	}
+	List grades = course_manager->current_student->grades; //shorter name
+	mtmPrintStudentInfo(course_manager->output_channel,
+						getStudentID(course_manager->current_student),
+						course_manager->current_student->first_name,
+						course_manager->current_student->last_name);
+	//if the list is empty then there is nothing to print
+	if(listGetSize(grades) != 0) {
+		/*//get the grades from smallest semester num to biggest semester num
+		List reversed_grades = listCopyReversed(course_manager, grades);
+		if(reversed_grades == NULL) { //if there was an allocation failure
+			course_manager->error = MTM_OUT_OF_MEMORY;
+			return false;
+		}
+		//get the first element(NOT A COPY)
+		Grade temp_grade = listGetFirst(reversed_grades);
+		char* semester = temp_grade->semester; //get the first semester
+		LIST_FOREACH(Grade, grade, reversed_grades) { //loop over all the grades
+			//if all grades of a semester have been printed print SemesterInfo
+			if(compareSemesters(semester, grade->semester) != 0) {
+				mtmPrintSemesterInfo(course_manager->output_channel, 
+									 getSemester(semester), 
+									 getTotalPointsX2(grades, semester),
+									 getFailedPointsX2(grades, semester),
+									 getEffectivePointsX2(grades, semester),
+									 getEffectiveGradeSumX2(grades, semester));
+				semester = grade->semester;
+			}
+			mtmPrintGradeInfo(course_manager->output_channel, 
+							getCourseID(grade->course_id), 
+							getPointsX2(grade->points), getGrade(grade->grade));
+		}
+		//print the last semester
+		mtmPrintSemesterInfo(course_manager->output_channel, 
+							 getSemester(semester), 
+							 getTotalPointsX2(grades, semester),
+							 getFailedPointsX2(grades, semester),
+							 getEffectivePointsX2(grades, semester),
+							 getEffectiveGradeSumX2(grades, semester));
+		listDestroy(reversed_grades); //destroy instance of reversed_grades*/
+	}
+	//print the grade summary
+	mtmPrintCleanSummary(course_manager->output_channel,
+						 getEffectivePointsX2(grades, NULL),
+						 getEffectiveGradeSumX2(grades, NULL));
+	return true;
 }
