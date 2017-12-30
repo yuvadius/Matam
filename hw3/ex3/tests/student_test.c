@@ -16,7 +16,7 @@ static bool testCreateStudent() {
 static bool testFriendRequest() {
 	CourseManager course_manager = createCourseManager();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
-	ASSERT_TEST(addStudent(course_manager,"110", "Alpha", "Beta"))// true expect
+	ASSERT_TEST(addStudent(course_manager,"110", "Alpha", "Beta"));//true expect
 																			//ed
 	ASSERT_TEST(!friendRequest(course_manager, "222"));// FALSE expected.
 	ASSERT_TEST(getCourseManagerError(course_manager) == 
