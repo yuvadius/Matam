@@ -128,29 +128,54 @@ static bool testUnFriend() {
 static bool testCompareStudents() {
 	Student student1 = createStudent("1", "1", "1");
 	Student student2 = createStudent("2", "2", "2");
-	ASSERT_TEST(compareStudents(student1,student2) < 0) 
+	ASSERT_TEST(student1!=NULL && student2!=NULL);// shouldnt be NULL because
+	// no memory allocation failiure expected here.
+	ASSERT_TEST(compareStudents(student1,student2) < 0); // stud2 is greater
 	return true;
 }
-
 
 static bool testCopyStudent() {
+	Student student1 = createStudent("1", "1", "1");
+	Student student2 = copyStudent(student1);
+	ASSERT_TEST(student1!=NULL && student2!=NULL);// shouldnt be NULL because
+	// no memory allocation failiure expected here.
+	ASSERT_TEST(compareStudents(student1, student2)==0); // should be the same.
 	return true;
 }
 
 
-static bool testGetGrade() {
+static bool testGetGrade() {   // ???????????????????ADD LATER???????????????????????
 	return true;
 }
 
 static bool testIsValidStudentID() {
+	ASSERT_TEST(!isValidStudentID("-1")); //FALSE expected as entered an invalid
+	// ID
+	ASSERT_TEST(!isValidStudentID("123456789999")); //FALSE expected as entered 
+	//an invalid ID
+	ASSERT_TEST(isValidStudentID("65940")); // true, valid ID.
 	return true;
 }
 
 static bool testGetStudentID() {
+	Student student1 = createStudent("1", "1", "1");
+	Student student2 = createStudent("-23", "2", "2");
+	ASSERT_TEST(student1!=NULL && student2!=NULL);// shouldnt be NULL because
+	// no memory allocation failiure expected here.
+	ASSERT_TEST(getStudentID(student1) == 1); // expected 1.
+	ASSERT_TEST(getStudentID(student2) == -1); // expected -1(invalid ID).
+	ASSERT_TEST(getStudentID(NULL) == -1); // expected -1 for NULL input.
 	return true;
 }
 
 static bool testDestroyStudent() {
+	Student student1 = createStudent("3", "3", "3");
+	ASSERT_TEST(student1!=NULL);// shouldnt be NULL because no memory allocation
+	// failiure expected here.
+	destroyStudent(student1); 
+	// There is no way to check here if the student instanse was freed corectly.
+	// This will be checked with valgrind. No memory leak means that the 
+	// instanse was correctly freed.
 	return true;
 }
 
