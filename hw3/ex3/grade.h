@@ -16,6 +16,16 @@
  *   reportBest              - Print the best grades
  *   reportWorst             - Print the worst grades
  *   reportReference         - Print students with highest the grades for course
+ *   isValidGrade            - Checks if the grade is valid
+ *   isValidPoints           - Checks if the points for a course are valid
+ *   isValidSemester         - Checks if the semester is valid
+ *   getGrade                - Get the grade
+ *   getPointsX2             - Get the points times 2
+ *   getSemester             - Get the semester
+ *   getCourseID             - Get the course ID
+ *   compareSemesters        - Compare between two semesters
+ *   compareCourses          - Compare between two course ids
+ *   copyGrade               - Copys a grade
  *   destroyGrade            - Destroys an instance of grade
  */
 
@@ -44,11 +54,12 @@ Grade createGrade(char* semester, char* course_id, char* points, char* grade);
  * @param5 grade the grade received in the course
  * @return
  * false if there was an error. The error will be written to
- * course_manager->error.
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
  * true if there was no error
  */
 bool addGrade(CourseManager course_manager, char* semester, char* course_id,
-				 char* points, char* grade);
+			  char* points, char* grade);
 
 /**
  * Removes a grade from the logged in student
@@ -58,7 +69,8 @@ bool addGrade(CourseManager course_manager, char* semester, char* course_id,
  * @param3 course_id the id of the course
  * @return
  * false if there was an error. The error will be written to
- * course_manager->error.
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_COURSE_DOES_NOT_EXIST
  * true if there was no error
  */
 bool removeGrade(CourseManager course_manager, char* semester, char* course_id);
@@ -71,7 +83,9 @@ bool removeGrade(CourseManager course_manager, char* semester, char* course_id);
  * @param3 grade the grade received in the course
  * @return
  * false if there was an error. The error will be written to
- * course_manager->error.
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_COURSE_DOES_NOT_EXIST,
+ * MTM_INVALID_PARAMETERS
  * true if there was no error
  */
 bool updateGrade(CourseManager course_manager, char* course_id, char* grade);
@@ -82,7 +96,8 @@ bool updateGrade(CourseManager course_manager, char* course_id, char* grade);
  * @param1 course_manager the CourseManager that the logged in student is in
  * @return
  * false if there was an error. The error will be written to
- * course_manager->error.
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
  * true if there was no error
  */
 bool reportFull(CourseManager course_manager);
@@ -135,6 +150,103 @@ bool reportWorst(CourseManager course_manager, char* amount);
  */
 bool reportReference(CourseManager course_manager, char* course_id, 
 					 char* amount);
+
+/**
+ * Checks if the grade is valid
+ *
+ * @param1 grade the grade that is checked for validity
+ * @return
+ * true if the grade is valid, false otherwise
+ */
+bool isValidGrade(char* grade);
+
+/**
+ * Checks if the points for a course are valid
+ *
+ * @param1 points the points that is checked for validity
+ * @return
+ * true if the points is valid, false otherwise
+ */
+bool isValidPoints(char* points);
+
+/**
+ * Checks if the semester is valid
+ *
+ * @param1 semester the semester that is checked for validity
+ * @return
+ * true if the semester is valid, false otherwise
+ */
+bool isValidSemester(char* semester);
+
+/**
+ * Get the grade
+ *
+ * @param1 grade the grade that contains the "grade"
+ * @return
+ * if there was an error then -1, otherwise the grade
+ */
+int getGrade(char* grade);
+
+/**
+ * Get the points times 2
+ *
+ * @param1 points the points that contains the "points"
+ * @return
+ * if there was an error then -1, otherwise the points
+ */
+int getPointsX2(char* points);
+
+/**
+ * Get the semester
+ *
+ * @param1 semester the semester that contains the "semester"
+ * @return
+ * if there was an error then -1, otherwise the semester
+ */
+int getSemester(char* semester);
+
+/**
+ * Get the course ID
+ *
+ * @param1 course_id the course_id that contains the "course id"
+ * @return
+ * if there was an error then -1, otherwise the course id
+ */
+int getCourseID(char* course_id);
+
+/**
+ * Compare between two semesters
+ *
+ * @param1 semester1 the semester we want to compare with semester2
+ * @param2 semester2 the semester we want to compare with semester1
+ * @return
+ * 		A positive integer if the first semester is greater;
+ * 		0 if they're equal or if one of the parameters is NULL;
+ * 		A negative integer if the second semester is greater.
+ */
+int compareSemesters(char* semester1, char* semester2);
+
+/**
+ * Compare between two course ids
+ *
+ * @param1 course_id1 the course id we want to compare with course_id2
+ * @param2 course_id2 the course id we want to compare with course_id1
+ * @return
+ * 		A positive integer if the first course id is greater;
+ * 		0 if they're equal or if one of the parameters is NULL;
+ * 		A negative integer if the second course id is greater.
+ */
+int compareCourses(char* course_id1, char* course_id2);
+
+/**
+ * Copys a grade
+ *
+ * @param1 grade the grade we want to copy
+ * @return
+ * NULL if there was an allocation failure or grade = NULL
+ * otherwise the grade
+ */
+Grade copyGrade(Grade grade);
 
 /**
  * Destroys an instance of grade

@@ -10,6 +10,7 @@ struct course_manager_t {
 	Set students;
 	Student current_student;
 	MtmErrorCode error;
+	FILE* output_channel
 };
 
 /**
@@ -55,6 +56,7 @@ CourseManager createCourseManager() {
 	}
 	course_manager->current_student = NULL;
 	course_manager->error = NULL;
+	course_manager->output_channel = NULL;
 	return course_manager;
 }
 
