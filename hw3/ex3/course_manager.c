@@ -285,7 +285,7 @@ bool isValidCourseID(char* course_id) {
 /**
  * Get a student with a certain id from the system
  *
- * @param1 student the student to retrieve from the system
+ * @param1 student_id the student to retrieve from the system
  * @return
  * the student if he exists, false otherwise
  */

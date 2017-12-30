@@ -9,8 +9,8 @@
 /**
  * List of tests, one for each function is usually a good thumb rule.
  */
-static bool testCourseManagerCreate() {
-	ASSERT_TEST(courseManagerCreate() != NULL); // shouldn`t return NULL because
+static bool testCreateCourseManager() {
+	ASSERT_TEST(createCourseManager() != NULL); // shouldn`t return NULL because
 	// no allocation error is expected here. 
 	return true;
 }
@@ -21,7 +21,7 @@ static bool testHandleInput() {
 }
 
 static bool testAddStudent() {
-	CourseManager course_manager = courseManagerCreate();
+	CourseManager course_manager = createCourseManager();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
 	ASSERT_TEST(addStudent(course_manager, "1010", "Mr", "Smith");// should
 	// be true
@@ -38,10 +38,10 @@ static bool testAddStudent() {
 	// if getCourseManagerError func failed, it will return NULL such that
 	// ASSERT_TEST fails.
 	return true;
-}
+
 
 static bool testLoginStudent() {
-	CourseManager course_manager = courseManagerCreate();
+	CourseManager course_manager = createCourseManager();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
 	ASSERT_TEST(!loginStudent(course_manager, NULL)); //should return FALSE
 	// because illegal ID was sent.
@@ -76,7 +76,7 @@ static bool testLoginStudent() {
 }
 
 static bool testRemoveStudent() {
-	CourseManager course_manager = courseManagerCreate();
+	CourseManager course_manager = createCourseManager();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
 	ASSERT_TEST(addStudent(course_manager, "2002", "Yuv", "Smith");// should
 	// be true
@@ -98,24 +98,28 @@ static bool testRemoveStudent() {
 }
 
 static bool testLogoutStudent() {
-	CourseManager course_manager = courseManagerCreate();
+	CourseManager course_manager = createCourseManager();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
 	ASSERT_TEST(addStudent(course_manager, "2002", "Tiesto", "!!!");// should
 	// be true
 	ASSERT_TEST(addStudent(course_manager, "121212", "Curbi", "???");// should
 	// be true
 	ASSERT_TEST(loginStudent(course_manager,"2002")); // should be true
-	ASSERT_TEST(logoutStudent(NULL)) // should be FALSE
-	ASSERT_TEST(logoutStudent(course_manager)) // should be true
+	ASSERT_TEST(!logoutStudent(NULL)); // should be FALSE
+	ASSERT_TEST(getCourseManagerError(course_manager) == 
+				MTM_NOT_LOGGED_IN); // this error is expected.
+	// if getCourseManagerError func failed, it will return NULL such that
+	// ASSERT_TEST fails.
+	ASSERT_TEST(logoutStudent(course_manager)); // should be true
 	// we will check if the student indeed loged out by trying to login him.
 	ASSERT_TEST(loginStudent(course_manager,"2002")); // should be true
 	return true;
 }
 
 static bool testFacultyRequest() {
-	CourseManager course_manager = courseManagerCreate();
+	CourseManager course_manager = createCourseManager();
 	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
-	ASSERT_TEST(!facultyRequest(course_manager,"0210",REMOVE_COURSE)); //FALSE
+	ASSERT_TEST(!facultyRequest(course_manager,"0210","REMOVE_COURSE")); //FALSE
 	ASSERT_TEST(getCourseManagerError(course_manager) == 
 				MTM_NOT_LOGGED_IN); // this error is expected.
 	// if getCourseManagerError func failed, it will return NULL such that
@@ -123,22 +127,42 @@ static bool testFacultyRequest() {
 	ASSERT_TEST(addStudent(course_manager, "121212", "Curbi", "???");// should
 	// be true
 	ASSERT_TEST(loginStudent(course_manager,"121212")); // should be true
-		ASSERT_TEST(!facultyRequest(course_manager,"121212",REMOVE_COURSE)); 
-		// FALSE
+	ASSERT_TEST(!facultyRequest(course_manager,"-14","REMOVE_COURSE"));
+																		//FALSE
 	ASSERT_TEST(getCourseManagerError(course_manager) == 
 				MTM_COURSE_DOES_NOT_EXIST); // this error is expected.
 	// if getCourseManagerError func failed, it will return NULL such that
 	// ASSERT_TEST fails.
+	ASSERT_TEST(facultyRequest("1332", "CANCEL_COURSE")); // expected true.
+	return true;
+}
 
+static bool testIsValidCourseID() {
+	CourseManager course_manager = createCourseManager();
+	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
+	ASSERT_TEST(!isValidCourseID(NULL)); // should be FALSE.
+	ASSERT_TEST(!isValidCourseID("0")); // should be FALSE.
+	ASSERT_TEST(isValidCourseID("1")); //should be true.
+	return true;
+}
 
+static bool testGetStudent() {
+	CourseManager course_manager = createCourseManager();
+	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
+	student1 = createStudent("123","Don","Diablo");
+	ASSERT_TEST(student1!=NULL); // expected true.
+	ASSERT_TEST(getStudent(course_manager, "124")==NULL); //expected NULL
+	ASSERT_TEST(getStudent(course_manager, "123")==student1); //student1 
+	//expected to be returned.
+	return true;
+}
 
-
-	//???????DO NOT FORGET TO ADD TESTS FOR THE THIRD ERROR MTM_INVALID_PARAMETERS?????????????
-	// +CORRECT TESTS FOR TRUE
-
-
-
-
+static bool testDestroyCourseManager() {
+	CourseManager course_manager = createCourseManager();
+	ASSERT_TEST(course_manager != NULL); // shouldn`t be NULL.
+	destroyCourseManager(course_manager);
+	ASSERT_TEST(course_manager==NULL); //expected to be NULL because the CM was
+	// destroyed.
 	return true;
 }
 
@@ -151,13 +175,18 @@ static bool testFacultyRequest() {
 
 
 int main() {
-	RUN_TEST(testCourseManagerCreate);
+	RUN_TEST(testCreateCourseManager);
 	RUN_TEST(testHandleInput);
 	RUN_TEST(testAddStudent);
 	RUN_TEST(testLoginStudent);
 	RUN_TEST(testRemoveStudent);
 	RUN_TEST(testLogoutStudent);
 	RUN_TEST(testFacultyRequest);
+	RUN_TEST(testIsValidCourseID);
+	RUN_TEST(testGetStudent);
+	RUN_TEST(testDestroyCourseManager);
 
 	return 0;
 }
+
+
