@@ -1,5 +1,5 @@
-#ifndef COURSE_MANAGER_H_
-#define COURSE_MANAGER_H_
+#ifndef LIST_H_
+#define LIST_H_
 
 #include <stdbool.h>
 /**

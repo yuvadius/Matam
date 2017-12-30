@@ -1,16 +1,16 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include "set.h"
+#include "mtm_ex3.h"
+#include "course_manager.h"
 #include "student.h"
-
-#define COURSE_ID_MIN 1
-#define COURSE_ID_MAX 999999
 
 struct course_manager_t {
 	Set students;
 	Student current_student;
 	MtmErrorCode error;
-	FILE* output_channel
+	FILE* output_channel;
 };
 
 /**
@@ -55,7 +55,6 @@ CourseManager createCourseManager() {
 		return NULL;
 	}
 	course_manager->current_student = NULL;
-	course_manager->error = NULL;
 	course_manager->output_channel = NULL;
 	return course_manager;
 }
@@ -201,7 +200,7 @@ bool addStudent(CourseManager course_manager, char* student_id,
 	destroyStudent(student);
 	if(result == SET_OUT_OF_MEMORY) {
 		course_manager->error = MTM_OUT_OF_MEMORY;
-		return false
+		return false;
 	}
 	else if(result == SET_ITEM_ALREADY_EXISTS) { //if the student was found
 		course_manager->error = MTM_STUDENT_ALREADY_EXISTS;
@@ -264,7 +263,7 @@ MtmErrorCode getCourseManagerError(CourseManager course_manager) {
 	if(course_manager == NULL) {
 		return false;
 	}
-	return course_manager->errorl
+	return course_manager->error;
 }
 
 /**
@@ -282,29 +281,6 @@ bool isValidCourseID(char* course_id) {
 	else {
 		return false;
 	}
-}
-
-/**
- * Get a student with a certain id from the system
- *
- * @param1 student_id the student to retrieve from the system
- * @return
- * the student if he exists, false otherwise
- */
-Student getStudent(CourseManager course_manager, char* student_id) {
-	//nothing to do if the student_id isn't set
-	if(student_id == NULL) {
-		return NULL;
-	}
-	//find the student in the set
-	SET_FOREACH(Student, student, course_manager->students) {
-		//if the student was found
-		if(strcmp(student->id, student_id) == 0) {
-			return student;
-		}
-	}
-	//student wasn't found
-	return NULL;
 }
 
 /**

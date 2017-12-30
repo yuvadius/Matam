@@ -1,7 +1,11 @@
 #ifndef STUDENT_H_
 #define STUDENT_H_
 
+#define STUDENT_ID_MIN 1
+#define STUDENT_ID_MAX 999999999
+
 #include <stdbool.h>
+#include "course_manager.h"
 /**
  * Manages the student operations
  *
@@ -18,6 +22,7 @@
  *   getStudentID            - Get the students id
  *   addFriendship           - Create a friendship between two students
  *   removeFriendship        - Terminate a friendship between two students
+ *   getStudent               - Get a student with a certain id from the system
  *   destroyStudent          - Destroys an instance of student
  */
 
@@ -167,6 +172,15 @@ bool addFriendship(CourseManager course_manager, Student student);
  * true if there was no error
  */
 bool removeFriendship(CourseManager course_manager, Student student);
+
+/**
+ * Get a student with a certain id from the system
+ *
+ * @param1 student the student to retrieve from the system
+ * @return
+ * the student if he exists, false otherwise
+ */
+Student getStudent(CourseManager course_manager, char* student_id);
 
 /**
  * Destroys an instance of student

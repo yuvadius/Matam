@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "set.h"
+#include "list.h"
+#include "mtm_ex3.h"
+#include "course_manager.h"
 #include "student.h"
-
-#define STUDENT_ID_MIN 1
-#define STUDENT_ID_MAX 999999999
+#include "grade.h"
 
 struct student_t {
 	Set friends;
@@ -435,6 +436,29 @@ bool removeFriendship(CourseManager course_manager, Student student) {
 	else {
 		return true;
 	}
+}
+
+/**
+ * Get a student with a certain id from the system
+ *
+ * @param1 student_id the student to retrieve from the system
+ * @return
+ * the student if he exists, false otherwise
+ */
+Student getStudent(CourseManager course_manager, char* student_id) {
+	//nothing to do if the student_id isn't set
+	if(student_id == NULL) {
+		return NULL;
+	}
+	//find the student in the set
+	SET_FOREACH(Student, student, course_manager->students) {
+		//if the student was found
+		if(strcmp(student->id, student_id) == 0) {
+			return student;
+		}
+	}
+	//student wasn't found
+	return NULL;
 }
 
 /**
