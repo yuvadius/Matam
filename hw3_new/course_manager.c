@@ -63,6 +63,14 @@ bool studentCommand(CourseManager course_manager, char* input_line, int i) {
 	return true;
 }
 
+bool gradeCommand(CourseManager course_manager, char* input_line, int i) {
+	return true;
+}
+
+bool reportCommand(CourseManager course_manager, char* input_line, int i) {
+	return true;
+}
+
 /**
  * Processes an input line command
  *
