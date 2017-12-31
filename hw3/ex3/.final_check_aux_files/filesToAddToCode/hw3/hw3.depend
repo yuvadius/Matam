@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1514714800 source:c:\users\yuvadius\desktop\github\matam\hw3\ex3\.final_check_aux_files\filestoaddtocode\main.c
+	<stdio.h>
+	"mtm_ex3.h"
+
+1513961640 c:\users\yuvadius\desktop\github\matam\hw3\ex3\.final_check_aux_files\filestoaddtocode\mtm_ex3.h
+	<stdio.h>
+	<stdbool.h>
+
