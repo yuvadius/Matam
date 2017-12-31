@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	if(setInputOutputFiles(&input_file, &output_file, argc, argv) == false) {
 		return 0;
 	}
-	fclose(input_file);
-	fclose(output_file);
+	fclose(input_file); //close file
+	fclose(output_file); //close file
     return 0;
 }
