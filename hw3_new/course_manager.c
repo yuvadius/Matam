@@ -78,8 +78,39 @@ bool isCriticalError(CourseManager course_manager) {
 bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 	if(strcmp(token, "login") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
+		return loginStudent(course_manager, atoi(token));
+	}
+	else if(strcmp(token, "logout") == 0) {
+		return logoutStudent(course_manager);
+	}
+	else if(strcmp(token, "add") == 0) {
+		token = strtok(NULL, del); //get the third argument(id)
+		int id = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(first name)
+		char* first_name = malloc(strlen(token) + 1);
+		if(first_name == NULL) { //if memory allocation failed
+			course_manager->error = MTM_OUT_OF_MEMORY;
+			return false;
+		}
+		strcpy(first_name, token); //get the first name
+		token = strtok(NULL, del); //get the fifth argument(last name)
+		char* last_name = malloc(strlen(token) + 1);
+		if(last_name == NULL) { //if memory allocation failed
+			course_manager->error = MTM_OUT_OF_MEMORY;
+			return false;
+		}
+		strcpy(last_name, token); //get the last name
+		bool result = addStudent(course_manager, id, first_name, last_name);
+		free(last_name);
+		free(first_name);
+		return result;
+	}
+	else if(strcmp(token, "remove")) {
+		token = strtok(NULL, del); //get the third argument(id)
+		return removeStudent(course_manager, atoi(token));
+	}
+	else if(strcmp(token, "friend_request")) {
 
-		//loginStudent()
 	}
 	return true;
 }
@@ -186,6 +217,167 @@ bool isValidCourseID(char* course_id) {
 		return true;
 	}
 	else {
+		return false;
+	}
+}
+
+/**
+ * Logs in a student to the system
+ *
+ * @param1 course_manager the CourseManager that the student will be logged into
+ * @param2 student_id the students ID
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error.
+ * Possible Non Critical Errors: MTM_ALREADY_LOGGED_IN,
+ * MTM_STUDENT_DOES_NOT_EXIST
+ * true if there was no error
+ */
+bool loginStudent(CourseManager course_manager, int student_id) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_ALREADY_LOGGED_IN
+	if(course_manager->current_student != NULL) {
+		course_manager->error = MTM_ALREADY_LOGGED_IN;
+		return false;
+	}
+	//find the student in the set
+	Student student = getStudent(course_manager, student_id);
+	//if the student wasn't found
+	if(student == NULL) {
+		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
+		return false;
+	}
+	else {
+		course_manager->current_student = student;
+		return true;
+	}
+}
+
+/**
+ * Gets the set of students from the system
+ *
+ * @param1 course_manager the CourseManager that the students are in
+ * @return
+ * NULL on failure, otherwise return the set of students
+ */
+Set getStudents(CourseManager course_manager) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return NULL;
+	}
+	return course_manager->students;
+}
+
+/**
+ * Logs out a student from the system
+ *
+ * @param1 course_manager CourseManager that the student will be logged out of
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error.
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
+ * true if there was no error
+ */
+bool logoutStudent(CourseManager course_manager) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return false;
+	}
+	//if a student is not logged in return MTM_NOT_LOGGED_IN
+	if(course_manager->current_student == NULL) {
+		course_manager->error = MTM_NOT_LOGGED_IN;
+		return false;
+	}
+	course_manager->current_student = NULL; //logout the student
+	return true;
+}
+
+/**
+ * Add the student to the system
+ *
+ * @param1 course_manager the CourseManager that the student will be added to
+ * @param2 student_id the students ID
+ * @param3 first_name the first name of the student
+ * @param4 last_name the last name of the student
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_STUDENT_ALREADY_EXISTS,
+ * MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool addStudent(CourseManager course_manager, int student_id, char* first_name,
+				char* last_name) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return false;
+	}
+	//find the student in the set
+	SET_FOREACH(Student, student, course_manager->students) {
+		//if the student was found
+		if(getStudentID(student) == student_id) {
+			course_manager->error = MTM_STUDENT_ALREADY_EXISTS;
+			return false;
+		}
+	}
+	//student doesn't exist
+	if(isValidStudentID(student_id) == false) { //if the id isn't valid
+		course_manager->error = MTM_INVALID_PARAMETERS;
+		return false;
+	}
+	//create a student
+	Student student = createStudent(student_id, first_name, last_name);
+	//if there was a memory allocation failure
+	if(student == NULL) {
+		course_manager->error = MTM_OUT_OF_MEMORY;
+		return false;
+	}
+	//add a copy of student to the set
+	SetResult result = setAdd(course_manager->students, student);
+	destroyStudent(student); //because a copy was added
+	if(result == SET_OUT_OF_MEMORY) {
+		course_manager->error = MTM_OUT_OF_MEMORY;
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+/**
+ * Remove the student from the system
+ *
+ * @param1 course_manager CourseManager that the student will be removed from
+ * @param2 student_id the students ID
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error.
+ * Possible Non Critical Errors: MTM_STUDENT_DOES_NOT_EXIST
+ * true if there was no error
+ */
+bool removeStudent(CourseManager course_manager, int student_id) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return false;
+	}
+	//find the student in the set
+	Student student = getStudent(course_manager, student_id);
+	//if the student wasn't found
+	if(student == NULL) {
+		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
+		return false;
+	}
+	//log out the student if the student is logged in
+	if(getStudentID(course_manager->current_student) == student_id) {
+		logoutStudent(course_manager);
+	}
+	if(setRemove(course_manager->students, student) == SET_SUCCESS) {
+		return true;
+	}
+	else { //something went horribly wrong
 		return false;
 	}
 }

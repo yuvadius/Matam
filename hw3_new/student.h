@@ -13,6 +13,10 @@
  * createStudent           - Creates an instance of student
  * copyStudent             - Copies a student
  * compareStudents         - Compare two students's ids
+ * getStudent              - Get a student with a certain id from the system
+ * isValidStudentID        - Checks if a student id is valid
+ * getStudentID            - Get the students id
+ * friendRequest           - Send a friend request from one student to another
  * destroyStudent          - Destroys an instance of student
  *
  * The following functions are available:
@@ -54,6 +58,48 @@ SetElement copyStudent(SetElement student);
  * 		A negative integer if the second student id is greater.
  */
 int compareStudents(SetElement student1, SetElement student2);
+
+/**
+ * Get a student with a certain id from the system
+ *
+ * @param1 student the student to retrieve from the system
+ * @param2 student_id the id of the student
+ * @return
+ * the student if he exists, NULL otherwise
+ */
+Student getStudent(CourseManager course_manager, int student_id);
+
+/**
+ * Checks if a student id is valid
+ *
+ * @param1 student_id the id of the student that is checked
+ * @return
+ * true if the id is valid, false otherwise
+ */
+bool isValidStudentID(int student_id);
+
+/**
+ * Get the students id
+ *
+ * @param1 student the student which contains the id
+ * @return
+ * the id if valid, 0 otherwise
+ */
+int getStudentID(Student student);
+
+/**
+ * Sends a friend request from the logged in student to the student with the id
+ *
+ * @param1 course_manager the CourseManager that the student is in
+ * @param2 id the student, which is receiving the friend request, ID
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_ALREADY_FRIEND,
+ * MTM_STUDENT_DOES_NOT_EXIST, MTM_ALREADY_REQUESTED
+ * true if there was no error
+ */
+bool friendRequest(CourseManager course_manager, int id);
 
 /**
  * Destroys an instance of student
