@@ -75,18 +75,22 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 		if(input_line[i] == '#') {
 			return true;
 		}
-		if(input_line[i] == 's') {
-			studentCommand();
+		if(input_line[i] == 's') { // student command
+			studentCommand(course_manager,input_line,i);
 		}
-		if(input_line[i] == 'g') {
-			gradeCommand();
+		if(input_line[i] == 'g') { // grade_sheet command
+			gradeCommand(course_manager,input_line,i);
 		}
-		if(input_line[i] == 'r') {
-			reportCommand();
+		if(input_line[i] == 'r') { // report command
+			reportCommand(course_manager,input_line,i);
 		}
 		++i;
 	}
 	return true;
+}
+
+bool studentCommand(CourseManager course_manager, char* input_line, int i) {
+	
 }
 
 /**
