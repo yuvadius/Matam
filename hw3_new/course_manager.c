@@ -82,15 +82,21 @@ bool isCriticalError(CourseManager course_manager) {
 	}
 }
 
-bool studentCommand(CourseManager course_manager, char* input_line, int i) {
+bool studentInput(CourseManager course_manager, char* input_line, char* token,
+				  const char delimiter[2]) {
+	printf("%s\n", token);
 	return true;
 }
 
-bool gradeCommand(CourseManager course_manager, char* input_line, int i) {
+bool gradeInput(CourseManager course_manager, char* input_line, char* token,
+				const char delimiter[2]) {
+	printf("%s\n", token);
 	return true;
 }
 
-bool reportCommand(CourseManager course_manager, char* input_line, int i) {
+bool reportInput(CourseManager course_manager, char* input_line, char* token,
+				 const char delimiter[2]) {
+	printf("%s\n", token);
 	return true;
 }
 
@@ -105,23 +111,31 @@ bool reportCommand(CourseManager course_manager, char* input_line, int i) {
  * true if there was no error
  */
 bool handleInput(CourseManager course_manager, char* input_line) {
-	int i=0;
-	while (input_line[i] != '\0' && i<MAX_LEN) {
-		if(input_line[i] == '#') {
-			return true;
-		}
-		if(input_line[i] == 's') { // student command
-			studentCommand(course_manager,input_line,i);
-		}
-		if(input_line[i] == 'g') { // grade_sheet command
-			gradeCommand(course_manager,input_line,i);
-		}
-		if(input_line[i] == 'r') { // report command
-			reportCommand(course_manager,input_line,i);
-		}
-		++i;
+	//nothing to do if the parameters aren't set
+	if(course_manager == NULL || input_line == NULL) {
+		return true;
 	}
-	return true;
+	const char delimiter[2] = " "; //the delimiter, break words between spaces
+	char *token = strtok(input_line, delimiter); // get the first token
+	if(token == NULL || token[0] == '#') { //if empty line or comment line
+		return true;
+	}
+	printf("%s\n", token);
+	if(strcmp(token, "student") == 0) {
+		token = strtok(NULL, delimiter); //get the subcommand
+		return studentInput(course_manager, input_line, token, delimiter);
+	}
+	else if(strcmp(token, "grade_sheet") == 0) {
+		token = strtok(NULL, delimiter); //get the subcommand
+		return gradeInput(course_manager, input_line, token, delimiter);
+	}
+	else if(strcmp(token, "report") == 0) {
+		token = strtok(NULL, delimiter); //get the subcommand
+		return reportInput(course_manager, input_line, token, delimiter);
+	}
+	else { //invalid command, shouldn't happen
+		return true;
+	}
 }
 
 /**

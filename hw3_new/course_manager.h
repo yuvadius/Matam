@@ -50,6 +50,15 @@ CourseManager createCourseManager();
  */
 bool isCriticalError(CourseManager course_manager);
 
+bool studentInput(CourseManager course_manager, char* input_line, char* token,
+				  const char delimiter[2]);
+
+bool gradeInput(CourseManager course_manager, char* input_line, char* token,
+				const char delimiter[2]);
+
+bool reportInput(CourseManager course_manager, char* input_line, char* token,
+				 const char delimiter[2]);
+
 /**
  * Processes an input line command
  *

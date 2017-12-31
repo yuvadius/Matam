@@ -70,26 +70,25 @@ void closeFiles(FILE* input_file, FILE* output_file) {
 int main(int argc, char *argv[])
 {
 	//the input and output file that will be used in the program
-	FILE* input_file = NULL;
-	FILE* output_file = NULL;
+	FILE* input = NULL;
+	FILE* output = NULL;
 	//if the command line parameters are invalid
-	if(setInputOutputFiles(&input_file, &output_file, argc, argv) == false) {
-		closeFiles(input_file, output_file);
+	if(setInputOutputFiles(&input, &output, argc, argv) == false) {
+		closeFiles(input, output);
 		return 0;
 	}
 	else {
 		char line[MAX_LEN];
-		CourseManager course_manager = createCourseManager();
-		while(fgets(line, MAX_LEN, input_file) != NULL) {
-			if(handleInput(course_manager, line) == false) {
-				mtmPrintErrorMessage(output_file,
-								getCourseManagerError(course_manager));
-				if(isCriticalError(course_manager) == true) {
+		CourseManager manager = createCourseManager();
+		while(fgets(line, MAX_LEN, input) != NULL) { //read line into "line"
+			if(handleInput(manager, line) == false) { //if there was an error
+				mtmPrintErrorMessage(output, getCourseManagerError(manager));
+				if(isCriticalError(manager) == true) { //exit if error critical
 					return 0;
 				}
 			}
 		}
 	}
-	closeFiles(input_file, output_file);
+	closeFiles(input, output);
     return 0;
 }
