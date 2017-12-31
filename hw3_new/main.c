@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	}
 	else {
 		char line[MAX_LEN];
-		CourseManager manager = createCourseManager();
+		CourseManager manager = createCourseManager(output);
 		while(fgets(line, MAX_LEN, input) != NULL) { //read line into "line"
 			if(handleInput(manager, line) == false) { //if there was an error
 				mtmPrintErrorMessage(output, getCourseManagerError(manager));
