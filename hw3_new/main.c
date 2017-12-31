@@ -20,27 +20,30 @@ bool setInputOutputFiles(FILE** input_file, FILE** output_file, int argc,
 						 char *argv[]) {
 	*input_file = stdin; //default as standard input file
 	*output_file = stdout; //default as standard output file
-	//not a valid amount of parameters
-	if(argc != 1 && argc != 3 && argc != 5) {
+	if(argc != 1 && argc != 3 && argc != 5) { //not a valid amount of parameters
+		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
+		return false;
+	}
+	if(argc >= 3 && strcmp(argv[1], "-i") != 0) {
+		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
+		return false;
+	}
+	if(argc == 5 && strcmp(argv[3], "-o") != 0) {
 		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
 		return false;
 	}
 	if(argc >= 3) {
-		if(strcmp(argv[1], "-i") != 0) {
-			mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
+		*input_file = fopen(argv[2], "r");
+		if(*input_file == NULL) { //if file couldn't be opened
+			mtmPrintErrorMessage(stdout, MTM_CANNOT_OPEN_FILE);
 			return false;
-		}
-		else {
-			*input_file = fopen(argv[2], "r");
 		}
 	}
 	if(argc == 5) {
-		if(strcmp(argv[3], "-o") != 0) {
-			mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
+		*output_file = fopen(argv[4], "w");
+		if(*output_file == NULL) { //if file couldn't be opened
+			mtmPrintErrorMessage(stdout, MTM_CANNOT_OPEN_FILE);
 			return false;
-		}
-		else {
-			*output_file = fopen(argv[4], "w");
 		}
 	}
 	return true;
@@ -55,5 +58,7 @@ int main(int argc, char *argv[])
 	if(setInputOutputFiles(&input_file, &output_file, argc, argv) == false) {
 		return 0;
 	}
+	fclose(input_file);
+	fclose(output_file);
     return 0;
 }
