@@ -49,6 +49,23 @@ bool setInputOutputFiles(FILE** input_file, FILE** output_file, int argc,
 	return true;
 }
 
+/**
+* closeFiles - Closes the input and output files opened with fopen
+*
+* @param input_file - the input file that will be closed if needed
+* @param output_file -the output file that will be closed if needed
+*/
+void closeFiles(FILE* input_file, FILE* output_file) {
+	//if input_file was successfully opened with fopen, close the input file
+	if(input_file != NULL && input_file != stdin) {
+		fclose(input_file);
+	}
+	//if output_file was successfully opened with fopen, close the input file
+	if(output_file != NULL && output_file != stdout) {
+		fclose(output_file);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	//the input and output file that will be used in the program
@@ -56,9 +73,14 @@ int main(int argc, char *argv[])
 	FILE* output_file = NULL;
 	//if the command line parameters are invalid
 	if(setInputOutputFiles(&input_file, &output_file, argc, argv) == false) {
+		closeFiles(input_file, output_file);
 		return 0;
 	}
-	fclose(input_file); //close file
-	fclose(output_file); //close file
+	else {
+		char line[MAX_LEN];
+		while(fgets(line, MAX_LEN, input_file) != NULL) {
+		}
+	}
+	closeFiles(input_file, output_file);
     return 0;
 }

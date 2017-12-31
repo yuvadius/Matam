@@ -4,11 +4,11 @@
 #include "set.h"
 #include "mtm_ex3.h"
 #include "course_manager.h"
-#include "student.h"
+//#include "student.h"
 
 struct course_manager_t {
-	Set students;
-	Student current_student;
+	//Set students;
+	//Student current_student;
 	MtmErrorCode error;
 	FILE* output_channel;
 };
@@ -47,14 +47,14 @@ CourseManager createCourseManager() {
 	if(course_manager == NULL) { //if there was a memory failure return NULL
 		return NULL;
 	}
-	course_manager->students = setCreate(copyStudent, destroyStudent, 
+	/*course_manager->students = setCreate(copyStudent, destroyStudent,
 										 compareStudents);
 	//if memory allocation failed
 	if(course_manager->students == NULL) {
 		destroyCourseManager(course_manager);
 		return NULL;
 	}
-	course_manager->current_student = NULL;
+	course_manager->current_student = NULL;*/
 	course_manager->output_channel = NULL;
 	return course_manager;
 }
@@ -70,11 +70,11 @@ CourseManager createCourseManager() {
  * true if there was no error
  */
 bool handleInput(CourseManager course_manager, char* input_line) {
-	int i=0;
+	/*int i=0;
 	while (input_line[i] != "/0" && i<MAX_LEN) {
 		if(input_line[i] == '')
 
-	}
+	}*/
 
 
 
@@ -99,7 +99,7 @@ bool loginStudent(CourseManager course_manager, char* student_id) {
 		return false;
 	}
 	//if a student is logged in return MTM_ALREADY_LOGGED_IN
-	if(course_manager->current_student != NULL) {
+	/*if(course_manager->current_student != NULL) {
 		course_manager->error = MTM_ALREADY_LOGGED_IN;
 		return false;
 	}
@@ -113,7 +113,8 @@ bool loginStudent(CourseManager course_manager, char* student_id) {
 	else {
 		course_manager->current_student = student;
 		return true;
-	}
+	}*/
+	return true;
 }
 
 /**
@@ -132,11 +133,11 @@ bool logoutStudent(CourseManager course_manager) {
 		return false;
 	}
 	//if a student is not logged in return MTM_NOT_LOGGED_IN
-	if(course_manager->current_student == NULL) {
+	/*if(course_manager->current_student == NULL) {
 		course_manager->error = MTM_NOT_LOGGED_IN;
 		return false;
 	}
-	course_manager->current_student = NULL; //logout the student
+	course_manager->current_student = NULL; //logout the student*/
 	return true;
 }
 
@@ -157,7 +158,7 @@ bool removeStudent(CourseManager course_manager, char* student_id) {
 		return false;
 	}
 	//find the student in the set
-	Student student = getStudent(course_manager, student_id);
+	/*Student student = getStudent(course_manager, student_id);
 	//if the student wasn't found
 	if(student == NULL) {
 		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
@@ -167,7 +168,7 @@ bool removeStudent(CourseManager course_manager, char* student_id) {
 	if(strcmp(course_manager->current_student->id, student_id) == 0) {
 		logoutStudent(course_manager);
 	}
-	destroyStudent(student);
+	destroyStudent(student);*/
 	return true;
 }
 
@@ -192,7 +193,7 @@ bool addStudent(CourseManager course_manager, char* student_id,
 		return false;
 	}
 	//if the parameters aren't valid return MTM_INVALID_PARAMETERS
-	if(isValidStudentID(student_id) == false) {
+	/*if(isValidStudentID(student_id) == false) {
 		course_manager->error = MTM_INVALID_PARAMETERS;
 		return false;
 	}
@@ -216,7 +217,8 @@ bool addStudent(CourseManager course_manager, char* student_id,
 	}
 	else {
 		return true;
-	}
+	}*/
+	return true;
 }
 
 /**
@@ -245,7 +247,7 @@ bool facultyRequest(CourseManager course_manager, char* course_id,
 		return false;
 	}
 	//if no student is logged in to the system
-	if(course_manager->current_student == NULL) {
+	/*if(course_manager->current_student == NULL) {
 		course_manager->error = MTM_NOT_LOGGED_IN;
 		return false;
 	}
@@ -254,7 +256,7 @@ bool facultyRequest(CourseManager course_manager, char* course_id,
 	   getGrade(course_manager, course_id) == -1) {
 		course_manager->error = MTM_COURSE_DOES_NOT_EXIST;
 		return false;
-	}
+	}*/
 	return true;
 }
 
@@ -301,6 +303,6 @@ void destroyCourseManager(CourseManager course_manager) {
 	if(course_manager == NULL) {
 		return;
 	}
-	setDestroy(course_manager->students); //destroy all students in the system
+	//setDestroy(course_manager->students); //destroy all students in the system
 	free(course_manager);
 }
