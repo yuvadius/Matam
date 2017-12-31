@@ -4,6 +4,7 @@
 #include <string.h>
 #include "test_utilities.h"
 #include "course_manager.h"
+#include "course_manager.c"
 
 
 /**
