@@ -59,6 +59,10 @@ CourseManager createCourseManager() {
 	return course_manager;
 }
 
+bool studentCommand(CourseManager course_manager, char* input_line, int i) {
+	return true;
+}
+
 /**
  * Processes an input line command
  *
@@ -71,7 +75,7 @@ CourseManager createCourseManager() {
  */
 bool handleInput(CourseManager course_manager, char* input_line) {
 	int i=0;
-	while (input_line[i] != '/0' && i<MAX_LEN) {
+	while (input_line[i] != '\0' && i<MAX_LEN) {
 		if(input_line[i] == '#') {
 			return true;
 		}
@@ -87,10 +91,6 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 		++i;
 	}
 	return true;
-}
-
-bool studentCommand(CourseManager course_manager, char* input_line, int i) {
-	
 }
 
 /**
