@@ -70,6 +70,14 @@ CourseManager createCourseManager() {
  * true if there was no error
  */
 bool handleInput(CourseManager course_manager, char* input_line) {
+	int i=0;
+	while (input_line[i] != "/0" && i<MAX_LEN) {
+		if(input_line[i] == '')
+
+	}
+
+
+
 	return true;
 }
 
