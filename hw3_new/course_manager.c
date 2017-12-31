@@ -59,6 +59,29 @@ CourseManager createCourseManager() {
 	return course_manager;
 }
 
+/**
+ * Checks if the error in course manager is critical
+ *
+ * @param1 course_manager the course manager that contains the error
+ * @return
+ * true if the error is critical or if course manager is NULL, false otherwise
+ */
+bool isCriticalError(CourseManager course_manager) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return true;
+	}
+	//check if the error is critical
+	switch(course_manager->error) {
+		case MTM_OUT_OF_MEMORY:
+		case MTM_INVALID_COMMAND_LINE_PARAMETERS:
+		case MTM_CANNOT_OPEN_FILE:
+			return true;
+		default :
+			return false;
+	}
+}
+
 bool studentCommand(CourseManager course_manager, char* input_line, int i) {
 	return true;
 }

@@ -42,6 +42,15 @@ typedef enum FacultyRequest_t {
 CourseManager createCourseManager();
 
 /**
+ * Checks if the error in course manager is critical
+ *
+ * @param1 course_manager the course manager that contains the error
+ * @return
+ * true if the error is critical, false if not
+ */
+bool isCriticalError(CourseManager course_manager);
+
+/**
  * Processes an input line command
  *
  * @param1 course_manager the CourseManager that the student will be logged into

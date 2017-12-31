@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mtm_ex3.h"
+#include "course_manager.h"
 
 /**
 * setInputOutputFiles - Sets the input file and output file according to the
@@ -78,7 +79,15 @@ int main(int argc, char *argv[])
 	}
 	else {
 		char line[MAX_LEN];
+		CourseManager course_manager = createCourseManager();
 		while(fgets(line, MAX_LEN, input_file) != NULL) {
+			if(handleInput(course_manager, line) == false) {
+				mtmPrintErrorMessage(output_file,
+								getCourseManagerError(course_manager));
+				if(isCriticalError(course_manager) == true) {
+					return 0;
+				}
+			}
 		}
 	}
 	closeFiles(input_file, output_file);
