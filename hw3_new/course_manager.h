@@ -5,6 +5,7 @@
 #define COURSE_ID_MAX 999999
 
 #include <stdbool.h>
+#include <stdio.h>
 #include "set.h"
 /**
  * Manages the interactive transcripts system
@@ -25,6 +26,7 @@
  *   addStudent              - Add a student to the system
  *   removeStudent           - Remove a student from the system
  *   setError                - Set the error of the course manager
+ *   getOutputChannel        - Get the system's output channel
  *   destroyCourseManager    - Destroy an instance of CourseManager
  */
 
@@ -207,6 +209,15 @@ bool removeStudent(CourseManager course_manager, int student_id);
  * @param2 error the error to insert into the course manager
  */
 void setError(CourseManager course_manager, MtmErrorCode error);
+
+/**
+ * Get the system's output channel
+ *
+ * @param1 course_manager CourseManager that has the output channel
+ * @return
+ * the output file, if there was an error then NULL
+ */
+FILE* getOutputChannel(CourseManager course_manager);
 
 /**
  * Destroy an instance of CourseManager

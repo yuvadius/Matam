@@ -6,6 +6,7 @@
 
 #include <stdbool.h>
 #include "set.h"
+#include "list.h"
 #include "course_manager.h"
 /**
  * Manages the student operations
@@ -21,6 +22,9 @@
  * addFriendship           - Create a friendship between two students
  * unFriend                - End a student's friendship with another student
  * removeFriendship        - Terminate a friendship between two students
+ * getStudentGrades        - Get a student's grades
+ * getStudentFirstName     - Get the student's first name
+ * getStudentLastName      - Get the student's last name
  * destroyStudent          - Destroys an instance of student
  *
  * The following functions are available:
@@ -185,6 +189,33 @@ bool unFriend(CourseManager course_manager, Student student_in, int id);
  */
 bool removeFriendship(CourseManager course_manager, Student student_in,
 					  Student student);
+
+/**
+ * Get a student's grades
+ *
+ * @param1 student the student that has the grades
+ * @return
+ * The list of grades. if there was an error return NULL
+ */
+List getStudentGrades(Student student);
+
+/**
+ * Get the student's first name
+ *
+ * @param1 student the student that has the first name
+ * @return
+ * The first name. if there was an error return NULL
+ */
+char* getStudentFirstName(Student student);
+
+/**
+ * Get the student's last name
+ *
+ * @param1 student the student that has the last name
+ * @return
+ * The last name. if there was an error return NULL
+ */
+char* getStudentLastName(Student student);
 
 /**
  * Destroys an instance of student
