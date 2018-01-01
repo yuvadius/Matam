@@ -15,6 +15,21 @@ struct course_manager_t {
 };
 
 /**
+ * Replaces an occurrence of a character in a string with another character
+ *
+ * @param1 str the string which will have a character replaced
+ * @param2 find the character in str that will be replaced
+ * @param3 replace the character that will replace the character "find"
+ */
+static void replaceChar(char* str, char find, char replace){
+    char *current_pos = strchr(str,find);
+    while (current_pos){
+        *current_pos = replace;
+        current_pos = strchr(current_pos,find);
+    }
+}
+
+/**
  * Creates an empty CourseManager
  *
  * @param1 output_file the output stream that will be written to
@@ -232,6 +247,7 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 		return true;
 	}
 	const char delimiter[2] = " "; //the delimiter, break words between spaces
+	replaceChar(input_line, '\n', ' '); //remove the newlines from line
 	char *token = strtok(input_line, delimiter); // get the first token
 	if(token == NULL || token[0] == '#') { //if empty line or comment line
 		return true;

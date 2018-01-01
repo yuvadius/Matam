@@ -35,6 +35,7 @@
  * getEffectiveGradeSumX2  - Get the effective sum for a semester times 2
  * isEffectiveGrade        - Checks if the grade is effective for a semester
  * isSportCourse           - Checks if the course is a sport course
+ * reportClean             - Print the clean matriculation
  * destroyGrade            - Destroys an instance of grade
  */
 
