@@ -559,6 +559,180 @@ bool isSportCourse(int course_id) {
 }
 
 /**
+ * Print the clean matriculation
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
+ * true if there was no error
+ */
+bool reportClean(CourseManager course_manager, Student student_in, List grades){
+	//can't do anything if course_manager or output_channel isn't set
+	/*if(course_manager == NULL || getOutputChannel(course_manager) == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(student_in == NULL) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return false;
+	}
+	mtmPrintStudentInfo(getOutputChannel(course_manager),
+						getStudentID(student_in),
+						getStudentFirstName(student_in),
+						getStudentLastName(student_in));
+	//if the list is empty then there is nothing to print
+	if(listGetSize(grades) != 0) {
+		//get the grades from smallest semester num to biggest semester num
+		List grades_copy = listCopy(grades);
+		if(grades_copy == NULL) { //if there was an allocation failure
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		ListResult result = listSort(grades_copy, compareCoursesSemesters,
+									 grades_copy);
+		//get the first element(NOT A COPY)
+		Grade temp_grade = listGetFirst(reversed_grades);
+		int semester = temp_grade->semester; //get the first semester
+		LIST_FOREACH(Grade, grade, reversed_grades) { //loop over all the grades
+			//if all grades of a semester have been printed print SemesterInfo
+			if(semester != grade->semester) {
+				mtmPrintSemesterInfo(getOutputChannel(course_manager), semester,
+									 getTotalPointsX2(grades, semester),
+									 getFailedPointsX2(grades, semester),
+									 getEffectivePointsX2(grades, semester),
+									 getEffectiveGradeSumX2(grades, semester));
+				semester = grade->semester;
+			}
+			mtmPrintGradeInfo(getOutputChannel(course_manager),grade->course_id,
+							  grade->points_x2, grade->grade);
+		}
+		//print the last semester
+		mtmPrintSemesterInfo(getOutputChannel(course_manager), semester,
+							 getTotalPointsX2(grades, semester),
+							 getFailedPointsX2(grades, semester),
+							 getEffectivePointsX2(grades, semester),
+							 getEffectiveGradeSumX2(grades, semester));
+		listDestroy(reversed_grades); //destroy instance of reversed_grades
+	}
+	//print the grade summary
+	mtmPrintSummary(getOutputChannel(course_manager),
+					getTotalPointsX2(grades, 0),
+					getFailedPointsX2(grades, 0),
+					getEffectivePointsX2(grades, 0),
+					getEffectiveGradeSumX2(grades, 0));
+	return true;
+
+
+
+
+
+
+
+
+	//can't do anything if course_manager or output_channel isn't set
+	if(course_manager == NULL || course_manager->output_channel == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(course_manager->current_student == NULL) {
+		course_manager->error = MTM_NOT_LOGGED_IN;
+		return false;
+	}
+	mtmPrintStudentInfo(course_manager->output_channel,
+						getStudentID(course_manager->current_student),
+						course_manager->current_student->first_name,
+						course_manager->current_student->last_name);
+	//if the list is empty then there is nothing to print
+	if(listGetSize(course_manager->current_student->grades) != 0) {
+		List grades = listCopy(course_manager->current_student->grades);
+		if(grades == NULL) { //if there was an allocation failure
+			course_manager->error = MTM_OUT_OF_MEMORY;
+			return false;
+		}
+		//sort the list according to courses and then semesters
+		ListResult result = listSort(grades, compareCoursesSemesters, NULL);
+		if(result == LIST_OUT_OF_MEMORY) {
+			course_manager->error = MTM_OUT_OF_MEMORY;
+			return;
+		}
+		LIST_FOREACH(Grade, grade, grades) {
+
+		}
+		//need to finish up
+	}
+	//print the grade summary
+	mtmPrintCleanSummary(course_manager->output_channel,
+						 getEffectivePointsX2(grades, NULL),
+						 getEffectiveGradeSumX2(grades, NULL));*/
+	return true;
+}
+
+/**
+ * Compare between two course ids and semesters
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if one of the parameters is NULL return 0
+ * 		else if the courses are not equal return compareCourses
+ * 		else if the semesters are not equal return compareSemesters
+ * 		else return the distance between the two grades in the list of grades
+ */
+int compareCoursesSemesters(ListElement grade1, ListElement grade2,
+							ListSortKey key) {
+	if(grade1 == NULL || grade2 == NULL || key == NULL) {
+		return 0;
+	}
+	else if(((Grade)grade1)->course_id != ((Grade)grade2)->course_id) {
+		return (((Grade)grade1)->course_id - ((Grade)grade2)->course_id);
+	}
+	else if(((Grade)grade2)->semester != ((Grade)grade2)->semester) {
+		return (((Grade)grade1)->semester - ((Grade)grade2)->semester);
+	}
+	else {
+		return distanceGrades((List)key, (Grade)grade1, (Grade)grade2);
+	}
+}
+
+/**
+ * Calculates the distance between two grades in list
+ *
+ * @param1 grades the list of grades that contains both grades
+ * @param2 grade1 the grade that is located in the list grades
+ * NOTE: grade1 should be a reference to a grade in grades(NOT A COPY)
+ * @param3 grade2 the grade that is located in the list grades
+ * NOTE: grade2 should be a reference to a grade in grades(NOT A COPY)
+ * @return
+ * 		the distance between the two grades on success and 0 on failure
+ */
+int distanceGrades(List grades, Grade grade1, Grade grade2) {
+	if(grades == NULL || grade1 == NULL || grade2 == NULL) {
+		return 0;
+	}
+	else {
+		int grade1_location_counter = 0, grade1_location = 0;
+		int grade2_location_counter = 0, grade2_location = 0;
+		LIST_FOREACH(Grade, grade, grades) { //loop over all the grades
+			if(grade == grade1) {
+				grade1_location = grade1_location_counter;
+			}
+			if(grade == grade2) {
+				grade2_location = grade2_location_counter;
+			}
+			++grade1_location_counter;
+			++grade2_location_counter;
+		}
+		return (grade1_location - grade2_location);
+	}
+}
+
+/**
  * Destroys an instance of grade
  *
  * @param1 grade the grade we destroy

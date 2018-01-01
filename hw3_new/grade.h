@@ -36,6 +36,8 @@
  * isEffectiveGrade        - Checks if the grade is effective for a semester
  * isSportCourse           - Checks if the course is a sport course
  * reportClean             - Print the clean matriculation
+ * compareCoursesSemesters - Compare between two courses and two semesters
+ * distanceGrades          - Calculates the distance between two grades in list
  * destroyGrade            - Destroys an instance of grade
  */
 
@@ -251,6 +253,48 @@ bool isEffectiveGrade(List grades, Grade grade, bool checkSemester);
  * true if the course is a sport course, false otherwise
  */
 bool isSportCourse(int course_id);
+
+/**
+ * Print the clean matriculation
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
+ * true if there was no error
+ */
+bool reportClean(CourseManager course_manager, Student student_in, List grades);
+
+/**
+ * Compare between two course ids and semesters
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if the courses are not equal return compareCourses
+ * 		else if the semesters are not equal return compareSemesters
+ * 		else return the distance between the two grades in the list of grades
+ */
+int compareCoursesSemesters(ListElement grade1, ListElement grade2,
+							ListSortKey key);
+
+/**
+ * Calculates the distance between two grades in list
+ *
+ * @param1 grades the list of grades that contains both grades
+ * @param2 grade1 the grade that is located in the list grades
+ * NOTE: grade1 should be a reference to a grade in grades(NOT A COPY)
+ * @param3 grade2 the grade that is located in the list grades
+ * NOTE: grade2 should be a reference to a grade in grades(NOT A COPY)
+ * @return
+ * 		the distance between the two grades on success and 0 on failure
+ */
+int distanceGrades(List grades, Grade grade1, Grade grade2);
 
 /**
  * Destroys an instance of grade
