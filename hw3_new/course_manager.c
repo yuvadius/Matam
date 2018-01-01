@@ -221,6 +221,8 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
  * course_manager->error.
  * true if there was no error
  */
+
+/*
 bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 	if(strcmp(token, "full") == 0) {
 		return reportFull(course_manager, course_manager->current_student,
@@ -241,6 +243,7 @@ bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 		return true;
 	}
 }
+*/
 
 /**
  * Processes an input line command
@@ -259,6 +262,7 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 	}
 	const char delimiter[2] = " "; //the delimiter, break words between spaces
 	replaceChar(input_line, '\n', ' '); //remove the newlines from line
+	replaceChar(input_line, '\t', ' '); //replace tabs with spaces
 	char *token = strtok(input_line, delimiter); // get the first token
 	if(token == NULL || token[0] == '#') { //if empty line or comment line
 		return true;
@@ -271,10 +275,12 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 		token = strtok(NULL, delimiter); //get the sub command
 		return gradeInput(course_manager, token, delimiter);
 	}
+	/*
 	else if(strcmp(token, "report") == 0) {
 		token = strtok(NULL, delimiter); //get the sub command
 		return reportInput(course_manager, token, delimiter);
 	}
+	*/
 	else { //invalid command, shouldn't happen
 		return true;
 	}
