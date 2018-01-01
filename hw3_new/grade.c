@@ -44,6 +44,35 @@ static List listCopyReversed(CourseManager course_manager, List list) {
 }
 
 /**
+ * deep copies a set into a newly created list
+ *
+ * @param1 course_manager the course_manager contains the error output
+ * @param2 set the set that will be copied
+ * @return
+ * The list created. if there was an allocation error return NULL or if one
+ * of the parameters was NULL then return NULL
+ */
+static List setToList(CourseManager course_manager, Set set) {
+	if(set == NULL) {
+		return NULL;
+	}
+	List list = listCreate(copyGrade, destroyGrade);
+	if(list == NULL) { //if there was a memory failure
+		setError(course_manager, MTM_OUT_OF_MEMORY);
+		return NULL;
+	}
+	SET_FOREACH(SetElement, element, set) {
+		ListResult result = listInsertFirst(list, element);
+		if(result == LIST_OUT_OF_MEMORY) {
+			listDestroy(list);
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return NULL;
+		}
+	}
+	return list;
+}
+
+/**
  * Creates an instance of a grade
  *
  * @param1 semester the semester when the grade was received
@@ -706,8 +735,11 @@ bool reportBest(CourseManager course_manager, Student student_in, List grades,
 			return false;
 		}
 		LIST_FOREACH(Grade, grade, filter_grades) { //loop over all the grades
-			mtmPrintGradeInfo(getOutputChannel(course_manager),grade->course_id,
-							  grade->points_x2, grade->grade);
+			if(amount > 0) { //don't print more then "amount"
+				mtmPrintGradeInfo(getOutputChannel(course_manager),
+							grade->course_id, grade->points_x2, grade->grade);
+				--amount;
+			}
 		}
 		listDestroy(filter_grades);
 	}
@@ -738,6 +770,246 @@ int compareBest(ListElement grade1, ListElement grade2, ListSortKey key) {
 	}
 	else {
 		return (((Grade)grade1)->course_id - ((Grade)grade2)->course_id);
+	}
+}
+
+/**
+ * Prints the worst grades
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @param4 amount the amount of grades to print
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool reportWorst(CourseManager course_manager, Student student_in, List grades,
+				 int amount) {
+	//can't do anything if course_manager or output_channel or grades aren't set
+	if(course_manager == NULL || getOutputChannel(course_manager) == NULL ||
+	   grades == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(student_in == NULL) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return false;
+	}
+	if(amount <= 0) {
+		setError(course_manager, MTM_INVALID_PARAMETERS);
+		return false;
+	}
+	//if the list is empty then there is nothing to print
+	if(listGetSize(grades) > 0) {
+		//Remove all non effective grades for the clean report
+		List filter_grades = listFilter(grades, isEffectiveCleanGrade, grades);
+		if(filter_grades == NULL) { //if there was an allocation failure
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		//sort filter_grades by courses/semesters
+		ListResult result = listSort(filter_grades, compareWorst, filter_grades);
+		if(result == LIST_OUT_OF_MEMORY) {
+			listDestroy(filter_grades);
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		LIST_FOREACH(Grade, grade, filter_grades) { //loop over all the grades
+			if(amount > 0) { //don't print more then "amount"
+				mtmPrintGradeInfo(getOutputChannel(course_manager),
+							grade->course_id, grade->points_x2, grade->grade);
+				--amount;
+			}
+		}
+		listDestroy(filter_grades);
+	}
+	return true;
+}
+
+/**
+ * Compare between two grades then two semesters then two courses
+ * This function is used as a filter for reportWorst
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if one of the parameters is NULL return 0
+ * 		then compare grades
+ * 		if the grades are equal compare by semesters
+ * 		if the semesters are equal compare by courses
+ */
+int compareWorst(ListElement grade1, ListElement grade2, ListSortKey key) {
+	if(grade1 == NULL || grade2 == NULL || key == NULL) {
+		return 0;
+	}
+	else if(((Grade)grade1)->grade != ((Grade)grade2)->grade) {
+		return (((Grade)grade1)->grade - ((Grade)grade2)->grade);
+	}
+	else if(((Grade)grade1)->semester != ((Grade)grade2)->semester){
+		return (((Grade)grade1)->semester - ((Grade)grade2)->semester);
+	}
+	else {
+		return (((Grade)grade1)->course_id - ((Grade)grade2)->course_id);
+	}
+}
+
+/**
+ * Print best students for referencing for a course
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @param4 course_id the course that we want to find a reference for
+ * @param5 amount the amount of grades to print
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool reportReference(CourseManager course_manager, Student student_in,
+					 Set friends, int course_id, int amount) {
+	//can't do anything if course_manager or output_channel or friends isn't set
+	if(course_manager == NULL || getOutputChannel(course_manager) == NULL ||
+	   friends == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(student_in == NULL) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return false;
+	}
+	if(amount <= 0) {
+		setError(course_manager, MTM_INVALID_PARAMETERS);
+		return false;
+	}
+	List friends_list = setToList(course_manager, friends);
+	if(friends_list == NULL) {
+		setError(course_manager, MTM_OUT_OF_MEMORY);
+		return false;
+	}
+	//if the list is empty then there is nothing to print
+	if(listGetSize(friends_list) > 0) {
+		//Remove all non effective grades for the clean report
+		List filter_grades = listFilter(friends_list, didStudentTakeCourse,
+										friends_list);
+		if(filter_grades == NULL) { //if there was an allocation failure
+			listDestroy(friends_list);
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		//sort filter_grades by courses/semesters
+		ListResult result = listSort(filter_grades, compareBestCourseGrades,
+									 &course_id);
+		if(result == LIST_OUT_OF_MEMORY) {
+			listDestroy(filter_grades);
+			listDestroy(friends_list);
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		LIST_FOREACH(Student, student, filter_grades) { //loop over all the grades
+			if(amount > 0) { //don't print more then "amount"
+				mtmPrintStudentName(getOutputChannel(course_manager),
+					getStudentFirstName(student), getStudentLastName(student));
+				--amount;
+			}
+		}
+		listDestroy(filter_grades);
+		listDestroy(friends_list);
+	}
+	return true;
+}
+
+/**
+ * Compare best grade of a course between two students
+ * This function is used as a sort function for reportReference
+ * If the student doesn't have a grade in a course his grade will be -1
+ *
+ * @param1 student1 the student that will be compared
+ * @param2 student2 the student that will be compared
+ * @param3 course_id the course that will be used. this will be a pointer to int
+ * @return
+ * 		student1's best grade in the course minus student2's best grade in
+ * 		the course
+ */
+int compareBestCourseGrades(ListElement student1, ListElement student2,
+							ListSortKey course_id) {
+	int student1_grade = -1, student2_grade = -1;
+	LIST_FOREACH(Grade, grade, getStudentGrades((Student)student1)) {
+		if(grade->course_id == (*(int*)course_id)) { //if course was found
+			if(grade->grade > student1_grade) { //if the grade is higher
+				student1_grade = grade->grade;
+			}
+		}
+	}
+	LIST_FOREACH(Grade, grade, getStudentGrades((Student)student2)) {
+		if(grade->course_id == (*(int*)course_id)) { //if course was found
+			if(grade->grade > student2_grade) { //if the grade is higher
+				student2_grade = grade->grade;
+			}
+		}
+	}
+	return (student2_grade - student1_grade);
+}
+
+/**
+ * Checks if a student took a course
+ *
+ * @param1 student the student that is checked for taking the course
+ * @param2 course_id the course that will be used. this will be a pointer to int
+ * NOTE: the grade that is sent should be a pointer to a grade in the list of
+ * grades
+ * @return
+ * true if the student took the course, false if not or if student or
+ * course_id is NULL
+ */
+bool didStudentTakeCourse(ListElement student, ListFilterKey course_id) {
+	if(student == NULL || ((int*)course_id) == NULL) {
+		return false;
+	}
+	else {
+		LIST_FOREACH(Grade, grade, getStudentGrades((Student)student)) {
+			if(grade->course_id == (*(int*)course_id)) { //if course was found
+				return true;
+			}
+		}
+		return false; //course was not found
+	}
+}
+
+/**
+ * Gets the course id of a certain grade
+ *
+ * @param1 grade the grade that contains the course id
+ * @return
+ * the course id on success, 0 on failure
+ */
+int getCourseID(Grade grade) {
+	if(grade == NULL) {
+		return 0;
+	}
+	return grade->course_id;
+}
+
+/**
+ * Gets the grade of a certain grade object
+ *
+ * @param1 grade the grade object that contains the grade
+ * @return
+ * the grade on success, 0 on failure
+ */
+int getGrade(Grade grade) {
+	if(grade == NULL) {
+		return 0;
+	}
+	else {
+		return grade->grade;
 	}
 }
 

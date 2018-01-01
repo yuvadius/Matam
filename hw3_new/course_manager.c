@@ -15,6 +15,28 @@ struct course_manager_t {
 };
 
 /**
+ * Converts a faculty request string to a constant
+ *
+ * @param1 request the faculty request string
+ * @return
+ * The FacultyRequest representing the faculty request string
+ */
+static FacultyRequest getFacultyRequst(char* request) {
+	if(strcmp(request, "remove_course") == 0) {
+		return REMOVE_COURSE;
+	}
+	else if(strcmp(request, "register_course") == 0) {
+		return REGISTER_COURSE;
+	}
+	else if(strcmp(request, "cancel_course") == 0) {
+		return CANCEL_COURSE;
+	}
+	else {
+		return NO_REQUEST;
+	}
+}
+
+/**
  * Replaces an occurrence of a character in a string with another character
  *
  * @param1 str the string which will have a character replaced
@@ -239,6 +261,36 @@ bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 						  getStudentGrades(course_manager->current_student),
 						  amount);
 	}
+	else if(strcmp(token, "worst") == 0) {
+		token = strtok(NULL, del); //get the third argument(amount)
+		int amount = atoi(token);
+		return reportWorst(course_manager, course_manager->current_student,
+						   getStudentGrades(course_manager->current_student),
+						   amount);
+	}
+	else if(strcmp(token, "reference") == 0) {
+		token = strtok(NULL, del); //get the third argument(course id)
+		int course_id = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(amount)
+		int amount = atoi(token);
+		return reportReference(course_manager, course_manager->current_student,
+						     getStudentFriends(course_manager->current_student),
+						     course_id, amount);
+	}
+	else if(strcmp(token, "faculty_request") == 0) {
+		token = strtok(NULL, del); //get the third argument(course id)
+		int course_id = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(request)
+		char* request = malloc(strlen(token) + 1);
+		if(request == NULL) { //if memory allocation failed
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		strcpy(request, token); //get the request
+		bool result = facultyRequest(course_manager, course_id, request);
+		free(request);
+		return result;
+	}
 	else { //invalid sub-command, shouldn't reach this place
 		return true;
 	}
@@ -287,7 +339,7 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 }
 
 /**
- * return the last "error" produced by one of the funcs.
+ * return the last "error" produced by one of the functions.
  *
  * @param1 course_manager CourseManager that we take the error from.
  * @return 
@@ -508,6 +560,44 @@ FILE* getOutputChannel(CourseManager course_manager) {
 	else {
 		return course_manager->output_channel;
 	}
+}
+
+/**
+ * Ignore the student faculty request
+ *
+ * @param1 course_manager CourseManager that the student will be removed from
+ * @param2 course_id the course ID
+ * @param3 request the request of the student which can be "remove_course" or
+ * "register_course" or "cancel_course"
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN,
+ * MTM_COURSE_DOES_NOT_EXIST, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool facultyRequest(CourseManager course_manager, int course_id, char* request){
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return false;
+	}
+	//if no student is logged in to the system
+	if(course_manager->current_student == NULL) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return false;
+	}
+	//if the request is to remove a course that does not exist
+	if(getFacultyRequst(request) == REGISTER_COURSE &&
+	   getNewestGrade(course_manager->current_student, course_id) == -1) {
+		setError(course_manager, MTM_COURSE_DOES_NOT_EXIST);
+		return false;
+	}
+	//if the parameters aren't valid return MTM_INVALID_PARAMETERS
+	if(getFacultyRequst(request) == NO_REQUEST) {
+		setError(course_manager, MTM_INVALID_PARAMETERS);
+		return false;
+	}
+	return true;
 }
 
 /**

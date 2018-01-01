@@ -25,6 +25,8 @@
  * getStudentGrades        - Get a student's grades
  * getStudentFirstName     - Get the student's first name
  * getStudentLastName      - Get the student's last name
+ * getNewestGrade          - Get the student's newest grade for a course
+ * getStudentFriends       - Get the student's set of friends
  * destroyStudent          - Destroys an instance of student
  *
  * The following functions are available:
@@ -216,6 +218,26 @@ char* getStudentFirstName(Student student);
  * The last name. if there was an error return NULL
  */
 char* getStudentLastName(Student student);
+
+/**
+ * Get the student's newest grade for a course
+ *
+ * @param1 student the student that will be checked
+ * @param2 course_id the course ID of the grade
+ * @return
+ * the newest grade of the course
+ * if there is no grade then return -1
+ */
+int getNewestGrade(Student student, int course_id);
+
+/**
+ * Get the student's set of friends
+ *
+ * @param1 student the student that contains the set of friends
+ * @return
+ * NULL on error, the set of friends on success
+ */
+Set getStudentFriends(Student student);
 
 /**
  * Destroys an instance of student

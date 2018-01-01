@@ -484,6 +484,48 @@ char* getStudentLastName(Student student) {
 }
 
 /**
+ * Get the student's newest grade for a course
+ *
+ * @param1 student the student that will be checked
+ * @param2 course_id the course ID of the grade
+ * @return
+ * the newest grade of the course
+ * if there is no grade then return -1
+ */
+int getNewestGrade(Student student, int course_id) {
+	//can't do anything if the student isn't set
+	if(student == NULL) {
+		return -1;
+	}
+	//find a grade for the course
+	LIST_FOREACH(Grade, grade, student->grades) {
+		//if grade for course found
+		if(course_id == getCourseID(grade)) {
+			return getGrade(grade);
+		}
+	}
+	//no grade was found
+	return -1;
+}
+
+/**
+ * Get the student's set of friends
+ *
+ * @param1 student the student that contains the set of friends
+ * @return
+ * NULL on error, the set of friends on success
+ */
+Set getStudentFriends(Student student) {
+	//can't do anything if the student isn't set
+	if(student == NULL) {
+		return NULL;
+	}
+	else {
+		return student->friends;
+	}
+}
+
+/**
  * Destroys an instance of student
  *
  * @param1 student the student we destroy

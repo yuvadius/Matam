@@ -38,8 +38,15 @@
  * reportClean             - Print the clean matriculation
  * compareCoursesSemesters - Compare between two courses and two semesters
  * isEffectiveCleanGrade   - Checks if the grade is effective for a clean report
- * reportBest              - Print the best grades
- * compareBest             - Compare between two grades/courses/semesters
+ * reportBest              - Prints the best grades
+ * compareBest             - Compares between two grades/courses/semesters
+ * reportWorst             - Prints the worst grades
+ * compareWorst            - Compares between two grades/courses/semesters
+ * reportReference         - Print best students for referencing for a course
+ * compareBestCourseGrades - Compare best grade of a course between two students
+ * didStudentTakeCourse    - Checks if a student took a course
+ * getCourseID             - Gets the course id of a certain grade
+ * getGrade                - Gets the grade of a certain grade
  * destroyGrade            - Destroys an instance of grade
  */
 
@@ -299,7 +306,7 @@ int compareCoursesSemesters(ListElement grade1, ListElement grade2,
 bool isEffectiveCleanGrade(ListElement grade, ListFilterKey grades);
 
 /**
- * Print the best grades
+ * Prints the best grades
  *
  * @param1 course_manager the CourseManager that the logged in student is in
  * @param2 student_in the current student that is logged in(will be NULL if no
@@ -317,6 +324,7 @@ bool reportBest(CourseManager course_manager, Student student_in, List grades,
 
 /**
  * Compare between two grades then two semesters then two courses
+ * This function is used as a filter for reportBest
  *
  * @param1 grade1 the grade that contains the course_id/semester to compare
  * @param2 grade2 the grade that contains the course_id/semester to compare
@@ -328,6 +336,101 @@ bool reportBest(CourseManager course_manager, Student student_in, List grades,
  * 		if the semesters are equal compare by courses
  */
 int compareBest(ListElement grade1, ListElement grade2, ListSortKey key);
+
+/**
+ * Prints the worst grades
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @param4 amount the amount of grades to print
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool reportWorst(CourseManager course_manager, Student student_in, List grades,
+				 int amount);
+
+/**
+ * Compare between two grades then two semesters then two courses
+ * This function is used as a filter for reportWorst
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if one of the parameters is NULL return 0
+ * 		then compare grades
+ * 		if the grades are equal compare by semesters
+ * 		if the semesters are equal compare by courses
+ */
+int compareWorst(ListElement grade1, ListElement grade2, ListSortKey key);
+
+/**
+ * Print best students for referencing for a course
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @param4 course_id the course that we want to find a reference for
+ * @param5 amount the amount of grades to print
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool reportReference(CourseManager course_manager, Student student_in,
+					 Set friends, int course_id, int amount);
+
+/**
+ * Compare best grade of a course between two students
+ * This function is used as a sort function for reportReference
+ * If the student doesn't have a grade in a course his grade will be -1
+ *
+ * @param1 student1 the student that will be compared
+ * @param2 student2 the student that will be compared
+ * @param3 course_id the course that will be used. this will be a pointer to int
+ * @return
+ * 		student1's best grade in the course minus student2's best grade in
+ * 		the course
+ */
+int compareBestCourseGrades(ListElement student1, ListElement student2,
+							ListSortKey course_id);
+
+/**
+ * Checks if a student took a course
+ *
+ * @param1 student the student that is checked for taking the course
+ * @param2 course_id the course that will be used. this will be a pointer to int
+ * NOTE: the grade that is sent should be a pointer to a grade in the list of
+ * grades
+ * @return
+ * true if the student took the course, false if not or if student is NULL
+ */
+bool didStudentTakeCourse(ListElement student, ListFilterKey course_id);
+
+/**
+ * Gets the course id of a certain grade
+ *
+ * @param1 grade the grade that contains the course id
+ * @return
+ * the course id on success, 0 on failure
+ */
+int getCourseID(Grade grade);
+
+/**
+ * Gets the grade of a certain grade object
+ *
+ * @param1 grade the grade object that contains the grade
+ * @return
+ * the grade on success, 0 on failure
+ */
+int getGrade(Grade grade);
 
 /**
  * Destroys an instance of grade

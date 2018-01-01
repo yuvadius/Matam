@@ -28,6 +28,7 @@
  *   removeStudent           - Remove a student from the system
  *   setError                - Set the error of the course manager
  *   getOutputChannel        - Get the system's output channel
+ *   facultyRequest          - Ignore the student faculty request
  *   destroyCourseManager    - Destroy an instance of CourseManager
  */
 
@@ -219,6 +220,22 @@ void setError(CourseManager course_manager, MtmErrorCode error);
  * the output file, if there was an error then NULL
  */
 FILE* getOutputChannel(CourseManager course_manager);
+
+/**
+ * Ignore the student faculty request
+ *
+ * @param1 course_manager CourseManager that the student will be removed from
+ * @param2 course_id the course ID
+ * @param3 request the request of the student which can be "remove_course" or
+ * "register_course" or "cancel_course"
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN,
+ * MTM_COURSE_DOES_NOT_EXIST, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool facultyRequest(CourseManager course_manager, int course_id, char* request);
 
 /**
  * Destroy an instance of CourseManager
