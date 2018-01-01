@@ -6,6 +6,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include "mtm_ex3.h"
 #include "set.h"
 /**
  * Manages the interactive transcripts system

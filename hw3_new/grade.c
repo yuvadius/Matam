@@ -304,8 +304,9 @@ bool updateGrade(CourseManager course_manager, Student student_in, List grades,
  * true if there was no error
  */
 bool reportFull(CourseManager course_manager, Student student_in, List grades) {
-	//can't do anything if course_manager or output_channel isn't set
-	if(course_manager == NULL || getOutputChannel(course_manager) == NULL) {
+	//can't do anything if course_manager or output_channel or grades aren't set
+	if(course_manager == NULL || getOutputChannel(course_manager) == NULL ||
+	   grades == NULL) {
 		return false;
 	}
 	//if a student is logged in return MTM_NOT_LOGGED_IN
@@ -318,7 +319,7 @@ bool reportFull(CourseManager course_manager, Student student_in, List grades) {
 						getStudentFirstName(student_in),
 						getStudentLastName(student_in));
 	//if the list is empty then there is nothing to print
-	if(listGetSize(grades) != 0) {
+	if(listGetSize(grades) > 0) {
 		//get the grades from smallest semester num to biggest semester num
 		List reversed_grades = listCopyReversed(course_manager, grades);
 		if(reversed_grades == NULL) { //if there was an allocation failure
@@ -555,6 +556,188 @@ bool isSportCourse(int course_id) {
 	}
 	else {
 		return false;
+	}
+}
+
+/**
+ * Print the clean matriculation
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN
+ * true if there was no error
+ */
+bool reportClean(CourseManager course_manager, Student student_in, List grades){
+	//can't do anything if course_manager or output_channel or grades aren't set
+	if(course_manager == NULL || getOutputChannel(course_manager) == NULL ||
+	   grades == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(student_in == NULL) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return false;
+	}
+	mtmPrintStudentInfo(getOutputChannel(course_manager),
+						getStudentID(student_in),
+						getStudentFirstName(student_in),
+						getStudentLastName(student_in));
+	//if the list is empty then there is nothing to print
+	if(listGetSize(grades) > 0) {
+		//Remove all non effective grades for the clean report
+		List filter_grades = listFilter(grades, isEffectiveCleanGrade, grades);
+		if(filter_grades == NULL) { //if there was an allocation failure
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		//sort filter_grades by courses/semesters
+		ListResult result = listSort(filter_grades, compareCoursesSemesters,
+									 filter_grades);
+		if(result == LIST_OUT_OF_MEMORY) {
+			listDestroy(filter_grades);
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		LIST_FOREACH(Grade, grade, filter_grades) { //loop over all the grades
+			mtmPrintGradeInfo(getOutputChannel(course_manager),grade->course_id,
+							  grade->points_x2, grade->grade);
+		}
+		listDestroy(filter_grades);
+	}
+	//print the clean grade summary
+	mtmPrintCleanSummary(getOutputChannel(course_manager),
+						 getEffectivePointsX2(grades, 0),
+						 getEffectiveGradeSumX2(grades, 0));
+	return true;
+}
+
+/**
+ * Compare between two course ids and semesters
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if one of the parameters is NULL return 0
+ * 		else if the courses are not equal return compareCourses
+ * 		else return compareSemesters
+ */
+int compareCoursesSemesters(ListElement grade1, ListElement grade2,
+							ListSortKey key) {
+	if(grade1 == NULL || grade2 == NULL || key == NULL) {
+		return 0;
+	}
+	else if(((Grade)grade1)->course_id != ((Grade)grade2)->course_id) {
+		return (((Grade)grade1)->course_id - ((Grade)grade2)->course_id);
+	}
+	else {
+		return (((Grade)grade1)->semester - ((Grade)grade2)->semester);
+	}
+}
+
+/**
+ * Checks if the grade is effective for a clean report
+ *
+ * @param1 grade the grade that is checked for effectiveness
+ * NOTE: the grade that is sent should be a pointer to a grade in the list of
+ * grades
+ * @param2 grades the list of grades that contains both the grade
+ * @return
+ * true if the grade is effective, false otherwise(if the grade sent is not a
+ * pointer to one of the grades in the list then false will be returned)
+ */
+bool isEffectiveCleanGrade(ListElement grade, ListFilterKey grades) {
+	if(grade == NULL || grades == NULL) {
+		return false;
+	}
+	else {
+		return isEffectiveGrade((List)grades, (Grade)grade, false);
+	}
+}
+
+/**
+ * Print the best grades
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @param4 amount the amount of grades to print
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool reportBest(CourseManager course_manager, Student student_in, List grades,
+				int amount) {
+	//can't do anything if course_manager or output_channel or grades aren't set
+	if(course_manager == NULL || getOutputChannel(course_manager) == NULL ||
+	   grades == NULL) {
+		return false;
+	}
+	//if a student is logged in return MTM_NOT_LOGGED_IN
+	if(student_in == NULL) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return false;
+	}
+	if(amount <= 0) {
+		setError(course_manager, MTM_INVALID_PARAMETERS);
+		return false;
+	}
+	//if the list is empty then there is nothing to print
+	if(listGetSize(grades) > 0) {
+		//Remove all non effective grades for the clean report
+		List filter_grades = listFilter(grades, isEffectiveCleanGrade, grades);
+		if(filter_grades == NULL) { //if there was an allocation failure
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		//sort filter_grades by courses/semesters
+		ListResult result = listSort(filter_grades, compareBest, filter_grades);
+		if(result == LIST_OUT_OF_MEMORY) {
+			listDestroy(filter_grades);
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		LIST_FOREACH(Grade, grade, filter_grades) { //loop over all the grades
+			mtmPrintGradeInfo(getOutputChannel(course_manager),grade->course_id,
+							  grade->points_x2, grade->grade);
+		}
+		listDestroy(filter_grades);
+	}
+	return true;
+}
+
+/**
+ * Compare between two grades then two semesters then two courses
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if one of the parameters is NULL return 0
+ * 		then compare grades
+ * 		if the grades are equal compare by semesters
+ * 		if the semesters are equal compare by courses
+ */
+int compareBest(ListElement grade1, ListElement grade2, ListSortKey key) {
+	if(grade1 == NULL || grade2 == NULL || key == NULL) {
+		return 0;
+	}
+	else if(((Grade)grade1)->grade != ((Grade)grade2)->grade) {
+		return (((Grade)grade2)->grade - ((Grade)grade1)->grade);
+	}
+	else if(((Grade)grade1)->semester != ((Grade)grade2)->semester){
+		return (((Grade)grade1)->semester - ((Grade)grade2)->semester);
+	}
+	else {
+		return (((Grade)grade1)->course_id - ((Grade)grade2)->course_id);
 	}
 }
 
