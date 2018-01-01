@@ -5,25 +5,26 @@
 #define STUDENT_ID_MAX 999999999
 
 #include <stdbool.h>
+#include "set.h"
 #include "course_manager.h"
 /**
  * Manages the student operations
  *
+ * createStudent           - Creates an instance of student
+ * copyStudent             - Copies a student
+ * compareStudents         - Compare two students's ids
+ * getStudent              - Get a student with a certain id from the system
+ * isValidStudentID        - Checks if a student id is valid
+ * getStudentID            - Get the students id
+ * friendRequest           - Send a friend request from one student to another
+ * handleFriendRequest     - Handle the request of the student with the "id"
+ * addFriendship           - Create a friendship between two students
+ * unFriend                - End a student's friendship with another student
+ * removeFriendship        - Terminate a friendship between two students
+ * destroyStudent          - Destroys an instance of student
+ *
  * The following functions are available:
  *
- *   createStudent           - Creates an instance of student
- *   friendRequest           - Send a friend request from one student to another
- *   unFriend                - End a student's friendship with another student
- *   handleFriendRequest     - Handle the request of the student with the "id"
- *   copyStudent             - Copys a student
- *   compareStudents         - Compare two students's ids
- *   getGrade                - Get the student's valid grade for clean report
- *   isValidStudentID        - Checks if a student id is valid
- *   getStudentID            - Get the students id
- *   addFriendship           - Create a friendship between two students
- *   removeFriendship        - Terminate a friendship between two students
- *   getStudent               - Get a student with a certain id from the system
- *   destroyStudent          - Destroys an instance of student
  */
 
 /** Type for defining the student */
@@ -45,61 +46,17 @@ typedef enum action_t {
  * @return
  * The student created. if there was an allocation error return NULL
  */
-Student createStudent(char* student_id, char* first_name, char* last_name);
+Student createStudent(int student_id, char* first_name, char* last_name);
 
 /**
- * Sends a friend request from the logged in student to the student with the id
- *
- * @param1 course_manager the CourseManager that the student is in
- * @param2 id the student, which is receiving the friend request, ID
- * @return
- * false if there was an error. The error will be written to
- * course_manager->error
- * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_ALREADY_FRIEND,
- * MTM_STUDENT_DOES_NOT_EXIST, MTM_ALREADY_REQUESTED
- * true if there was no error
- */
-bool friendRequest(CourseManager course_manager, char* id);
-
-/**
- * Terminate a friendship between two students
- *
- * @param1 course_manager the CourseManager that the logged in student is in
- * @param2 id the student, which is being unfriended, ID
- * @return
- * false if there was an error. The error will be written to
- * course_manager->error
- * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_NOT_FRIEND,
- * MTM_STUDENT_DOES_NOT_EXIST
- * true if there was no error
- */
-bool unFriend(CourseManager course_manager, char* id);
-
-/**
- * Handle the request of the student with the "id"
- *
- * @param1 course_manager the CourseManager that the logged in student is in
- * @param2 id the student, which sent the friend request, ID
- * @param3 action if is "accept" then the two become friends, if "reject" then
- * decline the friend request
- * @return
- * false if there was an error. The error will be written to
- * course_manager->error
- * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_ALREADY_FRIEND,
- * MTM_STUDENT_DOES_NOT_EXIST, MTM_NOT_REQUESTED, MTM_INVALID_PARAMETERS
- * true if there was no error
- */
-bool handleFriendRequest(CourseManager course_manager, char* id, char* action);
-
-/**
- * Copys a student
+ * Copies a student
  *
  * @param1 student the student we want to copy
  * @return
  * NULL if there was an allocation failure or student = NULL
  * otherwise the student
  */
-void* copyStudent(void* student);
+SetElement copyStudent(SetElement student);
 
 /**
  * Compare two students's ids
@@ -111,18 +68,17 @@ void* copyStudent(void* student);
  * 		0 if they're equal or if one of the parameters is NULL;
  * 		A negative integer if the second student id is greater.
  */
-int compareStudents(void* student1, void* student2);
+int compareStudents(SetElement student1, SetElement student2);
 
 /**
- * Get the logged in student's valid grade for clean report
+ * Get a student(NOT A COPY) with a certain id from the system
  *
- * @param1 course_manager the CourseManager that the logged in student is in
- * @param2 course_id the course ID of the grade
+ * @param1 student the student to retrieve from the system
+ * @param2 student_id the id of the student
  * @return
- * the valid grade of the course
- * if there is no grade then return -1
+ * the student if he exists, NULL otherwise
  */
-int getGrade(CourseManager course_manager, char* course_id);
+Student getStudent(CourseManager course_manager, int student_id);
 
 /**
  * Checks if a student id is valid
@@ -131,23 +87,60 @@ int getGrade(CourseManager course_manager, char* course_id);
  * @return
  * true if the id is valid, false otherwise
  */
-bool isValidStudentID(char* student_id);
+bool isValidStudentID(int student_id);
 
 /**
  * Get the students id
  *
  * @param1 student the student which contains the id
  * @return
- * the id if valid, -1 otherwise
+ * the id if valid, 0 otherwise
  */
 int getStudentID(Student student);
+
+/**
+ * Sends a friend request from the logged in student to the student with the id
+ *
+ * @param1 course_manager the CourseManager that the student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @param3 id the student, which is receiving the friend request, ID
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_ALREADY_FRIEND,
+ * MTM_STUDENT_DOES_NOT_EXIST, MTM_ALREADY_REQUESTED
+ * true if there was no error
+ */
+bool friendRequest(CourseManager course_manager, Student student_in, int id);
+
+/**
+ * Handle the request of the student with the "id"
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @param2 id the student, which sent the friend request, ID
+ * @param3 action if is "accept" then the two become friends, if "reject" then
+ * decline the friend request
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_ALREADY_FRIEND,
+ * MTM_STUDENT_DOES_NOT_EXIST, MTM_NOT_REQUESTED, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool handleFriendRequest(CourseManager course_manager, Student student_in,
+						 int id, char* action);
 
 /**
  * Create a friendship between two students, the logged in student and the
  * student sent in the parameters
  *
  * @param1 course_manager the CourseManager that the logged in student is in
- * @param2 student the student that will become friends with the logged in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @param3 student the student that will become friends with the logged in
  * student
  * @return
  * false if there was an error. The error will be written to
@@ -156,14 +149,33 @@ int getStudentID(Student student);
  * MTM_ALREADY_FRIEND
  * true if there was no error
  */
-bool addFriendship(CourseManager course_manager, Student student);
+bool addFriendship(CourseManager course_manager, Student student_in,
+				   Student student);
+
+/**
+ * End a student's friendship with another student
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @param3 id the student, which is being unfriended, ID
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_NOT_FRIEND,
+ * MTM_STUDENT_DOES_NOT_EXIST
+ * true if there was no error
+ */
+bool unFriend(CourseManager course_manager, Student student_in, int id);
 
 /**
  * Terminate a friendship between two students, the logged in student and the
  * student sent in the parameters
  *
  * @param1 course_manager the CourseManager that the logged in student is in
- * @param2 student the student that will cease to be friends with the logged in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @param3 student the student that will cease to be friends with the logged in
  * student
  * @return
  * false if there was an error. The error will be written to
@@ -171,22 +183,15 @@ bool addFriendship(CourseManager course_manager, Student student);
  * Possible Non Critical Errors:
  * true if there was no error
  */
-bool removeFriendship(CourseManager course_manager, Student student);
-
-/**
- * Get a student with a certain id from the system
- *
- * @param1 student the student to retrieve from the system
- * @return
- * the student if he exists, false otherwise
- */
-Student getStudent(CourseManager course_manager, char* student_id);
+bool removeFriendship(CourseManager course_manager, Student student_in,
+					  Student student);
 
 /**
  * Destroys an instance of student
  *
  * @param1 student the student we destroy
  */
-void destroyStudent(void* student);
+void destroyStudent(SetElement student);
+
 
 #endif /* STUDENT_H_ */
