@@ -24,7 +24,7 @@
  *   logoutStudent           - Logs out a student from the system
  *   addStudent              - Add a student to the system
  *   removeStudent           - Remove a student from the system
- *   getLoggedInStudent      - Get the student that is logged into the system
+ *   setError                - Set the error of the course manager
  *   destroyCourseManager    - Destroy an instance of CourseManager
  */
 
@@ -133,7 +133,7 @@ MtmErrorCode getCourseManagerError(CourseManager course_manager);
  * @return
  * true if the course id is valid false otherwise
  */
-bool isValidCourseID(char* course_id);
+bool isValidCourseID(int course_id);
 
 /**
  * Logs in a student to the system
@@ -200,9 +200,13 @@ bool addStudent(CourseManager course_manager, int student_id, char* first_name,
  */
 bool removeStudent(CourseManager course_manager, int student_id);
 
-
-
-void* getLoggedInStudent(CourseManager course_manager);
+/**
+ * Remove the student from the system
+ *
+ * @param1 course_manager CourseManager that has the error variable
+ * @param2 error the error to insert into the course manager
+ */
+void setError(CourseManager course_manager, MtmErrorCode error);
 
 /**
  * Destroy an instance of CourseManager

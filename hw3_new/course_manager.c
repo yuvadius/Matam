@@ -89,14 +89,14 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 		token = strtok(NULL, del); //get the fourth argument(first name)
 		char* first_name = malloc(strlen(token) + 1);
 		if(first_name == NULL) { //if memory allocation failed
-			course_manager->error = MTM_OUT_OF_MEMORY;
+			setError(course_manager, MTM_OUT_OF_MEMORY);
 			return false;
 		}
 		strcpy(first_name, token); //get the first name
 		token = strtok(NULL, del); //get the fifth argument(last name)
 		char* last_name = malloc(strlen(token) + 1);
 		if(last_name == NULL) { //if memory allocation failed
-			course_manager->error = MTM_OUT_OF_MEMORY;
+			setError(course_manager, MTM_OUT_OF_MEMORY);
 			return false;
 		}
 		strcpy(last_name, token); //get the last name
@@ -110,7 +110,30 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 		return removeStudent(course_manager, atoi(token));
 	}
 	else if(strcmp(token, "friend_request")) {
-
+		token = strtok(NULL, del); //get the third argument(id)
+		return friendRequest(course_manager, course_manager->current_student,
+							 atoi(token));
+	}
+	else if(strcmp(token, "handle_request")) {
+		token = strtok(NULL, del); //get the third argument(id)
+		int id = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(action)
+		char* action = malloc(strlen(token) + 1);
+		if(action == NULL) { //if memory allocation failed
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		strcpy(action, token); //get the action
+		bool result = handleFriendRequest(course_manager,
+						  	  	  	  	  course_manager->current_student,
+										  id, action);
+		free(action);
+		return result;
+	}
+	else if(strcmp(token, "unfriend")) {
+		token = strtok(NULL, del); //get the third argument(id)
+		return unFriend(course_manager, course_manager->current_student,
+							 atoi(token));
 	}
 	return true;
 }
@@ -211,9 +234,8 @@ MtmErrorCode getCourseManagerError(CourseManager course_manager) {
  * @return
  * true if the course id is valid false otherwise
  */
-bool isValidCourseID(char* course_id) {
-	int course_id_int = atoi(course_id); //string to int function
-	if(course_id_int >= COURSE_ID_MIN && course_id_int <= COURSE_ID_MAX) {
+bool isValidCourseID(int course_id) {
+	if(course_id >= COURSE_ID_MIN && course_id <= COURSE_ID_MAX) {
 		return true;
 	}
 	else {
@@ -240,14 +262,14 @@ bool loginStudent(CourseManager course_manager, int student_id) {
 	}
 	//if a student is logged in return MTM_ALREADY_LOGGED_IN
 	if(course_manager->current_student != NULL) {
-		course_manager->error = MTM_ALREADY_LOGGED_IN;
+		setError(course_manager, MTM_ALREADY_LOGGED_IN);
 		return false;
 	}
 	//find the student in the set
 	Student student = getStudent(course_manager, student_id);
 	//if the student wasn't found
 	if(student == NULL) {
-		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
+		setError(course_manager, MTM_STUDENT_DOES_NOT_EXIST);
 		return false;
 	}
 	else {
@@ -288,7 +310,7 @@ bool logoutStudent(CourseManager course_manager) {
 	}
 	//if a student is not logged in return MTM_NOT_LOGGED_IN
 	if(course_manager->current_student == NULL) {
-		course_manager->error = MTM_NOT_LOGGED_IN;
+		setError(course_manager, MTM_NOT_LOGGED_IN);
 		return false;
 	}
 	course_manager->current_student = NULL; //logout the student
@@ -319,27 +341,27 @@ bool addStudent(CourseManager course_manager, int student_id, char* first_name,
 	SET_FOREACH(Student, student, course_manager->students) {
 		//if the student was found
 		if(getStudentID(student) == student_id) {
-			course_manager->error = MTM_STUDENT_ALREADY_EXISTS;
+			setError(course_manager, MTM_STUDENT_ALREADY_EXISTS);
 			return false;
 		}
 	}
 	//student doesn't exist
 	if(isValidStudentID(student_id) == false) { //if the id isn't valid
-		course_manager->error = MTM_INVALID_PARAMETERS;
+		setError(course_manager, MTM_INVALID_PARAMETERS);
 		return false;
 	}
 	//create a student
 	Student student = createStudent(student_id, first_name, last_name);
 	//if there was a memory allocation failure
 	if(student == NULL) {
-		course_manager->error = MTM_OUT_OF_MEMORY;
+		setError(course_manager, MTM_OUT_OF_MEMORY);
 		return false;
 	}
 	//add a copy of student to the set
 	SetResult result = setAdd(course_manager->students, student);
 	destroyStudent(student); //because a copy was added
 	if(result == SET_OUT_OF_MEMORY) {
-		course_manager->error = MTM_OUT_OF_MEMORY;
+		setError(course_manager, MTM_OUT_OF_MEMORY);
 		return false;
 	}
 	else {
@@ -367,7 +389,7 @@ bool removeStudent(CourseManager course_manager, int student_id) {
 	Student student = getStudent(course_manager, student_id);
 	//if the student wasn't found
 	if(student == NULL) {
-		course_manager->error = MTM_STUDENT_DOES_NOT_EXIST;
+		setError(course_manager, MTM_STUDENT_DOES_NOT_EXIST);
 		return false;
 	}
 	//log out the student if the student is logged in
@@ -380,6 +402,20 @@ bool removeStudent(CourseManager course_manager, int student_id) {
 	else { //something went horribly wrong
 		return false;
 	}
+}
+
+/**
+ * Remove the student from the system
+ *
+ * @param1 course_manager CourseManager that has the error variable
+ * @param2 error the error to insert into the course manager
+ */
+void setError(CourseManager course_manager, MtmErrorCode error) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return;
+	}
+	course_manager->error = error;
 }
 
 /**
