@@ -5,6 +5,7 @@
 #include "mtm_ex3.h"
 #include "course_manager.h"
 #include "student.h"
+#include "grade.h"
 
 struct course_manager_t {
 	Set students;
@@ -135,7 +136,9 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 		return unFriend(course_manager, course_manager->current_student,
 							 atoi(token));
 	}
-	return true;
+	else { //invalid sub-command, shouldn't reach this place
+		return true;
+	}
 }
 
 /**
@@ -153,7 +156,40 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
  * true if there was no error
  */
 bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
-	return true;
+	if(strcmp(token, "add") == 0) {
+		token = strtok(NULL, del); //get the third argument(semester)
+		int semester = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(course_id)
+		int course_id = atoi(token);
+		token = strtok(NULL, del); //get the fifth argument(points)
+		int points_x2 = (int)(atof(token) * 2);
+		token = strtok(NULL, del); //get the sixth argument(grade)
+		int grade = atoi(token);
+		return addGrade(course_manager, course_manager->current_student,
+						getStudentGrades(course_manager->current_student),
+						semester, course_id, points_x2, grade);
+	}
+	else if(strcmp(token, "remove") == 0) {
+		token = strtok(NULL, del); //get the third argument(semester)
+		int semester = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(course_id)
+		int course_id = atoi(token);
+		return removeGrade(course_manager, course_manager->current_student,
+						   getStudentGrades(course_manager->current_student),
+						   semester, course_id);
+	}
+	else if(strcmp(token, "update") == 0) {
+		token = strtok(NULL, del); //get the third argument(course_id)
+		int course_id = atoi(token);
+		token = strtok(NULL, del); //get the fourth argument(grade)
+		int grade = atoi(token);
+		return removeGrade(course_manager, course_manager->current_student,
+						   getStudentGrades(course_manager->current_student),
+						   course_id, grade);
+	}
+	else { //invalid sub-command, shouldn't reach this place
+		return true;
+	}
 }
 
 /**
@@ -171,7 +207,13 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
  * true if there was no error
  */
 bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
-	return true;
+	if(strcmp(token, "full") == 0) {
+		return reportFull(course_manager, course_manager->current_student,
+						  getStudentGrades(course_manager->current_student));
+	}
+	else { //invalid sub-command, shouldn't reach this place
+		return true;
+	}
 }
 
 /**
@@ -416,6 +458,23 @@ void setError(CourseManager course_manager, MtmErrorCode error) {
 		return;
 	}
 	course_manager->error = error;
+}
+
+/**
+ * Get the system's output channel
+ *
+ * @param1 course_manager CourseManager that has the output channel
+ * @return
+ * the output file, if there was an error then NULL
+ */
+FILE* getOutputChannel(CourseManager course_manager) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return NULL;
+	}
+	else {
+		return course_manager->output_channel;
+	}
 }
 
 /**
