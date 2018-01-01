@@ -121,16 +121,16 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 		free(first_name);
 		return result;
 	}
-	else if(strcmp(token, "remove")) {
+	else if(strcmp(token, "remove") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
 		return removeStudent(course_manager, atoi(token));
 	}
-	else if(strcmp(token, "friend_request")) {
+	else if(strcmp(token, "friend_request") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
 		return friendRequest(course_manager, course_manager->current_student,
 							 atoi(token));
 	}
-	else if(strcmp(token, "handle_request")) {
+	else if(strcmp(token, "handle_request") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
 		int id = atoi(token);
 		token = strtok(NULL, del); //get the fourth argument(action)
@@ -146,7 +146,7 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 		free(action);
 		return result;
 	}
-	else if(strcmp(token, "unfriend")) {
+	else if(strcmp(token, "unfriend") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
 		return unFriend(course_manager, course_manager->current_student,
 							 atoi(token));
@@ -225,6 +225,17 @@ bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 	if(strcmp(token, "full") == 0) {
 		return reportFull(course_manager, course_manager->current_student,
 						  getStudentGrades(course_manager->current_student));
+	}
+	else if(strcmp(token, "clean") == 0) {
+		return reportFull(course_manager, course_manager->current_student,
+						  getStudentGrades(course_manager->current_student));
+	}
+	else if(strcmp(token, "best") == 0) {
+		token = strtok(NULL, del); //get the third argument(amount)
+		int amount = atoi(token);
+		return reportBest(course_manager, course_manager->current_student,
+						  getStudentGrades(course_manager->current_student),
+						  amount);
 	}
 	else { //invalid sub-command, shouldn't reach this place
 		return true;

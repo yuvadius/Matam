@@ -37,7 +37,9 @@
  * isSportCourse           - Checks if the course is a sport course
  * reportClean             - Print the clean matriculation
  * compareCoursesSemesters - Compare between two courses and two semesters
- * distanceGrades          - Calculates the distance between two grades in list
+ * isEffectiveCleanGrade   - Checks if the grade is effective for a clean report
+ * reportBest              - Print the best grades
+ * compareBest             - Compare between two grades/courses/semesters
  * destroyGrade            - Destroys an instance of grade
  */
 
@@ -276,25 +278,56 @@ bool reportClean(CourseManager course_manager, Student student_in, List grades);
  * @param2 grade2 the grade that contains the course_id/semester to compare
  * @param3 key the list of grades containing grade1 and grade2
  * @return
- * 		if the courses are not equal return compareCourses
- * 		else if the semesters are not equal return compareSemesters
- * 		else return the distance between the two grades in the list of grades
+ * 		if one of the parameters is NULL return 0
+ * 		else if the courses are not equal return compareCourses
+ * 		else return compareSemesters
  */
 int compareCoursesSemesters(ListElement grade1, ListElement grade2,
 							ListSortKey key);
 
 /**
- * Calculates the distance between two grades in list
+ * Checks if the grade is effective for a clean report
  *
- * @param1 grades the list of grades that contains both grades
- * @param2 grade1 the grade that is located in the list grades
- * NOTE: grade1 should be a reference to a grade in grades(NOT A COPY)
- * @param3 grade2 the grade that is located in the list grades
- * NOTE: grade2 should be a reference to a grade in grades(NOT A COPY)
+ * @param1 grade the grade that is checked for effectiveness
+ * NOTE: the grade that is sent should be a pointer to a grade in the list of
+ * grades
+ * @param2 grades the list of grades that contains both the grade
  * @return
- * 		the distance between the two grades on success and 0 on failure
+ * true if the grade is effective, false otherwise(if the grade sent is not a
+ * pointer to one of the grades in the list then false will be returned)
  */
-int distanceGrades(List grades, Grade grade1, Grade grade2);
+bool isEffectiveCleanGrade(ListElement grade, ListFilterKey grades);
+
+/**
+ * Print the best grades
+ *
+ * @param1 course_manager the CourseManager that the logged in student is in
+ * @param2 student_in the current student that is logged in(will be NULL if no
+ * student is logged in)
+ * @patam3 grades the list of grades of the logged in student
+ * @param4 amount the amount of grades to print
+ * @return
+ * false if there was an error. The error will be written to
+ * course_manager->error
+ * Possible Non Critical Errors: MTM_NOT_LOGGED_IN, MTM_INVALID_PARAMETERS
+ * true if there was no error
+ */
+bool reportBest(CourseManager course_manager, Student student_in, List grades,
+				int amount);
+
+/**
+ * Compare between two grades then two semesters then two courses
+ *
+ * @param1 grade1 the grade that contains the course_id/semester to compare
+ * @param2 grade2 the grade that contains the course_id/semester to compare
+ * @param3 key the list of grades containing grade1 and grade2
+ * @return
+ * 		if one of the parameters is NULL return 0
+ * 		then compare grades
+ * 		if the grades are equal compare by semesters
+ * 		if the semesters are equal compare by courses
+ */
+int compareBest(ListElement grade1, ListElement grade2, ListSortKey key);
 
 /**
  * Destroys an instance of grade
