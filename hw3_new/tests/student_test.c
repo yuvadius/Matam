@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "student.h"
-#include "course_manager.h"
+#include "../student.h"
+#include "../course_manager.h"
 
 
 static bool testCreateStudent() {

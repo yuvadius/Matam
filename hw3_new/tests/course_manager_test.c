@@ -3,11 +3,11 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "course_manager.h"
+#include "../course_manager.h"
 
-#include "student.h"
+#include "../student.h"
 
-#include "grade.h"
+#include "../grade.h"
 
 
 

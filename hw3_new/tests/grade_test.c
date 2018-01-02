@@ -3,9 +3,9 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "student.h"
-#include "grade.h"
-#include "list.h"
+#include "../student.h"
+#include "../grade.h"
+#include "../list.h"
 
 static bool testCreateGrade() {
 	Grade grade = createGrade(1,300,8,46);
