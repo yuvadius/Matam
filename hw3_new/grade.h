@@ -241,18 +241,15 @@ int getEffectiveGradeSumX2(List grades, int semester);
 /**
  * Checks if the grade is effective for a semester
  *
- * @param1 grades the list of grades that contains all the grades
- * @param2 grade the grade that is checked for effectiveness
- * NOTE: the grade that is sent should be a pointer to a grade in the list of
- * grades
- * @param3 checkSemester if false then the grade is effective if it is effective
+ * @param1 grades the list of grades that contains the grade to check for
+ * effectiveness at the current iterator
+ * @param2 checkSemester if false then the grade is effective if it is effective
  * for all the grades and not just for a certain semester. if true the the grade
  * is effective if it is effective for the semester that it is in
  * @return
- * true if the grade is effective, false otherwise(if the grade sent is not a
- * pointer to one of the grades in the list then false will be returned)
+ * true if the grade is effective, false otherwise
  */
-bool isEffectiveGrade(List grades, Grade grade, bool checkSemester);
+bool isEffectiveGrade(List grades, bool checkSemester);
 
 /**
  * Checks if the course is a sport course
