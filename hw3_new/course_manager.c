@@ -199,12 +199,19 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
 		token = strtok(NULL, del); //get the fourth argument(course_id)
 		int course_id = atoi(token);
 		token = strtok(NULL, del); //get the fifth argument(points)
-		int points_x2 = (int)(atof(token) * 2);
+		char* points = malloc(strlen(token) + 1);
+		if(points == NULL) { //if memory allocation failed
+			setError(course_manager, MTM_OUT_OF_MEMORY);
+			return false;
+		}
+		strcpy(points, token); //get the action
 		token = strtok(NULL, del); //get the sixth argument(grade)
 		int grade = atoi(token);
-		return addGrade(course_manager, getCurrentStudent(course_manager),
+		bool result = addGrade(course_manager,getCurrentStudent(course_manager),
 						getStudentGrades(getCurrentStudent(course_manager)),
-						semester, course_id, points_x2, grade);
+						semester, course_id, validatePoints(points), grade);
+		free(points);
+		return result;
 	}
 	else if(strcmp(token, "remove") == 0) {
 		token = strtok(NULL, del); //get the third argument(semester)

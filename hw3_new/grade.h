@@ -20,6 +20,7 @@
  *
  * The following functions are available:
  * createGrade             - Creates an instance of grade
+ * validatePoints          - Check if the points for a course are valid
  * isValidSemester         - Checks if the semester is valid
  * isValidPointsX2         - Checks if the points*2 for a course is valid
  * isValidGrade            - Checks if the grade is valid
@@ -64,6 +65,15 @@ typedef struct grade_t *Grade;
  * The grade created. if there was an allocation error return NULL
  */
 Grade createGrade(int semester, int course_id, int points_x2, int grade);
+
+/**
+ * Check if the points for a course are valid as received in the command line
+ *
+ * @param1 points the points of the course received in the command line
+ * @return
+ * -1 if the points aren't valid, else return the points*2
+ */
+int validatePoints(char* points);
 
 /**
  * Checks if the semester is valid

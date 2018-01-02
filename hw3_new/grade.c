@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include "set.h"
 #include "list.h"
 #include "mtm_ex3.h"
@@ -100,6 +101,34 @@ Grade createGrade(int semester, int course_id, int points_x2, int grade) {
 	else {
 		destroyGrade(grade_instance);
 		return NULL;
+	}
+}
+
+/**
+ * Check if the points for a course are valid as received in the command line
+ *
+ * @param1 points the points of the course received in the command line
+ * @return
+ * -1 if the points aren't valid, else return the points*2
+ */
+int validatePoints(char* points) {
+	if(points == NULL) {
+		return -1;
+	}
+	else if(strlen(points) != 1 && strlen(points) != 3) {
+		return -1;
+	}
+	else if(points[0] < '0' || points[0] > '9') {
+		return -1;
+	}
+	else if(strlen(points) == 3 && points[1] != '.') {
+		return -1;
+	}
+	else if(strlen(points) == 3 && points[2] != '0' && points[2] != '5') {
+		return -1;
+	}
+	else {
+		return (atoi(points)*2);
 	}
 }
 
