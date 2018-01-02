@@ -21,15 +21,11 @@ bool setInputOutputFiles(FILE** input_file, FILE** output_file, int argc,
 						 char *argv[]) {
 	*input_file = stdin; //default as standard input file
 	*output_file = stdout; //default as standard output file
-	if(argc != 1 && argc != 3 && argc != 5) { //not a valid amount of parameters
+	if(argc >= 2 && strcmp(argv[1], "-i") != 0) {
 		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
 		return false;
 	}
-	if(argc >= 3 && strcmp(argv[1], "-i") != 0) {
-		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
-		return false;
-	}
-	if(argc == 5 && strcmp(argv[3], "-o") != 0) {
+	if(argc >= 4 && strcmp(argv[3], "-o") != 0) {
 		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
 		return false;
 	}
@@ -40,7 +36,7 @@ bool setInputOutputFiles(FILE** input_file, FILE** output_file, int argc,
 			return false;
 		}
 	}
-	if(argc == 5) {
+	if(argc >= 5) {
 		*output_file = fopen(argv[4], "w");
 		if(*output_file == NULL) { //if file couldn't be opened
 			mtmPrintErrorMessage(stdout, MTM_CANNOT_OPEN_FILE);
