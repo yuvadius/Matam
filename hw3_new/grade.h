@@ -422,7 +422,7 @@ int getCourseID(Grade grade);
  *
  * @param1 grade the grade object that contains the grade
  * @return
- * the grade on success, 0 on failure
+ * the grade on success, -1 on failure
  */
 int getGrade(Grade grade);
 

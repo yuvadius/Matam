@@ -570,6 +570,7 @@ bool isEffectiveGrade(List grades, bool checkSemester) {
 				}
 			}
 		}
+		listDestroy(grades_copy);
 		return false; //no grade was found
 	}
 	else {
@@ -585,6 +586,7 @@ bool isEffectiveGrade(List grades, bool checkSemester) {
 				}
 			}
 		}
+		listDestroy(grades_copy);
 		return false; //no grade was found
 	}
 }
@@ -955,8 +957,8 @@ bool reportReference(CourseManager course_manager, Student student_in,
 			}
 		}
 		listDestroy(filter_grades);
-		listDestroy(friends_list);
 	}
+	listDestroy(friends_list);
 	return true;
 }
 
@@ -1046,11 +1048,11 @@ int getCourseID(Grade grade) {
  *
  * @param1 grade the grade object that contains the grade
  * @return
- * the grade on success, 0 on failure
+ * the grade on success, -1 on failure
  */
 int getGrade(Grade grade) {
 	if(grade == NULL) {
-		return 0;
+		return -1;
 	}
 	else {
 		return grade->grade;

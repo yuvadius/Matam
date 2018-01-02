@@ -17,6 +17,12 @@ struct student_t {
 	List grades; //will be sorted from newest to oldest
 };
 
+/**
+ * Translates an action string to an integer constant
+ *
+ * @param1 action the action that will be translated
+ * @return the appropriate translation for the action
+ */
 static Action getAction(char* action) {
 	if(strcmp(action, "accept") == 0) {
 		return ACCEPT;
@@ -26,6 +32,24 @@ static Action getAction(char* action) {
 	}
 	else {
 		return NO_ACTION;
+	}
+}
+
+/**
+ * Nullify all pointers in student
+ *
+ * @param1 student the student which will have its pointers nullified
+ */
+static void nullifyStudent(Student student) {
+	if(student == NULL) {
+		return;
+	}
+	else {
+		student->friends = NULL;
+		student->sent_requests = NULL;
+		student->first_name = NULL;
+		student->last_name = NULL;
+		student->grades = NULL;
 	}
 }
 
@@ -45,6 +69,7 @@ Student createStudent(int student_id, char* first_name, char* last_name) {
 	if(student == NULL) { //if there was a memory failure return NULL
 		return NULL;
 	}
+	nullifyStudent(student); //nullify student for safety
 	student->friends = setCreate(copyStudent, destroyStudent, compareStudents);
 	if(student->friends == NULL) { //if memory allocation failed
 		destroyStudent(student);
