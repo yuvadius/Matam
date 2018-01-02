@@ -636,7 +636,7 @@ bool reportClean(CourseManager course_manager, Student student_in, List grades){
 	//if the list is empty then there is nothing to print
 	if(listGetSize(grades) > 0) {
 		//Remove all non effective grades for the clean report
-		List filter_grades = listFilter(grades, isEffectiveCleanGrade, grades);
+		List filter_grades = filterEffectiveCleanGrades(grades);
 		if(filter_grades == NULL) { //if there was an allocation failure
 			setError(course_manager, MTM_OUT_OF_MEMORY);
 			return false;
@@ -687,22 +687,39 @@ int compareCoursesSemesters(ListElement grade1, ListElement grade2,
 }
 
 /**
- * Checks if the grade is effective for a clean report
+ * filters all grades that are not effective for a clean report
+ * and send a copy of the filtered list
  *
- * @param1 grade the grade that is checked for effectiveness
- * NOTE: the grade that is sent should be a pointer to a grade in the list of
- * grades
- * @param2 grades the list of grades that contains both the grade
+ * @param1 grades the list of grades to filter
  * @return
- * true if the grade is effective, false otherwise(if the grade sent is not a
- * pointer to one of the grades in the list then false will be returned)
+ * the list on success, NULL on failure
  */
-bool isEffectiveCleanGrade(ListElement grade, ListFilterKey grades) {
-	if(grade == NULL || grades == NULL) {
-		return false;
+List filterEffectiveCleanGrades(List grades) {
+	if(grades == NULL) {
+		return NULL;
 	}
 	else {
-		return isEffectiveGrade((List)grades, false);
+		List filter_grades = listCopy(grades);
+		if(filter_grades == NULL) { //if there was a memory allocation failure
+			return NULL;
+		}
+		//remove all grades that are not effective for a clean report
+		while(true) {
+			bool remove = false;
+			LIST_FOREACH(Grade, grade, filter_grades) { //loop over all grades
+				if(isEffectiveGrade(filter_grades, false) == false) {
+					remove = true;
+					break; //break foreach
+				}
+			}
+			if(remove == true) {
+				listRemoveCurrent(filter_grades); //remove non effective grade
+			}
+			else {
+				break; //done with removing all non effective clean grades
+			}
+		}
+		return filter_grades;
 	}
 }
 
@@ -739,7 +756,7 @@ bool reportBest(CourseManager course_manager, Student student_in, List grades,
 	//if the list is empty then there is nothing to print
 	if(listGetSize(grades) > 0) {
 		//Remove all non effective grades for the clean report
-		List filter_grades = listFilter(grades, isEffectiveCleanGrade, grades);
+		List filter_grades = filterEffectiveCleanGrades(grades);
 		if(filter_grades == NULL) { //if there was an allocation failure
 			setError(course_manager, MTM_OUT_OF_MEMORY);
 			return false;
@@ -823,7 +840,7 @@ bool reportWorst(CourseManager course_manager, Student student_in, List grades,
 	//if the list is empty then there is nothing to print
 	if(listGetSize(grades) > 0) {
 		//Remove all non effective grades for the clean report
-		List filter_grades = listFilter(grades, isEffectiveCleanGrade, grades);
+		List filter_grades = filterEffectiveCleanGrades(grades);
 		if(filter_grades == NULL) { //if there was an allocation failure
 			setError(course_manager, MTM_OUT_OF_MEMORY);
 			return false;

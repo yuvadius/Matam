@@ -290,17 +290,14 @@ int compareCoursesSemesters(ListElement grade1, ListElement grade2,
 							ListSortKey key);
 
 /**
- * Checks if the grade is effective for a clean report
+ * filters all grades that are not effective for a clean report
+ * and send a copy of the filtered list
  *
- * @param1 grade the grade that is checked for effectiveness
- * NOTE: the grade that is sent should be a pointer to a grade in the list of
- * grades
- * @param2 grades the list of grades that contains both the grade
+ * @param1 grades the list of grades to filter
  * @return
- * true if the grade is effective, false otherwise(if the grade sent is not a
- * pointer to one of the grades in the list then false will be returned)
+ * the list on success, NULL on failure
  */
-bool isEffectiveCleanGrade(ListElement grade, ListFilterKey grades);
+List filterEffectiveCleanGrades(List grades);
 
 /**
  * Prints the best grades
