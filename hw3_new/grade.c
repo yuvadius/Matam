@@ -115,20 +115,32 @@ int validatePoints(char* points) {
 	if(points == NULL) {
 		return -1;
 	}
-	else if(strlen(points) != 1 && strlen(points) != 3) {
+	int length = strlen(points);
+	if(length < 1) { //if empty string
 		return -1;
 	}
-	else if(points[0] < '0' || points[0] > '9') {
-		return -1;
-	}
-	else if(strlen(points) == 3 && points[1] != '.') {
-		return -1;
-	}
-	else if(strlen(points) == 3 && points[2] != '0' && points[2] != '5') {
+	else if(points[0] < '0' || points[0] > '9') { //first character not a digit
 		return -1;
 	}
 	else {
-		return (atof(points)*2);
+		for(int i = 0; i < length; ++i) {
+			if(points[i] == '.') {
+				if(i != (length - 2)) { //there should be 1 digit after the dot
+					return -1;
+				}
+				//the last digit after the dot can only be a 0 or 5
+				else if(points[i+1] != '0' && points[i+1] != '5') {
+					return -1;
+				}
+				else {
+					return (atof(points)*2); //return points*2
+				}
+			}
+			else if(points[i] < '0' || points[i] > '9') { //if is not a number
+				return -1;
+			}
+		}
+		return (atof(points)*2); //return points*2
 	}
 }
 
