@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "../student.h"
-#include "../course_manager.h"
+#include "student.h"
+#include "course_manager.h"
 
 
 static bool testCreateStudent() {
@@ -162,9 +162,7 @@ static bool testCopyStudent() {
 }
 
 
-//static bool testGetStudentGrades() {   // ???????????????????ADD LATER???????????????????????
-//	return true;
-//}
+
 
 static bool testIsValidStudentID() {
 	ASSERT_TEST(!isValidStudentID(-1)); //FALSE expected as entered an invalid
@@ -226,15 +224,7 @@ static bool testDestroyStudent() {
 
 
 
-
-
-
-
-
-
-
-
-int main2() {
+int main() {
 	RUN_TEST(testCreateStudent);
 	RUN_TEST(testFriendRequest);
 	RUN_TEST(testHandleFriendRequest); // handleFriendRequest uses the helper
@@ -242,7 +232,6 @@ int main2() {
 	RUN_TEST(testUnFriend); // unFriend uses the helper removeFriendship func.
 	RUN_TEST(testCompareStudents);
 	RUN_TEST(testCopyStudent);
-	//RUN_TEST(testGetStudentGrade);
 	RUN_TEST(testIsValidStudentID);
 	RUN_TEST(testGetStudentID);
 	RUN_TEST(testGetStudent);
