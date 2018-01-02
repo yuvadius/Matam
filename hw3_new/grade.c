@@ -128,7 +128,7 @@ int validatePoints(char* points) {
 		return -1;
 	}
 	else {
-		return (atoi(points)*2);
+		return (atof(points)*2);
 	}
 }
 
