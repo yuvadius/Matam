@@ -490,7 +490,7 @@ int getEffectivePointsX2(List grades, int semester) {
 		int effective_grade_points_x2 = 0;
 		LIST_FOREACH(Grade, grade, grades_copy) { //loop over all the grades
 			if(grade->semester == semester || semester == 0) {
-				if(isEffectiveGrade(grades, grade, (semester != 0))) {
+				if(isEffectiveGrade(grades_copy, (semester != 0))) {
 					effective_grade_points_x2 += grade->points_x2;
 				}
 			}
@@ -522,8 +522,8 @@ int getEffectiveGradeSumX2(List grades, int semester) {
 		int effective_grade_sum_x2 = 0;
 		LIST_FOREACH(Grade, grade, grades_copy) { //loop over all the grades
 			if(grade->semester == semester || semester == 0) {
-				if(isEffectiveGrade(grades, grade, (semester != 0))) {
-					effective_grade_sum_x2 += grade->grade;
+				if(isEffectiveGrade(grades_copy, (semester != 0))) {
+					effective_grade_sum_x2 += (grade->grade * grade->points_x2);
 				}
 			}
 		}
@@ -535,24 +535,25 @@ int getEffectiveGradeSumX2(List grades, int semester) {
 /**
  * Checks if the grade is effective for a semester
  *
- * @param1 grades the list of grades that contains all the grades
- * @param2 grade the grade that is checked for effectiveness
- * NOTE: the grade that is sent should be a pointer to a grade in the list of
- * grades
- * @param3 checkSemester if false then the grade is effective if it is effective
+ * @param1 grades the list of grades that contains the grade to check for
+ * effectiveness at the current iterator
+ * @param2 checkSemester if false then the grade is effective if it is effective
  * for all the grades and not just for a certain semester. if true the the grade
  * is effective if it is effective for the semester that it is in
  * @return
- * true if the grade is effective, false otherwise(if the grade sent is not a
- * pointer to one of the grades in the list then false will be returned)
+ * true if the grade is effective, false otherwise
  */
-bool isEffectiveGrade(List grades, Grade grade, bool checkSemester) {
-	//if the grades isn't set or semester isn't valid there is nothing to check
-	if(grades == NULL || grade == NULL) {
+bool isEffectiveGrade(List grades, bool checkSemester) {
+	//if the grades isn't set there is nothing to check
+	if(grades == NULL) {
 		return false;
 	}
 	//copy list so the iterator wouldn't change while looping
 	List grades_copy = listCopy(grades);
+	Grade grade = listGetCurrent(grades_copy); //get the grade we need to check
+	if(grade == NULL) { //nothing to do if the grade isn't set
+		return false;
+	}
 	//if the grade will be checked for effectiveness in a semester
 	//sport grades are always checked for effectiveness in a semester
 	if(checkSemester == true || isSportCourse(grade->course_id)) {
@@ -701,7 +702,7 @@ bool isEffectiveCleanGrade(ListElement grade, ListFilterKey grades) {
 		return false;
 	}
 	else {
-		return isEffectiveGrade((List)grades, (Grade)grade, false);
+		return isEffectiveGrade((List)grades, false);
 	}
 }
 

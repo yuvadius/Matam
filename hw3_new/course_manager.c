@@ -250,8 +250,8 @@ bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 						  getStudentGrades(course_manager->current_student));
 	}
 	else if(strcmp(token, "clean") == 0) {
-		return reportFull(course_manager, course_manager->current_student,
-						  getStudentGrades(course_manager->current_student));
+		return reportClean(course_manager, course_manager->current_student,
+						   getStudentGrades(course_manager->current_student));
 	}
 	else if(strcmp(token, "best") == 0) {
 		token = strtok(NULL, del); //get the third argument(amount)
