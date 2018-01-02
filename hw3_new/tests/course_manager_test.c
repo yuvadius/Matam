@@ -3,11 +3,11 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "course_manager.h"
+#include "../course_manager.h"
 
-#include "student.h"
+#include "../student.h"
 
-#include "grade.h"
+#include "../grade.h"
 
 
 
@@ -234,7 +234,7 @@ static bool testDestroyCourseManager() {
 
 
 
-int main() {
+int main1() {
 	
 	RUN_TEST(testCreateCourseManager);
 	RUN_TEST(testAddStudent);

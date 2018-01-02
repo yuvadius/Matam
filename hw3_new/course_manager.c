@@ -220,7 +220,7 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
 		int course_id = atoi(token);
 		token = strtok(NULL, del); //get the fourth argument(grade)
 		int grade = atoi(token);
-		return removeGrade(course_manager, course_manager->current_student,
+		return updateGrade(course_manager, course_manager->current_student,
 						   getStudentGrades(course_manager->current_student),
 						   course_id, grade);
 	}
@@ -244,7 +244,6 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
  * true if there was no error
  */
 
-/*
 bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 	if(strcmp(token, "full") == 0) {
 		return reportFull(course_manager, course_manager->current_student,
@@ -295,7 +294,6 @@ bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 		return true;
 	}
 }
-*/
 
 /**
  * Processes an input line command
@@ -327,12 +325,10 @@ bool handleInput(CourseManager course_manager, char* input_line) {
 		token = strtok(NULL, delimiter); //get the sub command
 		return gradeInput(course_manager, token, delimiter);
 	}
-	/*
 	else if(strcmp(token, "report") == 0) {
 		token = strtok(NULL, delimiter); //get the sub command
 		return reportInput(course_manager, token, delimiter);
 	}
-	*/
 	else { //invalid command, shouldn't happen
 		return true;
 	}

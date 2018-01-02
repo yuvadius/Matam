@@ -405,11 +405,14 @@ int getTotalPointsX2(List grades, int semester) {
 	}
 	else {
 		int total_points_x2 = 0;
-		LIST_FOREACH(Grade, grade, grades) { //loop over all the grades
+		//copy list so the iterator wouldn't change while looping
+		List grades_copy = listCopy(grades);
+		LIST_FOREACH(Grade, grade, grades_copy) { //loop over all the grades
 			if(grade->semester == semester || semester == 0) {
 				total_points_x2 += grade->points_x2;
 			}
 		}
+		listDestroy(grades_copy);
 		return total_points_x2;
 	}
 }
@@ -433,13 +436,16 @@ int getFailedPointsX2(List grades, int semester) {
 	}
 	else {
 		int failed_points_x2 = 0;
-		LIST_FOREACH(Grade, grade, grades) { //loop over all the grades
+		//copy list so the iterator wouldn't change while looping
+		List grades_copy = listCopy(grades);
+		LIST_FOREACH(Grade, grade, grades_copy) { //loop over all the grades
 			if(grade->semester == semester || semester == 0) {
 				if(isPassingGrade(grade->grade) == false) {
 					failed_points_x2 += grade->points_x2;
 				}
 			}
 		}
+		listDestroy(grades_copy);
 		return failed_points_x2;
 	}
 }
@@ -479,14 +485,17 @@ int getEffectivePointsX2(List grades, int semester) {
 		return -1;
 	}
 	else {
+		//copy list so the iterator wouldn't change while looping
+		List grades_copy = listCopy(grades);
 		int effective_grade_points_x2 = 0;
-		LIST_FOREACH(Grade, grade, grades) { //loop over all the grades
+		LIST_FOREACH(Grade, grade, grades_copy) { //loop over all the grades
 			if(grade->semester == semester || semester == 0) {
 				if(isEffectiveGrade(grades, grade, (semester != 0))) {
 					effective_grade_points_x2 += grade->points_x2;
 				}
 			}
 		}
+		listDestroy(grades_copy);
 		return effective_grade_points_x2;
 	}
 }
@@ -508,14 +517,17 @@ int getEffectiveGradeSumX2(List grades, int semester) {
 		return -1;
 	}
 	else {
+		//copy list so the iterator wouldn't change while looping
+		List grades_copy = listCopy(grades);
 		int effective_grade_sum_x2 = 0;
-		LIST_FOREACH(Grade, grade, grades) { //loop over all the grades
+		LIST_FOREACH(Grade, grade, grades_copy) { //loop over all the grades
 			if(grade->semester == semester || semester == 0) {
 				if(isEffectiveGrade(grades, grade, (semester != 0))) {
 					effective_grade_sum_x2 += grade->grade;
 				}
 			}
 		}
+		listDestroy(grades_copy);
 		return effective_grade_sum_x2;
 	}
 }
@@ -539,12 +551,15 @@ bool isEffectiveGrade(List grades, Grade grade, bool checkSemester) {
 	if(grades == NULL || grade == NULL) {
 		return false;
 	}
+	//copy list so the iterator wouldn't change while looping
+	List grades_copy = listCopy(grades);
 	//if the grade will be checked for effectiveness in a semester
 	//sport grades are always checked for effectiveness in a semester
-	else if(checkSemester == true || isSportCourse(grade->course_id)) {
-		LIST_FOREACH(Grade, list_grade, grades) { //loop over all the grades
+	if(checkSemester == true || isSportCourse(grade->course_id)) {
+		LIST_FOREACH(Grade, list_grade, grades_copy) { //loop over all the grades
 			if(list_grade->semester == grade->semester &&
 			   list_grade->course_id == grade->course_id) {
+				listDestroy(grades_copy);
 				//if this effective grade was the grade sent return true
 				if(list_grade == grade) {
 					return true;
@@ -557,8 +572,9 @@ bool isEffectiveGrade(List grades, Grade grade, bool checkSemester) {
 		return false; //no grade was found
 	}
 	else {
-		LIST_FOREACH(Grade, list_grade, grades) { //loop over all the grades
+		LIST_FOREACH(Grade, list_grade, grades_copy) { //loop over all the grades
 			if(list_grade->course_id == grade->course_id) {
+				listDestroy(grades_copy);
 				//if this effective grade was the grade sent return true
 				if(list_grade == grade) {
 					return true;
@@ -940,21 +956,27 @@ bool reportReference(CourseManager course_manager, Student student_in,
  */
 int compareBestCourseGrades(ListElement student1, ListElement student2,
 							ListSortKey course_id) {
+	//copy list so the iterator wouldn't change while looping
+	List grades_copy = listCopy(getStudentGrades((Student)student1));
 	int student1_grade = -1, student2_grade = -1;
-	LIST_FOREACH(Grade, grade, getStudentGrades((Student)student1)) {
+	LIST_FOREACH(Grade, grade, grades_copy) {
 		if(grade->course_id == (*(int*)course_id)) { //if course was found
 			if(grade->grade > student1_grade) { //if the grade is higher
 				student1_grade = grade->grade;
 			}
 		}
 	}
-	LIST_FOREACH(Grade, grade, getStudentGrades((Student)student2)) {
+	listDestroy(grades_copy);
+	//copy list so the iterator wouldn't change while looping
+	grades_copy = listCopy(getStudentGrades((Student)student2));
+	LIST_FOREACH(Grade, grade, grades_copy) {
 		if(grade->course_id == (*(int*)course_id)) { //if course was found
 			if(grade->grade > student2_grade) { //if the grade is higher
 				student2_grade = grade->grade;
 			}
 		}
 	}
+	listDestroy(grades_copy);
 	return (student2_grade - student1_grade);
 }
 
@@ -974,11 +996,15 @@ bool didStudentTakeCourse(ListElement student, ListFilterKey course_id) {
 		return false;
 	}
 	else {
-		LIST_FOREACH(Grade, grade, getStudentGrades((Student)student)) {
+		//copy list so the iterator wouldn't change while looping
+		List grades_copy = listCopy(getStudentGrades((Student)student));
+		LIST_FOREACH(Grade, grade, grades_copy) {
 			if(grade->course_id == (*(int*)course_id)) { //if course was found
+				listDestroy(grades_copy);
 				return true;
 			}
 		}
+		listDestroy(grades_copy);
 		return false; //course was not found
 	}
 }
