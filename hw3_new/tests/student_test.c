@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "student.h"
-#include "course_manager.h"
+#include "../student.h"
+#include "../course_manager.h"
 
 
 static bool testCreateStudent() {
@@ -234,7 +234,7 @@ static bool testDestroyStudent() {
 
 
 
-int main() {
+int main2() {
 	RUN_TEST(testCreateStudent);
 	RUN_TEST(testFriendRequest);
 	RUN_TEST(testHandleFriendRequest); // handleFriendRequest uses the helper
