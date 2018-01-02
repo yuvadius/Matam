@@ -14,6 +14,7 @@
  * createStudent           - Creates an instance of student
  * copyStudent             - Copies a student
  * compareStudents         - Compare two students's ids
+ * getStudentCopy          - Get a studentCopy with a certain id from the system
  * getStudent              - Get a student with a certain id from the system
  * isValidStudentID        - Checks if a student id is valid
  * getStudentID            - Get the students id
@@ -43,6 +44,14 @@ typedef enum action_t {
 	NO_ACTION,
 } Action;
 
+//a copy function for ints for a set of ints
+SetElement copyID(SetElement id);
+
+//a free compare for ints for a set of ints
+int compareID(SetElement id1, SetElement id2);
+
+//a copy free for ints for a set of ints
+void freeID(SetElement id);
 /**
  * Creates a student
  *
@@ -85,6 +94,16 @@ int compareStudents(SetElement student1, SetElement student2);
  * the student if he exists, NULL otherwise
  */
 Student getStudent(CourseManager course_manager, int student_id);
+
+/**
+ * Get a student(COPY) with a certain id from the system
+ *
+ * @param1 student the student to retrieve from the system
+ * @param2 student_id the id of the student
+ * @return
+ * the student if he exists, NULL otherwise
+ */
+Student getStudentCopy(CourseManager course_manager, int student_id);
 
 /**
  * Checks if a student id is valid

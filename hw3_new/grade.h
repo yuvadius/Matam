@@ -37,14 +37,14 @@
  * isSportCourse           - Checks if the course is a sport course
  * reportClean             - Print the clean matriculation
  * compareCoursesSemesters - Compare between two courses and two semesters
- * isEffectiveCleanGrade   - Checks if the grade is effective for a clean report
+ * filterEffectiveCleanGrades - Filters out the grades that aren't effective
  * reportBest              - Prints the best grades
  * compareBest             - Compares between two grades/courses/semesters
  * reportWorst             - Prints the worst grades
  * compareWorst            - Compares between two grades/courses/semesters
  * reportReference         - Print best students for referencing for a course
  * compareBestCourseGrades - Compare best grade of a course between two students
- * didStudentTakeCourse    - Checks if a student took a course
+ * filterStudentsNoTakeCourse - Filters out the students that didn't take course
  * getCourseID             - Gets the course id of a certain grade
  * getGrade                - Gets the grade of a certain grade
  * destroyGrade            - Destroys an instance of grade
@@ -397,16 +397,15 @@ int compareBestCourseGrades(ListElement student1, ListElement student2,
 							ListSortKey course_id);
 
 /**
- * Checks if a student took a course
+ * Checks which students took the course and sends back a copy of the list
+ * without the students that didn't take the course
  *
- * @param1 student the student that is checked for taking the course
- * @param2 course_id the course that will be used. this will be a pointer to int
- * NOTE: the grade that is sent should be a pointer to a grade in the list of
- * grades
+ * @param1 students the list of students that will be filtered
+ * @param2 course_id the course that will be checked if the students took it
  * @return
- * true if the student took the course, false if not or if student is NULL
+ * the list of students on success. NULL on failure
  */
-bool didStudentTakeCourse(ListElement student, ListFilterKey course_id);
+List filterStudentsNoTakeCourse(CourseManager cm, List students, int course_id);
 
 /**
  * Gets the course id of a certain grade

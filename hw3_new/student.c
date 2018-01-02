@@ -9,8 +9,8 @@
 #include "grade.h"
 
 struct student_t {
-	Set friends;
-	Set sent_requests;
+	Set friends; //set of ids of the friends
+	Set sent_requests; //set of ids of the students receiving the friend request
 	int id;
 	char* first_name;
 	char* last_name;
@@ -53,6 +53,23 @@ static void nullifyStudent(Student student) {
 	}
 }
 
+//a copy function for ints for a set of ints
+SetElement copyID(SetElement id) {
+	int* id_copy = malloc(sizeof(*id_copy));
+	*id_copy = *((int*)id);
+	return id_copy;
+}
+
+//a free compare for ints for a set of ints
+int compareID(SetElement id1, SetElement id2) {
+	return (*((int*)id1) - *((int*)id2));
+}
+
+//a copy free for ints for a set of ints
+void freeID(SetElement id) {
+	free((int*)id);
+}
+
 /**
  * Creates a student
  *
@@ -70,12 +87,12 @@ Student createStudent(int student_id, char* first_name, char* last_name) {
 		return NULL;
 	}
 	nullifyStudent(student); //nullify student for safety
-	student->friends = setCreate(copyStudent, destroyStudent, compareStudents);
+	student->friends = setCreate(copyID, freeID, compareID);
 	if(student->friends == NULL) { //if memory allocation failed
 		destroyStudent(student);
 		return NULL;
 	}
-	student->sent_requests = setCreate(copyStudent, destroyStudent, compareStudents);
+	student->sent_requests=setCreate(copyID, freeID, compareID);
 	if(student->sent_requests == NULL) { //if memory allocation failed
 		destroyStudent(student);
 		return NULL;
@@ -107,7 +124,7 @@ Student createStudent(int student_id, char* first_name, char* last_name) {
 }
 
 /**
- * Copys a student
+ * Copies a student
  *
  * @param1 student the student we want to copy
  * @return
@@ -119,8 +136,17 @@ SetElement copyStudent(SetElement student) {
 	if(student == NULL) {
 		return NULL;
 	}
-	return createStudent(((Student)student)->id, ((Student)student)->first_name,
-						 ((Student)student)->last_name);
+	Student student_copy = createStudent(((Student)student)->id,
+				((Student)student)->first_name, ((Student)student)->last_name);
+	//destroy empty lists and sets that were set in "createStudent"
+	listDestroy(student_copy->grades);
+	setDestroy(student_copy->friends);
+	setDestroy(student_copy->sent_requests);
+	//copy sets and lists into the copied student
+	student_copy->grades = listCopy(((Student)student)->grades);
+	student_copy->friends = setCopy(((Student)student)->friends);
+	student_copy->sent_requests = setCopy(((Student)student)->sent_requests);
+	return student_copy;
 }
 
 /**
@@ -160,6 +186,30 @@ Student getStudent(CourseManager course_manager, int student_id) {
 		//if the student was found
 		if(student->id == student_id) {
 			return student;
+		}
+	}
+	//student wasn't found
+	return NULL;
+}
+
+/**
+ * Get a student(COPY) with a certain id from the system
+ *
+ * @param1 student the student to retrieve from the system
+ * @param2 student_id the id of the student
+ * @return
+ * the student if he exists, NULL otherwise
+ */
+Student getStudentCopy(CourseManager course_manager, int student_id) {
+	//can't do anything if course_manager isn't set
+	if(course_manager == NULL) {
+		return NULL;
+	}
+	//find the student in the set
+	SET_FOREACH(Student, student, getStudents(course_manager)) {
+		//if the student was found
+		if(student->id == student_id) {
+			return copyStudent(student);
 		}
 	}
 	//student wasn't found
@@ -232,19 +282,19 @@ bool friendRequest(CourseManager course_manager, Student student_in, int id) {
 	}
 	//if the students are already friends or the logged in student sent a
 	// request to himself.
-	else if(setIsIn(student_in->friends, student) || compareStudents(student_in,
-													 student)==0) {
+	else if(setIsIn(student_in->friends, &(student->id)) ||
+			compareStudents(student_in, student)==0) {
 		setError(course_manager, MTM_ALREADY_FRIEND);
 		return false;
 	}
 	//if a request was already sent
-	else if(setIsIn(student_in->sent_requests, student)) {
+	else if(setIsIn(student_in->sent_requests, &(student->id))) {
 		setError(course_manager, MTM_ALREADY_REQUESTED);
 		return false;
 	}
 	else {
 		//add the friend request to the set of requests
-		SetResult result = setAdd(student_in->sent_requests, student);
+		SetResult result = setAdd(student_in->sent_requests, &(student->id));
 		if(result == SET_OUT_OF_MEMORY) {
 			setError(course_manager, MTM_OUT_OF_MEMORY);
 			return false;
@@ -290,12 +340,12 @@ bool handleFriendRequest(CourseManager course_manager, Student student_in,
 		return false;
 	}
 	//if the students are friends
-	else if(setIsIn(student_in->friends, student)) {
+	else if(setIsIn(student_in->friends, &(student->id))) {
 		setError(course_manager, MTM_ALREADY_FRIEND);
 		return false;
 	}
 	//if a request wasn't sent
-	else if(setIsIn(student->sent_requests, student_in) == false) {
+	else if(setIsIn(student->sent_requests, &(student_in->id)) == false) {
 		setError(course_manager, MTM_NOT_REQUESTED);
 		return false;
 	}
@@ -307,14 +357,14 @@ bool handleFriendRequest(CourseManager course_manager, Student student_in,
 	}
 	else if(getAction(action) == ACCEPT) {
 		//remove friendship requests from both sides
-		setRemove(student->sent_requests, student_in);
-		setRemove(student_in->sent_requests, student);
+		setRemove(student->sent_requests, &(student_in->id));
+		setRemove(student_in->sent_requests, &(student->id));
 		//add friendship between the two students
 		return addFriendship(course_manager, student_in, student);
 	}
 	else if(getAction(action) == REJECT) {
 		//remove the friend request of the student
-		setRemove(student->sent_requests, student_in);
+		setRemove(student->sent_requests, &(student_in->id));
 		return true;
 	}
 	else { //shouldn't reach this place
@@ -353,7 +403,7 @@ bool addFriendship(CourseManager course_manager, Student student_in,
 		return false;
 	}
 	//add "student" as friend to logged in student
-	SetResult result = setAdd(student_in->friends, student);
+	SetResult result = setAdd(student_in->friends, &(student->id));
 	if(result == SET_OUT_OF_MEMORY) {
 		setError(course_manager, MTM_OUT_OF_MEMORY);
 		return false;
@@ -363,7 +413,7 @@ bool addFriendship(CourseManager course_manager, Student student_in,
 		return false;
 	}
 	//add logged in student as friend to "student"
-	result = setAdd(student->friends, student_in);
+	result = setAdd(student->friends, &(student_in->id));
 	if(result == SET_OUT_OF_MEMORY) {
 		setError(course_manager, MTM_OUT_OF_MEMORY);
 		return false;
@@ -409,7 +459,7 @@ bool unFriend(CourseManager course_manager, Student student_in, int id) {
 		return false;
 	}
 	//if the students are not friends
-	else if(setIsIn(student_in->friends, student) == false) {
+	else if(setIsIn(student_in->friends, &(student->id)) == false) {
 		setError(course_manager, MTM_NOT_FRIEND);
 		return false;
 	}
@@ -445,13 +495,13 @@ bool removeFriendship(CourseManager course_manager, Student student_in,
 		return false;
 	}
 	//remove "student" as friend from logged in student
-	SetResult result = setRemove(student_in->friends, student);
+	SetResult result = setRemove(student_in->friends, &(student->id));
 	if(result == SET_ITEM_DOES_NOT_EXIST) {
 		setError(course_manager, MTM_NOT_FRIEND);
 		return false;
 	}
 	//remove logged in student as friend from "student"
-	result = setRemove(student->friends, student_in);
+	result = setRemove(student->friends, &(student_in->id));
 	if(result == SET_ITEM_DOES_NOT_EXIST) {
 		setError(course_manager, MTM_NOT_FRIEND);
 		return false;

@@ -9,7 +9,7 @@
 
 struct course_manager_t {
 	Set students;
-	Student current_student;
+	int current_student; //the id of the logged in student
 	MtmErrorCode error;
 	FILE* output_channel;
 };
@@ -71,7 +71,7 @@ CourseManager createCourseManager(FILE* output_file) {
 		destroyCourseManager(course_manager);
 		return NULL;
 	}
-	course_manager->current_student = NULL;
+	course_manager->current_student = NO_STUDENT_LOGGED_IN;
 	course_manager->output_channel = output_file;
 	return course_manager;
 }
@@ -149,7 +149,7 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 	}
 	else if(strcmp(token, "friend_request") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
-		return friendRequest(course_manager, course_manager->current_student,
+		return friendRequest(course_manager, getCurrentStudent(course_manager),
 							 atoi(token));
 	}
 	else if(strcmp(token, "handle_request") == 0) {
@@ -163,14 +163,14 @@ bool studentInput(CourseManager course_manager, char* token, const char del[2]){
 		}
 		strcpy(action, token); //get the action
 		bool result = handleFriendRequest(course_manager,
-						  	  	  	  	  course_manager->current_student,
+										  getCurrentStudent(course_manager),
 										  id, action);
 		free(action);
 		return result;
 	}
 	else if(strcmp(token, "unfriend") == 0) {
 		token = strtok(NULL, del); //get the third argument(id)
-		return unFriend(course_manager, course_manager->current_student,
+		return unFriend(course_manager, getCurrentStudent(course_manager),
 							 atoi(token));
 	}
 	else { //invalid sub-command, shouldn't reach this place
@@ -202,8 +202,8 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
 		int points_x2 = (int)(atof(token) * 2);
 		token = strtok(NULL, del); //get the sixth argument(grade)
 		int grade = atoi(token);
-		return addGrade(course_manager, course_manager->current_student,
-						getStudentGrades(course_manager->current_student),
+		return addGrade(course_manager, getCurrentStudent(course_manager),
+						getStudentGrades(getCurrentStudent(course_manager)),
 						semester, course_id, points_x2, grade);
 	}
 	else if(strcmp(token, "remove") == 0) {
@@ -211,8 +211,8 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
 		int semester = atoi(token);
 		token = strtok(NULL, del); //get the fourth argument(course_id)
 		int course_id = atoi(token);
-		return removeGrade(course_manager, course_manager->current_student,
-						   getStudentGrades(course_manager->current_student),
+		return removeGrade(course_manager, getCurrentStudent(course_manager),
+						   getStudentGrades(getCurrentStudent(course_manager)),
 						   semester, course_id);
 	}
 	else if(strcmp(token, "update") == 0) {
@@ -220,8 +220,8 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
 		int course_id = atoi(token);
 		token = strtok(NULL, del); //get the fourth argument(grade)
 		int grade = atoi(token);
-		return updateGrade(course_manager, course_manager->current_student,
-						   getStudentGrades(course_manager->current_student),
+		return updateGrade(course_manager, getCurrentStudent(course_manager),
+						   getStudentGrades(getCurrentStudent(course_manager)),
 						   course_id, grade);
 	}
 	else { //invalid sub-command, shouldn't reach this place
@@ -246,25 +246,25 @@ bool gradeInput(CourseManager course_manager, char* token, const char del[2]) {
 
 bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 	if(strcmp(token, "full") == 0) {
-		return reportFull(course_manager, course_manager->current_student,
-						  getStudentGrades(course_manager->current_student));
+		return reportFull(course_manager, getCurrentStudent(course_manager),
+						  getStudentGrades(getCurrentStudent(course_manager)));
 	}
 	else if(strcmp(token, "clean") == 0) {
-		return reportClean(course_manager, course_manager->current_student,
-						   getStudentGrades(course_manager->current_student));
+		return reportClean(course_manager, getCurrentStudent(course_manager),
+						   getStudentGrades(getCurrentStudent(course_manager)));
 	}
 	else if(strcmp(token, "best") == 0) {
 		token = strtok(NULL, del); //get the third argument(amount)
 		int amount = atoi(token);
-		return reportBest(course_manager, course_manager->current_student,
-						  getStudentGrades(course_manager->current_student),
+		return reportBest(course_manager, getCurrentStudent(course_manager),
+						  getStudentGrades(getCurrentStudent(course_manager)),
 						  amount);
 	}
 	else if(strcmp(token, "worst") == 0) {
 		token = strtok(NULL, del); //get the third argument(amount)
 		int amount = atoi(token);
-		return reportWorst(course_manager, course_manager->current_student,
-						   getStudentGrades(course_manager->current_student),
+		return reportWorst(course_manager, getCurrentStudent(course_manager),
+						   getStudentGrades(getCurrentStudent(course_manager)),
 						   amount);
 	}
 	else if(strcmp(token, "reference") == 0) {
@@ -272,9 +272,9 @@ bool reportInput(CourseManager course_manager, char* token, const char del[2]) {
 		int course_id = atoi(token);
 		token = strtok(NULL, del); //get the fourth argument(amount)
 		int amount = atoi(token);
-		return reportReference(course_manager, course_manager->current_student,
-						     getStudentFriends(course_manager->current_student),
-						     course_id, amount);
+		return reportReference(course_manager,getCurrentStudent(course_manager),
+						   getStudentFriends(getCurrentStudent(course_manager)),
+						   course_id, amount);
 	}
 	else if(strcmp(token, "faculty_request") == 0) {
 		token = strtok(NULL, del); //get the third argument(course id)
@@ -384,7 +384,7 @@ bool loginStudent(CourseManager course_manager, int student_id) {
 		return false;
 	}
 	//if a student is logged in return MTM_ALREADY_LOGGED_IN
-	if(course_manager->current_student != NULL) {
+	if(course_manager->current_student != NO_STUDENT_LOGGED_IN) {
 		setError(course_manager, MTM_ALREADY_LOGGED_IN);
 		return false;
 	}
@@ -396,7 +396,7 @@ bool loginStudent(CourseManager course_manager, int student_id) {
 		return false;
 	}
 	else {
-		course_manager->current_student = student;
+		course_manager->current_student = getStudentID(student);
 		return true;
 	}
 }
@@ -432,11 +432,11 @@ bool logoutStudent(CourseManager course_manager) {
 		return false;
 	}
 	//if a student is not logged in return MTM_NOT_LOGGED_IN
-	if(course_manager->current_student == NULL) {
+	if(course_manager->current_student == NO_STUDENT_LOGGED_IN) {
 		setError(course_manager, MTM_NOT_LOGGED_IN);
 		return false;
 	}
-	course_manager->current_student = NULL; //logout the student
+	course_manager->current_student = NO_STUDENT_LOGGED_IN; //logout the student
 	return true;
 }
 
@@ -516,7 +516,7 @@ bool removeStudent(CourseManager course_manager, int student_id) {
 		return false;
 	}
 	//log out the student if the student is logged in
-	if(getStudentID(course_manager->current_student) == student_id) {
+	if(course_manager->current_student == student_id) {
 		logoutStudent(course_manager);
 	}
 	if(setRemove(course_manager->students, student) == SET_SUCCESS) {
@@ -578,13 +578,13 @@ bool facultyRequest(CourseManager course_manager, int course_id, char* request){
 		return false;
 	}
 	//if no student is logged in to the system
-	if(course_manager->current_student == NULL) {
+	if(course_manager->current_student == NO_STUDENT_LOGGED_IN) {
 		setError(course_manager, MTM_NOT_LOGGED_IN);
 		return false;
 	}
 	//if the request is to remove a course that does not exist
-	if(getFacultyRequst(request) == REGISTER_COURSE &&
-	   getNewestGrade(course_manager->current_student, course_id) == -1) {
+	if(getNewestGrade(getCurrentStudent(course_manager), course_id) == -1
+			&& getFacultyRequst(request) == REMOVE_COURSE) {
 		setError(course_manager, MTM_COURSE_DOES_NOT_EXIST);
 		return false;
 	}
@@ -593,7 +593,33 @@ bool facultyRequest(CourseManager course_manager, int course_id, char* request){
 		setError(course_manager, MTM_INVALID_PARAMETERS);
 		return false;
 	}
+	mtmFacultyResponse(course_manager->output_channel,"your request was rejected");
 	return true;
+}
+
+/**
+ * Get the logged in student
+ *
+ * @param1 course_manager CourseManager that the student is in
+ * @return
+ * on success the student. on failure NULL
+ */
+void* getCurrentStudent(CourseManager course_manager) {
+	if(course_manager == NULL) {
+		return NULL;
+	}
+	else if(course_manager->current_student == NO_STUDENT_LOGGED_IN) {
+		setError(course_manager, MTM_NOT_LOGGED_IN);
+		return NULL;
+	}
+	else {
+		SET_FOREACH(Student, student, course_manager->students) {
+			if(getStudentID(student) == course_manager->current_student) {
+				return student;
+			}
+		}
+		return NULL; //no student was found
+	}
 }
 
 /**

@@ -56,13 +56,13 @@ static List setToList(CourseManager course_manager, Set set) {
 	if(set == NULL) {
 		return NULL;
 	}
-	List list = listCreate(copyGrade, destroyGrade);
+	List list = listCreate(copyStudent, destroyStudent);
 	if(list == NULL) { //if there was a memory failure
 		setError(course_manager, MTM_OUT_OF_MEMORY);
 		return NULL;
 	}
-	SET_FOREACH(SetElement, element, set) {
-		ListResult result = listInsertFirst(list, element);
+	SET_FOREACH(int*, element, set) {
+		ListResult result = listInsertFirst(list, getStudent(course_manager, *element));
 		if(result == LIST_OUT_OF_MEMORY) {
 			listDestroy(list);
 			setError(course_manager, MTM_OUT_OF_MEMORY);
@@ -933,8 +933,8 @@ bool reportReference(CourseManager course_manager, Student student_in,
 	//if the list is empty then there is nothing to print
 	if(listGetSize(friends_list) > 0) {
 		//Remove all non effective grades for the clean report
-		List filter_grades = listFilter(friends_list, didStudentTakeCourse,
-										friends_list);
+		List filter_grades = filterStudentsNoTakeCourse(course_manager,
+				friends_list,course_id);
 		if(filter_grades == NULL) { //if there was an allocation failure
 			listDestroy(friends_list);
 			setError(course_manager, MTM_OUT_OF_MEMORY);
@@ -1001,31 +1001,40 @@ int compareBestCourseGrades(ListElement student1, ListElement student2,
 }
 
 /**
- * Checks if a student took a course
+ * Checks which students took the course and sends back a copy of the list
+ * without the students that didn't take the course
  *
- * @param1 student the student that is checked for taking the course
- * @param2 course_id the course that will be used. this will be a pointer to int
- * NOTE: the grade that is sent should be a pointer to a grade in the list of
- * grades
+ * @param1 students the list of students that will be filtered
+ * @param2 course_id the course that will be checked if the students took it
  * @return
- * true if the student took the course, false if not or if student or
- * course_id is NULL
+ * the list of students on success. NULL on failure
  */
-bool didStudentTakeCourse(ListElement student, ListFilterKey course_id) {
-	if(student == NULL || ((int*)course_id) == NULL) {
-		return false;
+List filterStudentsNoTakeCourse(CourseManager cm, List students, int course_id){
+	if(students == NULL) { //nothing to do if the list of students isn't set
+		return NULL;
 	}
 	else {
-		//copy list so the iterator wouldn't change while looping
-		List grades_copy = listCopy(getStudentGrades((Student)student));
-		LIST_FOREACH(Grade, grade, grades_copy) {
-			if(grade->course_id == (*(int*)course_id)) { //if course was found
-				listDestroy(grades_copy);
-				return true;
+		List filter_students = listCopy(students);
+		if(filter_students == NULL) { //if there was a memory allocation failure
+			return NULL;
+		}
+		//remove all students who didn't receive a grade in the course
+		while(true) {
+			bool remove = false;
+			LIST_FOREACH(Student, student, filter_students) {
+				if(getNewestGrade(student, course_id) == -1) { //if has no grade
+					remove = true;
+					break; //break the foreach
+				}
+			}
+			if(remove == true) {
+				listRemoveCurrent(filter_students);
+			}
+			else {
+				break; //done with removing all students with no grade in course
 			}
 		}
-		listDestroy(grades_copy);
-		return false; //course was not found
+		return filter_students;
 	}
 }
 

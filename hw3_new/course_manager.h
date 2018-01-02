@@ -3,6 +3,7 @@
 
 #define COURSE_ID_MIN 1
 #define COURSE_ID_MAX 999999
+#define NO_STUDENT_LOGGED_IN 0
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -29,6 +30,7 @@
  *   setError                - Set the error of the course manager
  *   getOutputChannel        - Get the system's output channel
  *   facultyRequest          - Ignore the student faculty request
+ *   getCurrentStudent       - Get the currently logged in student
  *   destroyCourseManager    - Destroy an instance of CourseManager
  */
 
@@ -236,6 +238,15 @@ FILE* getOutputChannel(CourseManager course_manager);
  * true if there was no error
  */
 bool facultyRequest(CourseManager course_manager, int course_id, char* request);
+
+/**
+ * Get the logged in student
+ *
+ * @param1 course_manager CourseManager that the student is in
+ * @return
+ * on success the student. on failure NULL
+ */
+void* getCurrentStudent(CourseManager course_manager);
 
 /**
  * Destroy an instance of CourseManager

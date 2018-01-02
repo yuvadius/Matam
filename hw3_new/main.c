@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 	//the input and output file that will be used in the program
 	FILE* input = NULL;
 	FILE* output = NULL;
+	FILE* error = stderr;
 	//if the command line parameters are invalid
 	if(setInputOutputFiles(&input, &output, argc, argv) == false) {
 		closeFiles(input, output);
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
 		CourseManager manager = createCourseManager(output);
 		while(fgets(line, MAX_LEN, input) != NULL) { //read line into "line"
 			if(handleInput(manager, line) == false) { //if there was an error
-				mtmPrintErrorMessage(output, getCourseManagerError(manager));
+				mtmPrintErrorMessage(error, getCourseManagerError(manager));
 				if(isCriticalError(manager) == true) { //exit if error critical
 					return 0;
 				}
