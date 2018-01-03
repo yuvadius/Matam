@@ -21,6 +21,10 @@ bool setInputOutputFiles(FILE** input_file, FILE** output_file, int argc,
 						 char *argv[]) {
 	*input_file = stdin; //default as standard input file
 	*output_file = stdout; //default as standard output file
+	if(argc == 2 || argc == 4) { //there must be files specified after -i and -o
+		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
+		return false;
+	}
 	if(argc >= 2 && strcmp(argv[1], "-i") != 0) {
 		mtmPrintErrorMessage(stdout, MTM_INVALID_COMMAND_LINE_PARAMETERS);
 		return false;
