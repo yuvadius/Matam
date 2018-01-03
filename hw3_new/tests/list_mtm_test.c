@@ -3,8 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include "test_utilities.h"
-#include "list_mtm.h"
-#include "list_mtm.c"
+#include "../list_mtm/list_mtm.h"
 
 ListElement copyString(ListElement str) {
 	assert(str);
