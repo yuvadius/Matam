@@ -5,6 +5,7 @@
 #include "test_utilities.h"
 #include "../list_mtm/list_mtm.h"
 
+
 ListElement copyString(ListElement str) {
 	assert(str);
 	char* copy = malloc(strlen(str) + 1);
@@ -37,7 +38,9 @@ static bool testListInsertFirst() {
 	List list= listCreate(copyString, destroyString);
 	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
 	//if the element was successfully inserted to list->head
-	ASSERT_TEST(compareStrings("HELLO WORLD" , list->head->data, NULL)==0);
+	char* first = listGetFirst(list);
+	ASSERT_TEST(first!=NULL); // shouldnt be NULL
+	ASSERT_TEST(compareStrings("HELLO WORLD" , first, NULL)==0);
 	// checking if the first element indeed is as expected.
 	return true;
 }
@@ -48,12 +51,13 @@ static bool testListInsertLast() {
 	ASSERT_TEST(listGetFirst(list)!=NULL); // the iterator is the head node.
 	ASSERT_TEST(listInsertLast(list, "last element") == LIST_SUCCESS);
 	// checking if the function returned success.
-	ASSERT_TEST(compareStrings("last element",list->head->next->data, NULL)==0);
+	listGetNext(list); // iterator moved be 1 to the last Node
+	char* last = listGetCurrent(list);
+	ASSERT_TEST(last!=NULL); // shouldnt be NULL
+	ASSERT_TEST(compareStrings("last element",last, NULL)==0);
 	// checking if the new element indeed is the last one(second element);
 	ASSERT_TEST(listInsertLast(list, NULL) == LIST_NULL_ARGUMENT);
 	// the function should fail because a NULL element was sent.
-	ASSERT_TEST(list->iterator == list->head); // the iterator shouldn`t change;
-	// checking if it still is the head node.
 	return true;
 }
 
@@ -65,17 +69,20 @@ static bool testListInsertAfterCurrent() {
 	ASSERT_TEST(listInsertAfterCurrent(list,"hello") == LIST_INVALID_CURRENT);
 	// should fail because iterator=NULL.
 	ASSERT_TEST(listInsertFirst(list, "HELLO WORLD") == LIST_SUCCESS);
-	list->iterator = list->head; // the iterator is the head of the list.
+	listGetFirst(list); // the iterator is the head of the list.
 	ASSERT_TEST(listInsertAfterCurrent(list,"hello") == LIST_SUCCESS);
 	// should pass.
-	list->iterator = list->iterator->next; // the iterator is the second element
+	listGetNext(list); // the iterator is the second element
 	ASSERT_TEST(listInsertLast(list, "last element") == LIST_SUCCESS);
 	// this is the last element. iterator should be the second element
 	ASSERT_TEST(listInsertAfterCurrent(list,"middle") == LIST_SUCCESS);
 	// this element should be "hello" element. therefore "middle" is between
 	// "hello" and "last element".
-	list->iterator = list->iterator->next; // the iterator should be "middle"
-	ASSERT_TEST(compareStrings(list->iterator->data, "middle", NULL)==0);
+	listGetNext(list);; // the iterator should be "middle"
+	char* current = listGetCurrent(list);
+	ASSERT_TEST(current!=NULL); // shouldnt be NULL
+
+	ASSERT_TEST(compareStrings(current, "middle", NULL)==0);
 	// checking if the iterator indeed is "middle".
 	return true;
 }
@@ -90,10 +97,11 @@ static bool testListCopy() {
 	}
 	List list2 = listCopy(list);
 	ASSERT_TEST(list2!=NULL); // if the function indeed returned the new list
-	list->iterator = list->head; // the iterator is the head of the list
-	list2->iterator = list2->head; // the iterator is the head of the list
+	listGetFirst(list); // the iterator is the head of the list
+	listGetFirst(list2); // the iterator is the head of the list
 	for (int i=0; i<3; i++){
-		ASSERT_TEST(!compareStrings(listGetNext(list),listGetNext(list2),NULL));
+		ASSERT_TEST(compareStrings(listGetNext(list),
+				listGetNext(list2),NULL)==0); // o shone..
 	}
 	// checks if all the elements are identical.
 	return true;
@@ -111,14 +119,11 @@ static bool testListGetSize() {
 }
 
 static bool testListGetFirst() {
-	char* arr[4] = {"hello","hi","hey","world"};
 	List list = listCreate(copyString,destroyString);
-	for (int i=0; i<4; i++){
-		ASSERT_TEST(listInsertFirst(list,arr[i])==LIST_SUCCESS);
-	}
-	ASSERT_TEST(listGetFirst(NULL)==NULL);
-	ASSERT_TEST(compareStrings(list->head->data,listGetFirst(list),NULL)==0);
-	// if list->head and listGetFirst(list) are the same.
+	ASSERT_TEST(listInsertFirst(list, "hello")==LIST_SUCCESS);
+	char* first = listGetFirst(list);
+	ASSERT_TEST(first!=NULL);//should be NULL
+	ASSERT_TEST(compareStrings(first,"hello",NULL)==0);
 	return true;
 }
 
@@ -137,18 +142,19 @@ static bool testListGetNext() {
 }
 
 static bool testListInsertBeforeCurrent() {
-    char* arr[1] = {"MATAM"};
 	List list = listCreate(copyString,destroyString);
-	for (int i=0; i<1; i++){
-		ASSERT_TEST(listInsertLast(list,arr[i])==LIST_SUCCESS);
-	}
-	Node starting_iterator= list->head; // it shouldn`t change. points on MATAM
-	ASSERT_TEST(compareStrings("MATAM", listGetFirst(list), NULL)==0);
-	ASSERT_TEST(listInsertBeforeCurrent(list,"INFI")==LIST_SUCCESS);
-	ASSERT_TEST(listInsertBeforeCurrent(list,"ALGEBRA")==LIST_SUCCESS);
-	ASSERT_TEST(listInsertBeforeCurrent(list,"ATAM")==LIST_SUCCESS);
-	ASSERT_TEST(compareStrings("INFI",list->head->data,NULL)==0);
-	ASSERT_TEST(compareStrings("MATAM",starting_iterator->data,NULL)==0);
+	char* element = "hello";
+	ASSERT_TEST(listInsertFirst(list, element)==LIST_SUCCESS);//success expected
+	ASSERT_TEST(listInsertBeforeCurrent(NULL, element)== LIST_NULL_ARGUMENT);
+													// this error is expected
+	listGetFirst(list); // iterator is the first node.
+	ASSERT_TEST(listInsertBeforeCurrent(list, "world")== LIST_SUCCESS);
+	ASSERT_TEST(compareStrings("world", listGetFirst(list), NULL)==0);
+	// checking if indeed the func inserted the element to the first place
+
+
+
+
 	return true;
 }
 
@@ -162,7 +168,8 @@ static bool testListRemoveCurrent() {
 	ASSERT_TEST(listRemoveCurrent(list)==LIST_INVALID_CURRENT); //iterator=NULL
 	listGetFirst(list); // iterator = head
 	ASSERT_TEST(listRemoveCurrent(list)==LIST_SUCCESS);
-	ASSERT_TEST(list->iterator==NULL); //should be NULL after calling the func.
+	ASSERT_TEST(listGetCurrent(list)==NULL); //should be NULL after
+	//														calling the func.
 	ASSERT_TEST(compareStrings(listGetFirst(list), "world",
 													 NULL)==0);// after removing
 	// the first element the head should be "world".
