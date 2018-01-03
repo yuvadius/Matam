@@ -600,7 +600,11 @@ bool facultyRequest(CourseManager course_manager, int course_id, char* request){
 		setError(course_manager, MTM_INVALID_PARAMETERS);
 		return false;
 	}
-	mtmFacultyResponse(course_manager->output_channel,"your request was rejected");
+	//shouldn't happen, but check for safety
+	if(course_manager->output_channel != NULL) {
+		mtmFacultyResponse(course_manager->output_channel,
+						   "your request was rejected");
+	}
 	return true;
 }
 
