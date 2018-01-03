@@ -276,13 +276,6 @@ static bool testFacultyRequest() {
 				MTM_INVALID_PARAMETERS); // this error is expected.
 	// if getCourseManagerError func failed, it will return NULL such that
 	// ASSERT_TEST fails.
-
-
-
-
-
-
-
 	return true;
 }
 
