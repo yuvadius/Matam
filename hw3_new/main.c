@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
+		destroyCourseManager(manager);
 	}
 	closeFiles(input, output);
     return 0;
