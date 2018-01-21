@@ -5,7 +5,7 @@
 #include "../Plain.h"
 #include "../Mountain.h"
 #include "../River.h"
-//#include "../World.h"
+#include "../World.h"
 #include "../exceptions.h"
 
 using namespace mtm;
@@ -29,7 +29,7 @@ bool testPlainConstructor() {
 }
 
 bool testPlainGroupArrive() {
-    Area* tel_aviv(new Plain("Tel-Aviv"));
+    AreaPtr tel_aviv(new Plain("Tel-Aviv"));
     std::map<std::string, Clan> clan_map = makeClanMap();
     ASSERT_NO_EXCEPTION(tel_aviv->groupArrive("Alpha1", "Beta", clan_map));
     // divide
@@ -50,7 +50,7 @@ bool testMountainConstructor() {
 }
 
 bool testMountainGroupArrive(){
-    Area* carmel(new Mountain("Carmel"));
+	AreaPtr carmel(new Mountain("Carmel"));
     std::map<std::string, Clan> clan_map = makeClanMap();
     ASSERT_NO_EXCEPTION(carmel->groupArrive("Alpha1", "Beta", clan_map));
     ASSERT_NO_EXCEPTION(carmel->groupArrive("Lambda2", "Gamma", clan_map));
@@ -67,7 +67,7 @@ bool testMountainGroupArrive(){
 }
 
 bool testMountainGroupLeave(){
-    Area* carmel(new Mountain("Carmel"));
+	AreaPtr carmel(new Mountain("Carmel"));
     std::map<std::string, Clan> clan_map = makeClanMap();
     ASSERT_NO_EXCEPTION(carmel->groupArrive("Alpha1", "Beta", clan_map));
     ASSERT_NO_EXCEPTION(carmel->groupArrive("Lambda2", "Gamma", clan_map));
@@ -111,7 +111,7 @@ bool testRiverConstructor() {
 }
 
 bool testRiverGroupArrive(){
-    Area* jordan(new River("Jordan"));
+	AreaPtr jordan(new River("Jordan"));
     std::map<std::string, Clan> clan_map = makeClanMap();
     ASSERT_NO_EXCEPTION(jordan->groupArrive("Alpha1", "Beta", clan_map));
     ASSERT_NO_EXCEPTION(jordan->groupArrive("Alpha2", "Beta", clan_map));
