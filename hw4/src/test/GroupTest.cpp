@@ -1,6 +1,6 @@
 /*#include "testMacros.h"
-#include "Group.h"
-#include "exceptions.h"
+#include "../Group.h"
+#include "../exceptions.h"
 
 using namespace mtm;
 
@@ -671,7 +671,7 @@ bool testOutput(){
     return true;
 }
 
-int main2(){
+int main(){
 	RUN_TEST(testConstructor1);
 	RUN_TEST(testConstructor2);
 	RUN_TEST(testGetName);

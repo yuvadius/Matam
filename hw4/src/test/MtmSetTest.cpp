@@ -1,6 +1,6 @@
-#include "testMacros.h"
-#include "MtmSet.h"
-#include "exceptions.h"
+/*#include "testMacros.h"
+#include "../MtmSet.h"
+#include "../exceptions.h"
 
 using namespace mtm;
 
@@ -266,7 +266,7 @@ bool testIsSuperSetOf() {
 	return true;
 }
 
-bool testEqual() {
+bool testSetEqual() {
 	MtmSet<string> set;
 	MtmSet<string>::iterator empty_iterator = set.end();
 	ASSERT_NO_EXCEPTION(set.insert("this homework is taking forever"));
@@ -281,7 +281,7 @@ bool testEqual() {
 	return true;
 }
 
-bool testNotEqual() {
+bool testSetNotEqual() {
 	MtmSet<string> set;
 	MtmSet<string>::iterator empty_iterator = set.end();
 	ASSERT_NO_EXCEPTION(set.insert("this homework is taking forever"));
@@ -296,7 +296,7 @@ bool testNotEqual() {
 	return true;
 }
 
-bool testUnite() {
+bool testSetUnite() {
 	MtmSet<int> set;
 	ASSERT_NO_EXCEPTION(set.insert(1));
 	ASSERT_NO_EXCEPTION(set.insert(2));
@@ -312,7 +312,7 @@ bool testUnite() {
 	return true;
 }
 
-bool testUniteConst() {
+bool testSetUniteConst() {
 	MtmSet<int> set;
 	ASSERT_NO_EXCEPTION(set.insert(1));
 	ASSERT_NO_EXCEPTION(set.insert(2));
@@ -380,7 +380,7 @@ bool testGetSubSetConst() {
 	return true;
 }
 
-int main(){
+int main2(){
 	RUN_TEST(testConstructor);
 	RUN_TEST(testCopyConstructor);
 	RUN_TEST(testInsert);
@@ -397,13 +397,13 @@ int main(){
 	RUN_TEST(testFindConst);
 	RUN_TEST(testContains);
 	RUN_TEST(testIsSuperSetOf);
-	RUN_TEST(testEqual);
-	RUN_TEST(testNotEqual);
-	RUN_TEST(testUnite);
-	RUN_TEST(testUniteConst);
+	RUN_TEST(testSetEqual);
+	RUN_TEST(testSetNotEqual);
+	RUN_TEST(testSetUnite);
+	RUN_TEST(testSetUniteConst);
 	RUN_TEST(testIntersect);
 	RUN_TEST(testIntersectConst);
 	RUN_TEST(testGetSubSet);
 	RUN_TEST(testGetSubSetConst);
     return 0;
-}
+}*/
