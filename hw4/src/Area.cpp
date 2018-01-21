@@ -101,4 +101,96 @@ namespace mtm {
 		}
 		return names;
 	}
+
+	/**
+	 * get the clan of the group stored in "groups"
+	 * @param group_name The name of the group
+	 * @return the name of the clan of the group if it exists,
+	 * an empty string otherwise
+	 */
+	const string Area::getClan(const string& group_name) {
+		for(std::vector<GroupPointer>::const_iterator it = groups.begin();
+			it != groups.end(); ++it) {
+			if((*it)->getName() == group_name) {
+				return (*it)->getClan();
+			}
+		}
+		return "";
+	}
+
+	/**
+	 * get the strongest group in the clan of the group(not including the group)
+	 * in the area
+	 * @param clan The name of the clan
+	 * @return the strongest group in "groups", if none exist then nullptr
+	 */
+	const GroupPointer Area::getStrongestInClan(const string& group) {
+		const string clan_name = getClan(group);
+		GroupPointer strongest = nullptr;
+		for(std::vector<GroupPointer>::const_iterator it = groups.begin();
+			it != groups.end(); ++it) {
+			if((*it)->getName() != group && (*it)->getClan() == clan_name) {
+				if(strongest == nullptr) {
+					strongest = *it;
+				}
+				else if(strongest < *it) {
+					strongest = *it;
+				}
+			}
+		}
+		return strongest;
+	}
+
+	/**
+	 * get the strongest group in the area(not including "group")
+	 * @return the strongest group, if none exist then nullptr
+	 */
+	const GroupPointer Area::getStrongestGroup(const string& group) {
+		GroupPointer strongest = nullptr;
+		for(std::vector<GroupPointer>::const_iterator it = groups.begin();
+			it != groups.end(); ++it) {
+			if((*it)->getName() != group) {
+				if(strongest == nullptr) {
+					strongest = *it;
+				}
+				else if(strongest < *it) {
+					strongest = *it;
+				}
+			}
+		}
+		return strongest;
+	}
+
+		/**
+		 * get the strongest group in the area(not including groups in
+		 * filter_groups) that is in the clan or is in a clan that is
+		 * friends with the clan
+		 * @param filter_groups the groups that cannot be returned as the
+		 * strongest group
+		 * @param clan the clan that the strongest group belongs to or is
+		 * friends with
+		 * @return the strongest group, if none exist then nullptr
+		 */
+		const GroupPointer Area::getStrongestGroupFriend(
+				const std::vector<string>& filter_groups, const Clan& clan) {
+		GroupPointer strongest = nullptr;
+		for(std::vector<GroupPointer>::const_iterator it = groups.begin();
+			it != groups.end(); ++it) {
+			//if group was not found
+			if(std::find(filter_groups.begin(), filter_groups.end(),
+						(*it)->getName()) == filter_groups.end()) {
+				//if the groups' clans are friends
+				if(clan.isFriend(Clan((*it)->getClan()))) {
+					if(strongest == nullptr) {
+						strongest = *it;
+					}
+					else if(strongest < *it) {
+						strongest = *it;
+					}
+				}
+			}
+		}
+		return strongest;
+
+	}
 }

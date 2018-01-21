@@ -380,7 +380,7 @@ bool testGetSubSetConst() {
 	return true;
 }
 
-int main2(){
+int main(){
 	RUN_TEST(testConstructor);
 	RUN_TEST(testCopyConstructor);
 	RUN_TEST(testInsert);

@@ -141,13 +141,13 @@ namespace mtm{
 		if(this->clan == clan) { //if the group isn't changing clans
 			return;
 		}
-		this->clan = clan;
 		if(this->clan != "") { //if the group is leaving its clan
 			changeMorale(MORALE_CHANGE, false, true);
 		}
 		else {
 			changeMorale(MORALE_CHANGE, true, true);
 		}
+		this->clan = clan;
 	}
 
 	/**

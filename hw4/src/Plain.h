@@ -15,7 +15,7 @@ using std::map;
 namespace mtm{
     
     /**
-     * An abstract call of an area in the world.
+     * An area of type plain
      * Assume every name is unique.
      * Groups that become empty, should be removed from the area.
      */
@@ -34,16 +34,39 @@ namespace mtm{
     										 map<string, Clan>& clan_map);
 
     public:
+
+    	/**
+		 * Constructor
+		 * @param name The name of the plain
+		 * @throws AreaInvalidArguments If the name is empty
+		 */
+		explicit Plain(const std::string& name);
+
+		/**
+		 * Disable copy constructor
+		 */
+		Plain(const Plain&) = delete;
+
+		/**
+		 * Disable assignment operator
+		 */
+		Plain &operator=(const Plain &) = delete;
+
+		/**
+		 * Destructor
+		 */
+		~Plain();
         
     	/**
 		 * Get a group into the plain area
 		 * This function call the base class first and then does checks if the
 		 * group should unite or divide
 		 * the group should unite with the strongest group in the clan if the
-		 * group's size is less then GROUP_UNITE_THRESHOLD * group_clan.getSize()
+		 * group's size is less then GROUP_UNITE_THRESHOLD*group_clan.getSize()
 		 * and if the united group's size is less then or equal to
 		 * GROUP_UNITE_THRESHOLD * group_clan.getSize()
-		 * the group should divide if the group has at least GROUP_DIVIDE_THRESHOLD
+		 * the group should divide if the group has at least
+		 * GROUP_DIVIDE_THRESHOLD
 		 * members in the group and if the group's size is more then
 		 * GROUP_UNITE_THRESHOLD * group_clan.getSize()
 		 * the divided groups name will be set by "getGroupDivideName"
@@ -52,8 +75,8 @@ namespace mtm{
 		 * @param clan_map The map of clans that contains the clan of the group
 		 */
         void groupArrive(const string& group_name, const string& clan,
-                                 map<string, Clan>& clan_map);
+                                 map<string, Clan>& clan_map) override;
     };
 } //namespace mtm
 
-#endif //MTM4_AREA_H
+#endif //MTM4_PLAIN_H

@@ -26,6 +26,41 @@ namespace mtm{
         std::vector<GroupPointer> groups;
         std::vector<std::string> reachable_areas;
 
+        /**
+		 * get the clan of the group stored in "groups"
+		 * @param group_name The name of the group
+		 * @return the name of the clan of the group if it exists,
+		 * an empty string otherwise
+		 */
+		const string getClan(const string& group_name);
+
+		/**
+		 * get the strongest group in the clan of the group(not including group)
+		 * in the area
+		 * @param clan The name of the clan
+		 * @return the strongest group in "groups", if none exist then nullptr
+		 */
+		const GroupPointer getStrongestInClan(const string& group);
+
+		/**
+		 * get the strongest group in the area(not including "group")
+		 * @return the strongest group, if none exist then nullptr
+		 */
+		const GroupPointer getStrongestGroup(const string& group);
+
+		/**
+		 * get the strongest group in the area(not including groups in
+		 * filter_groups) that is in the clan or is in a clan that is
+		 * friends with the clan
+		 * @param filter_groups the groups that cannot be returned as the
+		 * strongest group
+		 * @param clan the clan that the strongest group belongs to or is
+		 * friends with
+		 * @return the strongest group, if none exist then nullptr
+		 */
+		const GroupPointer getStrongestGroupFriend(
+					const std::vector<string>& filter_groups, const Clan& clan);
+
     public:
         /**
          * Constructor

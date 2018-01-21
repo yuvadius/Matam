@@ -1,8 +1,25 @@
+#include <string>
 #include "Area.h"
 #include "Plain.h"
 #include <algorithm>
 
 namespace mtm {
+
+	/**
+	 * Constructor
+	 * @param name The name of the plain
+	 * @throws AreaInvalidArguments If the name is empty
+	 */
+	Plain::Plain(const std::string& name) : Area(name) {
+
+	}
+
+	/**
+	 * Destructor
+	 */
+	Plain::~Plain() {
+
+	}
 
 	/**
 	 * Get the divided group name
@@ -58,8 +75,10 @@ namespace mtm {
 		Clan group_clan = clan_map.find(clan)->second; //get the clan
 		GroupPointer group = group_clan.getGroup(group_name);//get group in clan
 		if(group->getSize() < (GROUP_UNITE_THRESHOLD * group_clan.getSize())) {
-			GroupPointer max=*max_element(std::begin(groups), std::end(groups));
-			group->unite(*max, GROUP_UNITE_THRESHOLD * group_clan.getSize());
+			std::vector<GroupPointer>::iterator max =
+							max_element(std::begin(groups), std::end(groups));
+			group->unite(**max, GROUP_UNITE_THRESHOLD * group_clan.getSize());
+			groups.erase(max);
 		}
 		else if(group->getSize() > GROUP_UNITE_THRESHOLD*group_clan.getSize()) {
 			if(group->getSize() >= GROUP_DIVIDE_THRESHOLD) {
