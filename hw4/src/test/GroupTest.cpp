@@ -1,4 +1,4 @@
-/*#include "testMacros.h"
+#include "testMacros.h"
 #include "../Group.h"
 #include "../exceptions.h"
 
@@ -689,4 +689,4 @@ int main(){
 	RUN_TEST(testTrade);
 	RUN_TEST(testOutput);
     return 0;
-}*/
+}

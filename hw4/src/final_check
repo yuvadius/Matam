@@ -1,0 +1,565 @@
+#!/bin/bash
+
+function print_usage {
+    echo "Usage:"
+    echo "final_check <submission file>"
+}
+
+
+#In case you need to add something to the PATH variable when (and only when) running the students executables (scripts), have the following updated (at any point before running their scripts):
+STUDENT_PATH_VAR_PREFIX=""
+
+# TMP_DIR_WITH_PATH will be set later by create_empty_tmp_dir 
+TMP_DIR_WITH_PATH="/tmp/TO_BE_SET_LATER"
+TMP_DIR_WITH_PATH_IS_SET=0
+
+#The following should be '1' for C/C++ assignments, and '0' for Bash assignments.
+TESTING_COMPILED_PROGRAM=1
+
+
+#REMEMBER:  '~' does not expand inside regular double quotes.
+ORIGINAL_AUX_FILES_BASE_DIR_PATH=~mtmchk/public/1718a/ex4/.final_check_aux_files
+
+
+# ALL_WENT_WELL_SO_FAR will be set to 0 as soon as something fails along the check (something not that critical - that we still want to continue with the check instead of calling fail_and_exit, just so that the user can see the results of the rest of the check. 
+ALL_WENT_WELL_SO_FAR=1
+
+
+function main {
+    if (( $# != 1 )); then
+        print_usage
+        exit 1
+    fi
+    
+    if [[ "$1" == "--help" ]]; then
+        print_usage
+        exit 1
+    fi    
+
+	validate_gcc_version
+    
+    verify_submission_file_name_and_existence "$1"
+    
+    create_empty_tmp_dir
+    
+    init_existing_empty_temp_dir "$1"
+       
+    #echo "This script will now run your scripts with the published tests."
+    echo "This script will now compile your code and run your program with the published tests."
+    
+    read -p "Continue? (y/n)" -r REPLY
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+        fail_and_exit
+    fi
+      
+    #STUDENT_PATH_VAR_PREFIX="${TMP_DIR_WITH_PATH}/code"
+    #cd "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/MainDirectoryExample"
+    
+    safe_copy "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/filesToAddToCode/exceptions.h" "${TMP_DIR_WITH_PATH}/code/exceptions.h" 1
+    safe_copy "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/filesToAddToCode/test/testMacros.h" "${TMP_DIR_WITH_PATH}/code/testMacros.h" 1
+    
+    safe_copy "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/filesToAddToCode/test/testMacros.h" "${TMP_DIR_WITH_PATH}/code/test/testMacros.h" 1
+    
+    #cp "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/filesToAddToCode/"* "${TMP_DIR_WITH_PATH}/code"
+    
+    cp -r "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/PublishedTests/"* "${TMP_DIR_WITH_PATH}/"
+
+    echo "Compiling example test 1..."
+    source_files="${TMP_DIR_WITH_PATH}/code/Group.cpp ${TMP_DIR_WITH_PATH}/part1/examplePart1.cpp"    
+    compile "${TMP_DIR_WITH_PATH}/part1/test1" "g++ -std=c++11 -Wall -pedantic-errors -Werror -DNDEBUG -I${TMP_DIR_WITH_PATH}/code/" " " "$source_files"
+    result=$?
+    if (( result == 0 )); then
+        echo -n "Running the published (uncompleted) examplePart1.cpp unit test..."
+        run_tests "${TMP_DIR_WITH_PATH}/part1/test1" "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/input_output_err/part1" 1 10 1 1
+    fi
+
+    echo "Compiling example test 2..."
+    source_files="${TMP_DIR_WITH_PATH}/part2/examplePart2.cpp"    
+    compile "${TMP_DIR_WITH_PATH}/part2/test2" "g++ -std=c++11 -Wall -pedantic-errors -Werror -DNDEBUG -I${TMP_DIR_WITH_PATH}/code/" " " "$source_files"
+    result=$?
+    if (( result == 0 )); then
+        echo -n "Running the published (uncompleted) examplePart2.cpp unit test..."
+        run_tests "${TMP_DIR_WITH_PATH}/part2/test2" "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/input_output_err/part2" 1 10 1 1
+    fi
+    
+    echo "Compiling example test 3..."
+    source_files="${TMP_DIR_WITH_PATH}/part3/examplePart3.cpp ${TMP_DIR_WITH_PATH}/code/*.cpp"   
+    compile "${TMP_DIR_WITH_PATH}/part3/test3" "g++ -std=c++11 -Wall -pedantic-errors -Werror -DNDEBUG -I${TMP_DIR_WITH_PATH}/code/" " " "$source_files"
+    result=$?
+    if (( result == 0 )); then
+        echo -n "Running the published (uncompleted) examplePart3.cpp unit test..."
+        run_tests "${TMP_DIR_WITH_PATH}/part3/test3" "$ORIGINAL_AUX_FILES_BASE_DIR_PATH/input_output_err/part3" 1 10 1 1
+    fi
+    
+    delete_tmp_dir
+
+    PrintFinalMessageAndExitOnFail ALL_WENT_WELL_SO_FAR
+}
+
+
+# Set up the TMP_DIR_WITH_PATH directory.
+# Pre-condition: TMP_DIR_WITH_PATH exists and is empty.
+# Calls fail_and_exit when fails.
+# param 1: the submitted zip file (with path).
+function init_existing_empty_temp_dir {
+    if [ ! -d "$ORIGINAL_AUX_FILES_BASE_DIR_PATH" ]; then
+        echo "ERROR: Couldn't find the following directory: $ORIGINAL_AUX_FILES_BASE_DIR_PATH"
+        echo "Make sure you're running this script on csl2."
+        fail_and_exit
+    fi
+    
+    ##### Creating [${TMP_DIR_WITH_PATH}/code]: 
+    
+    #unzip-ing:
+    mkdir "${TMP_DIR_WITH_PATH}/code"
+    unzip "$1" -d "${TMP_DIR_WITH_PATH}/code" > /dev/null
+    result=$?
+    if (( result != 0 )); then
+        echo "ERROR: failed to unzip '$1'. Make sure that file is a valid zip file"
+        fail_and_exit
+    fi
+    
+    #making sure the exact expected file tree was unzipped:
+    
+    check_unzipped_dir_exists "${TMP_DIR_WITH_PATH}/code" "test" 1
+    
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Group.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Group.cpp" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "MtmSet.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Clan.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Clan.cpp" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Area.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Area.cpp" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Plain.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Plain.cpp" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Mountain.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "Mountain.cpp" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "River.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "River.cpp" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "World.h" 1
+    check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "World.cpp" 1
+    
+    #if [[ ( ! -f "${TMP_DIR_WITH_PATH}/code/Makefile" ) &&  ( ! -f "${TMP_DIR_WITH_PATH}/code/makefile" ) ]]; then
+    #    echo "ERROR: The 'Makefile' (or 'makefile')  file is missing! You will lose points for this :("
+    #    ALL_WENT_WELL_SO_FAR=0
+    #fi
+    
+    
+    if (( $(ls -d "${TMP_DIR_WITH_PATH}/code/"*.pdf 2>/dev/null | wc -l) == 0 )); then
+        echo "ERROR: There's no PDF file (with the solution to the dry part) in '$1' (directly in its root directory)!"
+        ALL_WENT_WELL_SO_FAR=0
+    fi
+    
+    
+    #check_unzipped_proper_file_exists "${TMP_DIR_WITH_PATH}/code" "conversation.c" 1
+    
+    #making sure no unnecessary files were submitted.
+    #if (( $(ls -d "${TMP_DIR_WITH_PATH}/code/list_mtm/"* 2>/dev/null | wc -l) > 1 )); then
+    #    echo "ERROR: The list_mtm directory must contain a single file: 'list_mtm.c'."
+    #    echo "Multiple files detected!"
+    #    fail_and_exit
+    #fi    
+    
+    # Lets make sure the files types submitted make sense.
+    fileTypes="$(find "${TMP_DIR_WITH_PATH}/code" -maxdepth 1 -type f | sed 's/.*\.//' | sort | uniq)"
+    if (( $(echo "$fileTypes" | wc -l) > 3 )); then
+        echo "ERROR: The only file types allowed in the root directory of the zip are: '.cpp', '.h' and '.pdf'!"
+        ALL_WENT_WELL_SO_FAR=0
+    fi
+    if (( $(echo "$fileTypes" | grep '^cpp$' | wc -c) == 0 )); then
+        echo "ERROR: No '.cpp' files were detected in the root directory of the zip file!"
+        fail_and_exit
+    fi
+    if (( $(echo "$fileTypes" | grep '^h$' | wc -c) == 0 )); then
+        echo "ERROR: No '.h' files were detected in the root directory of the zip file!"
+        fail_and_exit
+    fi 
+    
+    #making sure no more than one directory was in the zip:
+    if (( $(ls -d "${TMP_DIR_WITH_PATH}/code/"*/ 2>/dev/null | wc -l) > 1 )); then
+        echo "ERROR: The zip file '$1' must contain only the directly 'test' (and non-directory files)."
+        echo "Other directories were detected!"
+        fail_and_exit
+    fi
+ 
+    chmod u+x "${TMP_DIR_WITH_PATH}/code/"*
+
+}
+
+
+
+
+
+
+
+##############################################################
+# Code that needs no updating.
+##############################################################
+
+
+PARENT_DIR_FOR_TEMP_DIR="/tmp"
+
+#Validates that gcc version 4.7 is used. 
+function validate_gcc_version {
+    if [[ $(which gcc) != /usr/local/gcc4.7/bin/gcc ]]; then
+        echo "ERROR: Bad version of gcc was detected. You must use version 4.7"
+        echo "Run the following to set version 4.7 as the default for the current shell:"
+        echo "source /usr/local/gcc4.7/setup.sh"
+        
+        fail_and_exit
+    fi
+}
+
+#Verifies the submission file name ends with ".zip", and that it exists.
+#Calls fail_and_exit when fails.
+#param 1: the submitted zip file (with path).
+function verify_submission_file_name_and_existence {
+    
+    if [[ "$1" != *.zip ]]; then
+        echo "ERROR: your submission file must be a zip file (its name must end with '.zip')."
+        echo "The file you provided ($1) isn't."
+        fail_and_exit
+    fi
+    
+    if [[ ! -f "$1" ]]; then
+        echo "ERROR: The file you provided ($1) doesn't exist."
+        fail_and_exit 
+    fi
+    
+}
+
+
+#param 1: timeout (in seconds; integer).
+#param 2,...: command & parameters
+#the exit status is:
+#   1 - in case a timeout occurred before the command finished.
+#   2 - in case no timeout occurred, but the command's exit status was non-zero (or other failure occurred).
+#   3 - in case segfault occured, according to the exit status (you shoud accept this result as success if the exit status of the command is undefined).
+#   0 - in case no timeout occurred, and the command's exit status was zero.
+function run_with_timeout {
+    TIME_OUT_EXIT_STATUS=124
+
+    original_path="$PATH"
+    PATH="$STUDENT_PATH_VAR_PREFIX:$PATH"
+    
+    timeout "$@"
+    result=$?
+    
+    PATH="$original_path"
+    
+    if (( result == TIME_OUT_EXIT_STATUS )); then
+        return 1
+    elif (( result == 0 )); then
+        return 0
+    elif (( result == 139 )); then
+        return 3
+    else
+        return 2
+    fi
+}
+
+
+
+#Creates an empty temporary directory. Sets TMP_DIR_WITH_PATH to be the full name of the new temporary directory.
+#calls fail_and_exit when failed.
+function create_empty_tmp_dir {
+
+    temp_dir_with_path=$(mktemp -d "$PARENT_DIR_FOR_TEMP_DIR/TMP__XXXXXXXXXXXX")
+    result=$?
+    if (( result != 0 )); then
+        echo "ERROR: Failed to create temporary directory under '$PARENT_DIR_FOR_TEMP_DIR'!"
+        fail_and_exit
+    fi
+    
+    if [ ! -d "$temp_dir_with_path" ]; then
+        echo "ERROR: Failed to create temporary directory '$temp_dir_with_path'"
+        fail_and_exit
+    fi
+    
+    TMP_DIR_WITH_PATH="$temp_dir_with_path"
+    TMP_DIR_WITH_PATH_IS_SET=1
+}
+
+#Deletes the directory TMP_DIR_WITH_PATH.
+#Note: in order to prevent infinite loop, this function does not call fail_and_exit on any event.
+function delete_tmp_dir {
+
+    if (( TMP_DIR_WITH_PATH_IS_SET == 0 )); then
+        echo "ERROR: TMP_DIR_WITH_PATH isn't set."
+        return
+    fi
+    
+    safe_delete_dir "$TMP_DIR_WITH_PATH"
+    TMP_DIR_WITH_PATH_IS_SET=0
+}
+
+#Copies a file/directory safely (no overwrite occurs). 
+#param 1: source
+#param 2: target
+#param 3: 1 if the copying is essential (and then fail_and_exit is called when failed), or 0 if not (and then ALL_WENT_WELL_SO_FAR is set to 0).
+function safe_copy {
+    failed=0
+    if [[ -e $2 ]]; then
+        echo "ERROR: Can't copy a file to '$2' because '$2' already exists!"
+        echo "You shouldn't include that file in your submission file!"
+        failed=1
+    elif [[ ! -e $1 ]]; then
+        echo "ERROR: Can't copy '$1' to '$2' because '$1' doesn't exist!"
+        failed=1
+    else
+        cp -r "$1" "$2"
+        if [[ ! -e $2 ]]; then
+            echo "ERROR: Coping '$1' to '$2' failed!"
+            failed=1
+        fi 
+    fi
+   
+    if (( failed == 1 )); then
+        if (( $3 == 1)); then
+            fail_and_exit
+        else
+            ALL_WENT_WELL_SO_FAR=0
+        fi
+    fi
+}
+
+# Checks that a proper file (not a directory) we've expected to unzipped indeed exists.
+# Either calls fail_and_exit or sets ALL_WENT_WELL_SO_FAR to 0 if fails (i.e. if file does not exists)
+#param 1: the directory to which the zip file was unzipped (including path).
+#param 2: the proper file to make sure exists, including path - relative to $1.
+#param 3: either '1' if the file is critical (meaning, 'fail_and_exit' must be called if it does not exist), or '0' if we want to just print an error and set ALL_WENT_WELL_SO_FAR to 0.
+function check_unzipped_proper_file_exists {
+    if [[ ! -f "$1/$2" ]]; then
+    
+        echo "ERROR: The following file must be in your zip file, and is missing:"
+        echo "$2"
+        if (( $3 == 0 )); then
+            echo "Missing files will probably hurt your grade a lot :("
+            ALL_WENT_WELL_SO_FAR=0
+        else
+            fail_and_exit
+        fi
+
+    fi
+}
+
+# Checks that a directory we've expected to unzipped indeed exists.
+# Calls fail_and_exit if fails (if directory does not exists)
+#param 1: the directory to which the zip file was unzipped (including path).
+#param 2: the directory to make sure exists, including path - relative to $1.
+#param 3: either 1 if the directory is essential (fail_and_exit is called if missing) or 0 if not (ALL_WENT_WELL_SO_FAR is set to 0).
+function check_unzipped_dir_exists {
+    if [[ ! -d "$1/$2" ]]; then
+        echo "ERROR: The following directory must be in your zip file, and is missing:"
+        echo "$2"
+        
+        if (( $3 == 0 )); then
+            echo "You will lose points for this :("
+            echo "Note that if you've placed the files that were supposed to be in this directory somewhere else - other checks might fail!"
+            ALL_WENT_WELL_SO_FAR=0
+        else
+            fail_and_exit
+        fi
+    fi
+}
+
+
+# This function asserts that each given filename (including path) - does not contain white spaces.
+# If the assertion fails - fail_and_exit is called.
+#param1,... - each parameter is a filename (including path).
+function assert_filenames_have_no_whitespaces {
+    for f in "$@"; do
+        if [[ "$f" =~ ^.*[[:space:]].*$ ]]; then
+            echo "ERROR: The full file name '$f' contains white spaces!"
+            fail_and_exit
+        fi
+    done
+}
+
+
+# Compiles a given set of c files.
+# Sets ALL_WENT_WELL_SO_FAR to 0 if compilation failed.
+# Calls fail_and_exit when failing in an unexpected way.
+# Returns 0 on success, and 1 if compilation failed.
+# param1 - the output executable to create (with path). Must not contain white spaces.
+# param2 - the compilation command string, not including the '-o ...' flag and source files. For example:
+#           "gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG". Must not contain white spaces except as a flag separator.
+# param3 - more compilation flags that should appear at the end of the compilation command (for example: "-lm"
+# param4 - a string holding all the source files to compile (with paths), for example "../aaa.c ../bbb.c ../ccc.c". Each file name must not contain white spaces.
+function compile {
+    if [[ -e $1 ]]; then
+        echo "ERROR: Can't compile! target file already exists."
+        fail_and_exit
+    fi
+    
+    compilation_command="$2 -o $1 $4 $3"
+    $compilation_command 2>/dev/null
+    result=$?
+    
+    if [[ ( $result -ne 0  ) || ( ! -f $1 ) ]]; then
+        echo "ERROR: Compilation error occurred. Try compiling yourself with the following flags (you might need to change the prefix of some paths for '-I' flags etc.):"
+        echo "$2   <your source files>   $3"
+        ALL_WENT_WELL_SO_FAR=0
+        return 1
+    fi
+    return 0
+}
+
+
+
+
+# Sets ALL_WENT_WELL_SO_FAR to 0 if at least one test failed.
+# Calls fail_and_exit when failing in an unexpected way.
+# All the temporary test output files are saved under ["$TMP_DIR_WITH_PATH/test-outputs"] which is created and then deleted by this function.
+# param 1 - the executable file (or just junk, in case $6 is 0).
+# param 2 - the directory containing the test files. 
+# param 3 - the number of tests to run.
+# param 4 - timeout (in seconds, integer) to limit each test (if it doesn't finish within this time span - it fails).
+# param 5 - either 0 or 1. If 1, then the exit code of the executable must be 0, or else we consider it failed. If 0, then the exit code of the executable doesn't matter (and we don't check for segmentation fault).
+# param 6 - testing mode. 
+#   * If '0': Runs a single test for each executable (each test is a set of [executable file, expected output file, optional expected error file]).
+#       Under the $2 directory, there are files in the format: test<number>, test<number>.out, test<number>.err (the err file is optional, if it doesn't exist - then we require empty std error) where <number> starts from 1.
+#       $1 is ignored.
+#   * If '1': Runs tests with a given executable (each test is a set of [input file, expected output files, optional expected error file]). 
+#       Under the $2 directory, there are files in the format: test<number>.in, test<number>.out, test<number>.err (the err file is optional, if it doesn't exist - then we require no std error) where <number> starts from 1.
+function run_tests {
+    
+    if (( $# != 6 )); then
+        echo "ERROR: run_tests: invalid parameters number!"
+        exit 1
+    fi
+    
+    if (( TMP_DIR_WITH_PATH_IS_SET == 0 )); then
+        echo "ERROR: TMP_DIR_WITH_PATH isn't set."
+        fail_and_exit
+    fi
+    
+    test_outputs_dir="$TMP_DIR_WITH_PATH/test-outputs"
+    mkdir "$test_outputs_dir"
+    
+    for i in $(seq 1 $3); do
+        test_ok=1
+        
+        if (( $3 > 1 )); then
+            echo -n "Running test ${i}: "
+        fi
+        
+        if (( $6 == 0 )); then
+            run_with_timeout $4 "$2/test${i}"  1>"$test_outputs_dir/test${i}.out" 2>"$test_outputs_dir/test${i}.err"
+            result=$?
+        else
+            run_with_timeout $4 "$1" <"$2/test${i}.in" 1>"$test_outputs_dir/test${i}.out" 2>"$test_outputs_dir/test${i}.err"
+            result=$?
+        fi
+        
+        if (( result == 1 )); then
+            echo " FAILED!!!!! (timeout)"
+            test_ok=0
+        elif (( ( $5 == 1 ) && ( result == 3 ) )); then
+            #Note: we can trust the report of segfault only if the normal exit status is 0.
+            echo " FAILED!!!!! (segfault)"
+            test_ok=0
+        elif ((  (result == 2 ) && ( $5 == 1 )  )); then
+            if (( TESTING_COMPILED_PROGRAM == 1 )); then
+                echo " FAILED!!!!! (bad exit code - might be caused by some runtime error)"
+            else
+                echo " FAILED!!!!! (bad exit code - might be caused by some error)"
+            fi
+            test_ok=0
+        else
+            #The executable finished ok. Lets check the output & error.
+            diff_wc=$(diff "$2/test${i}.out" "$test_outputs_dir/test${i}.out" | wc -l)
+            if (( diff_wc > 0 )); then
+                echo " FAILED!!!!! (bad output - 'diff' reported differences)"
+                test_ok=0
+            else
+                # Lets check the std error.
+                
+                if [[ -f "$2/test${i}.err" ]]; then
+                    diff_wc=$(diff "$2/test${i}.err" "$test_outputs_dir/test${i}.err" | wc -l)
+                    if (( diff_wc > 0 )); then
+                        echo " FAILED!!!!! (bad std error - 'diff' reported differences)"
+                        test_ok=0
+                    fi
+                else
+                    error_wc=$(cat "$test_outputs_dir/test${i}.err" | wc -l)
+                    if (( error_wc > 0 )); then
+                        echo " FAILED!!!!! (bad std error - was suppose to be empty!)"
+                        test_ok=0
+                    fi
+                fi
+            fi    
+        fi
+        
+        if (( test_ok == 1 )); then
+            echo " success"
+        else
+            ALL_WENT_WELL_SO_FAR=0
+        fi
+            
+    done
+    
+    
+    safe_delete_dir "$test_outputs_dir"
+}
+
+
+
+
+# Deletes a directory that is under '/tmp'.
+# Calls fail_and_exit if fails (if for example - the directory's absolute path does not begin with '/tmp/', or cotnains '..').
+# Note that by using the soft links, one can still delete a directory outside of the '/tmp' directory.
+#param 1 - the directory (with absolute path) to delete (must begin with '/tmp/', and must not contain '..').
+function safe_delete_dir {
+    echo "$1" | grep '\.\.' >/dev/null
+    result=$?
+    if (( result == 0 )); then
+        echo "ERROR: safe_delete_dir: the given path contains '..'!"
+        fail_and_exit
+    fi
+    
+    if [ ! -d "$1" ]; then
+        echo "ERROR: safe_delete_dir: The directory '$1' doesn't exist."
+        fail_and_exit
+    fi
+    
+    if [[ $(echo "$1" | cut -c 1-5) != "/tmp/" ]]; then
+        echo "ERROR: failed to delete '$1' because it supposes to begin with '/tmp/'!"
+        fail_and_exit
+    else
+        rm -rf "$1"
+    fi
+
+    if [ -d "$1" ]; then
+        echo "ERROR: Failed to delete directory '$1'"
+        fail_and_exit
+    fi
+    
+}
+
+#param 1 - Should be '1' if everything went well ("final check passed") and '0' otherwise.
+function PrintFinalMessageAndExitOnFail {
+    if (( $1 == 1 )); then
+        echo "Everything went well :)"
+        echo "Final check passed."
+    else
+        echo "The final check did not fully succeed (see errors)."
+        echo "Please correct your solution and try again."
+        fail_and_exit
+    fi
+}
+    
+
+function fail_and_exit {
+    echo "****   The final check failed   ****"
+    
+    if (( TMP_DIR_WITH_PATH_IS_SET == 1 )); then
+        delete_tmp_dir
+    fi
+    
+    exit 1
+}
+
+main "$@"
+    
+    

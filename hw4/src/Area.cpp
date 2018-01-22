@@ -1,5 +1,6 @@
 #include "Area.h"
 #include <algorithm>
+#include <vector>
 
 namespace mtm {
 
@@ -86,7 +87,7 @@ namespace mtm {
 	 *  same name;
 	 */
 	void Area::groupLeave(const std::string& group_name) {
-		for(std::vector<GroupPointer>::const_iterator it = groups.begin();
+		for(std::vector<GroupPointer>::iterator it = groups.begin();
 			it != groups.end(); ++it) {
 			if((*it)->getName() == group_name) {
 				groups.erase(it);

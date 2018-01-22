@@ -1,0 +1,1 @@
+./AreasTest && ./ClanTest && ./GroupTest && ./MtmSetTest && ./WorldTest

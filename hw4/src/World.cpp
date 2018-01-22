@@ -232,7 +232,7 @@ namespace mtm {
 		Clan& clan1_reference = clan_map.find(clan1)->second;
 		Clan& clan2_reference = clan_map.find(clan2)->second;
 		clan1_reference.unite(clan2_reference, new_name);
-		clan_map.erase(clan_map.find(clan2));
+		clan_map.erase(clan_map.find(clan2)); //erase empty clan
 		if(clan1 != new_name) {
 			clan_map.insert(std::pair<string, Clan>(new_name,
 													Clan(clan1_reference)));

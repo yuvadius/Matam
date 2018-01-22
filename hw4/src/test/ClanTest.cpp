@@ -1,4 +1,4 @@
-/*#include "testMacros.h"
+#include "testMacros.h"
 #include "../Group.h"
 #include "../Clan.h"
 #include "../exceptions.h"
@@ -175,4 +175,4 @@ int main(){
 	RUN_TEST(testIsFriend);
 	RUN_TEST(testOutput);
     return 0;
-}*/
+}

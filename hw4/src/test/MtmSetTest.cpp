@@ -1,4 +1,4 @@
-/*#include "testMacros.h"
+#include "testMacros.h"
 #include "../MtmSet.h"
 #include "../exceptions.h"
 
@@ -406,4 +406,4 @@ int main(){
 	RUN_TEST(testGetSubSet);
 	RUN_TEST(testGetSubSetConst);
     return 0;
-}*/
+}
