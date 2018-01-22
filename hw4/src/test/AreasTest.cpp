@@ -1,4 +1,4 @@
-#include "testMacros.h"
+/*#include "testMacros.h"
 #include "../Group.h"
 #include "../Clan.h"
 #include "../Area.h"
@@ -136,4 +136,4 @@ int main(){
 	RUN_TEST(testRiverConstructor);
 	RUN_TEST(testRiverGroupArrive);
     return 0;
-}
+}*/

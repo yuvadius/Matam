@@ -72,7 +72,6 @@ namespace mtm {
 	 * @param group_name The name of the leaving group.
 	 */
 	void Mountain::groupLeave(const std::string& group_name) {
-		Area::groupLeave(group_name);
 		if(group_name != controlling_group) {
 			GroupPointer strongest_in_clan = getStrongestInClan(group_name);
 			if(strongest_in_clan != nullptr) {
@@ -88,5 +87,6 @@ namespace mtm {
 				}
 			}
 		}
+		Area::groupLeave(group_name);
 	}
 }

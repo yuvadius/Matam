@@ -18,10 +18,17 @@ namespace mtm {
         /**
 		 * Get the group with the name group_name in the world
 		 * @param group_name the name of the group
-		 * @return the group that has the name group_name, if it doesn't exist then
-		 * return nullptr
+		 * @return the group that has the name group_name, if it doesn't exist
+		 * then return nullptr
 		 */
-        const GroupPointer getGroup(const string& group_name);
+        const GroupPointer getGroup(const string& group_name) const;
+
+        /**
+		 * Get the group's area
+		 * @param group_name the name of the group
+		 * @return the area of the group, if it does not exist return ""
+		 */
+		const string getGroupArea(const string& group_name) const;
 
     public:
         /**

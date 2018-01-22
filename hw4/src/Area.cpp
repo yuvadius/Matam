@@ -90,6 +90,7 @@ namespace mtm {
 			it != groups.end(); ++it) {
 			if((*it)->getName() == group_name) {
 				groups.erase(it);
+				return;
 			}
 		}
 		throw AreaGroupNotFound();

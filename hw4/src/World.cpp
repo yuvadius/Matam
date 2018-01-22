@@ -1,5 +1,6 @@
 #include <string>
 #include "World.h"
+#include "Clan.h"
 #include "Area.h"
 #include "Plain.h"
 #include "Mountain.h"
@@ -33,7 +34,7 @@ namespace mtm {
 		if(new_clan == "") {
 			throw WorldInvalidArgument();
 		}
-		if(clan_map.find(new_clan) == clan_map.end()) {
+		if(clan_map.find(new_clan) != clan_map.end()) {
 			throw WorldClanNameIsTaken();
 		}
 		clan_map.insert(std::pair<string, Clan>(new_clan, Clan(new_clan)));
@@ -51,7 +52,7 @@ namespace mtm {
 		if(area_name == "") {
 			throw WorldInvalidArgument();
 		}
-		if(areas.find(area_name) == areas.end()) {
+		if(areas.find(area_name) != areas.end()) {
 			throw WorldAreaNameIsTaken();
 		}
 		switch(type) {
@@ -73,7 +74,7 @@ namespace mtm {
 	 * @return the group that has the name group_name, if it doesn't exist then
 	 * return nullptr
 	 */
-	const GroupPointer World::getGroup(const string& group_name) {
+	const GroupPointer World::getGroup(const string& group_name) const {
 		GroupPointer group = nullptr;
 		for(map<string, Clan>::const_iterator it = clan_map.begin();
 			it != clan_map.end(); ++it) {
@@ -118,7 +119,8 @@ namespace mtm {
 		if(areas.find(area_name) == areas.end()) {
 			throw WorldAreaNotFound();
 		}
-		clan_map[clan_name].addGroup(Group(group_name,num_children,num_adults));
+		clan_map.find(clan_name)->second.addGroup(Group(group_name,
+													num_children,num_adults));
 		areas[area_name]->groupArrive(group_name, clan_name, clan_map);
 	}
 
@@ -142,6 +144,21 @@ namespace mtm {
 	}
 
 	/**
+	 * Get the group's area
+	 * @param group_name the name of the group
+	 * @return the area of the group, if it does not exist return ""
+	 */
+	const string World::getGroupArea(const string& group_name) const {
+		for(map<string, AreaPtr>::const_iterator it = areas.begin();
+			it != areas.end(); ++it) {
+			if(it->second->getGroupsNames().contains(group_name)) {
+				return it->first;
+			}
+		}
+		return nullptr;
+	}
+
+	/**
 	 * Move a group to destination area.
 	 * @param group_name The name of the group that should move
 	 * @param destination The name of the area the group should move to.
@@ -155,6 +172,105 @@ namespace mtm {
 	 *  reachable from the area the group is currently in.
 	 */
 	void World::moveGroup(const string& group_name, const string& destination) {
+		GroupPointer group = getGroup(group_name);
+		if(group == nullptr) {
+			throw WorldGroupNotFound();
+		}
+		if(areas.find(destination) == areas.end()) {
+			throw WorldAreaNotFound();
+		}
+		if(areas[destination]->getGroupsNames().contains(group_name)) {
+			throw WorldGroupAlreadyInArea();
+		}
+		AreaPtr group_area = areas[getGroupArea(group_name)];
+		if(group_area == nullptr || !(group_area->isReachable(destination))) {
+			throw WorldAreaNotReachable();
+		}
+		group_area->groupLeave(group_name);
+		areas[destination]->groupArrive(group_name, group->getClan(), clan_map);
+	}
 
+	/**
+	 * Make to clans friends.
+	 * @param clan1 The name of one of the clans to become friends.
+	 * @param clan2 The name of the other clan to become friends with.
+	 * @throws WorldClanNotFound If at least one of the clans isn't in
+	 * the world.
+	 */
+	void World::makeFriends(const string& clan1, const string& clan2) {
+		if(clan_map.find(clan1) == clan_map.end() ||
+		   clan_map.find(clan2) == clan_map.end()) {
+			throw WorldClanNotFound();
+		}
+		clan_map.find(clan1)->second.makeFriend(clan_map.find(clan2)->second);
+	}
+
+	/**
+	 * Unite to clans to a new clan with a new name.
+	 * @param clan1 The name of one of the clan that need to unite.
+	 * @param clan2 The name of the second clan that need to unite.
+	 * @param new_name The name of the new clan.
+	 * @throws WorldInvalidArgument If new_name is empty.
+	 * @throws WorldClanNameIsTaken If new_name was already used for a
+	 * clan that is not clan1 or clan2.
+	 * @throws WorldClanNotFound If clan1 or clan2 are not in the world.
+	 */
+	void World::uniteClans(const string& clan1, const string& clan2, const
+								 string& new_name) {
+		if(new_name == "") {
+			throw WorldInvalidArgument();
+		}
+		if(clan_map.find(new_name) != clan_map.end()) {
+			if(new_name != clan1 && new_name != clan2) {
+				throw WorldClanNameIsTaken();
+			}
+		}
+		if(clan_map.find(clan1) == clan_map.end() ||
+		   clan_map.find(clan2) == clan_map.end()) {
+			throw WorldClanNotFound();
+		}
+		Clan& clan1_reference = clan_map.find(clan1)->second;
+		Clan& clan2_reference = clan_map.find(clan2)->second;
+		clan1_reference.unite(clan2_reference, new_name);
+		clan_map.erase(clan_map.find(clan2));
+		if(clan1 != new_name) {
+			clan_map.insert(std::pair<string, Clan>(new_name,
+													Clan(clan1_reference)));
+			clan_map.erase(clan_map.find(clan1));
+		}
+	}
+
+	/**
+	 * Print a group to the ostream, using the group output function (<<).
+	 * Add to it another line (after the last one of a regular print) of
+	 * the form:
+	 *      Group's current area: [area name]
+	 * That print the area which the group is in.
+	 * @param os The ostream to print into.
+	 * @param group_name The name of the group to print.
+	 * @throws WorldGroupNotFound If there is no group in the world with
+	 *  the given name.
+	 */
+	void World::printGroup(std::ostream& os, const string& group_name) const {
+		GroupPointer group = getGroup(group_name);
+		if(group == nullptr) {
+			throw WorldGroupNotFound();
+		}
+		os << (*group);
+		os << "Group's current area: " << getGroupArea(group_name) << std::endl;
+	}
+
+	/**
+	 * Print a clan to the ostream, using the clan output function.
+	 * @param os The ostream to print into.
+	 * @param clan_name The name of the clan to print.
+	 * @throws WorldClanNotFound If there is no clan with the given name
+	 *  in the world.
+	 */
+	void World::printClan(std::ostream& os, const string& clan_name) const {
+		if(clan_map.find(clan_name) == clan_map.end()) {
+			throw WorldClanNotFound();
+		}
+		os << clan_map.find(clan_name)->second;
 	}
 }
