@@ -1,0 +1,43 @@
+#!/bin/bash
+
+findCourseLine() {
+	courses_file="courses.list"
+	course_line=""
+	while read line           
+	do
+		course_id="${line%% *}" #first word of string is the course id
+		if [[ $course_id == "$1" ]]; then        
+			course_line="$line"
+			break
+		fi
+	done < "$courses_file"
+	echo "$course_line"
+}
+
+findPrerequisiteCourses () {
+	course_number_of_digits=6 #a valid course has 6 digit numbers
+	prerequisite_courses=()
+	for (( i=$#;i>0;i-- ));do
+		word=${!i}
+		size=${#word}
+		if (( size == course_number_of_digits )); then
+			prerequisite_courses+="$word"
+			course_line=$(findCourseLine $word)
+			more_courses=$(findPrerequisiteCourses $course_line)
+			for course in "$more_courses"
+			do
+				prerequisite_courses+="$course"
+			done
+		else
+			break
+		fi
+	done
+	for course in "$prerequisite_courses"
+	do
+		echo -n "$course "
+	done
+}
+
+course_line=$(findCourseLine $1)
+courses=$(findPrerequisiteCourses $course_line)
+echo "$courses"

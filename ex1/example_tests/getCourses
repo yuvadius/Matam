@@ -1,0 +1,105 @@
+#!/bin/bash
+
+#this function receives an element as the first argument and an array as the
+#second argument and returns true if the element is in the array
+#and returns false if otherwise
+inArray() {
+	element=$1
+	for (( i=$#;i>1;i-- ));do
+		word=${!i}
+		if [[ "$element" == "$word" ]]; then
+			return 0 # 0 = true in linux
+		fi
+	done
+	return 1 # 1 = false in linux
+}
+
+#this function receives a string and returns true if the string is a rational
+#number and false otherwise
+isRationalNumber() {
+	number=$1
+	if [[ "$number" != "" ]]; then #if number
+		if [[ "${number//[0-9]}" == "" || "${number//[0-9]}" == "." ]]; then
+			return 0 # 0 = true in linux
+		fi
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives a variable and checks whether the variable is a valid
+#amount of course points(a valid amount of course points is any rational number
+#that is bigger or equal to 0 and smaller than 10)
+isCoursePoints() {
+	number=$( printf "%.0f" $1 )
+	if isRationalNumber $number; then
+		if (( number >= 0 )); then
+			if (( number < 10 )); then
+				return 0 # 0 = true in linux
+			fi
+		fi
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives a line from the file "courses.list" and prints
+#everything in the line before the course points
+printCourseIdName () {
+	n=$# #number of arguments passed to function
+	for (( i=$#;i>0;i-- ));do
+		word=${!i}
+		if isCoursePoints $word; then
+			break
+		else
+			n=$((n-1))
+		fi
+	done
+	#print everything before the course points
+	for (( i=1;i<=$n-1;i++ ));do
+		echo -n "${!i}"
+		if (( i != n-1 )); then
+			echo -n " "
+		fi
+	done
+}
+
+courses_file="courses.list"
+semester=$1
+courses_names=()
+checked_courses=()
+max_students=0
+#loop over all files in directory. this loops over the course files in 
+#ascending order and therefor there is no need to sort the course files
+for file in *
+do
+	if [[ $file == *.course ]]; then
+		while read line           
+		do
+			if [[ $line = *"$semester"* ]]; then
+				#retrieve the filename without extension, which is the course id
+				course_id="${file%%.*}"
+				if ! inArray $course_id ${checked_courses[@]}; then
+					checked_courses+=("$course_id")
+					#get all students that illegaly applied to the course
+					students_cant_apply=$(getStudents $course_id $semester)
+					#get number of newlines in "$students_cant_apply"
+					num_of_newlines=$(echo "$students_cant_apply" | wc -l)
+					if [[ "$students_cant_apply" != "" ]]; then
+						course_line=$(findCourseLine $course_id $courses_file)
+						course_id_name=$(printCourseIdName $course_line)
+						if (( num_of_newlines == max_students )); then
+							courses_names+=("$course_id_name")
+						elif (( num_of_newlines > max_students )); then
+							courses_names=("$course_id_name")
+							max_students=$num_of_newlines
+						fi
+					fi
+				fi
+			fi        
+		done < "$file"
+	fi
+done
+
+#prints array in ascending order
+if [[ "${#courses_names[@]}" != "0" ]]; then #if array length isn't 0
+	printf "%s\n" "${courses_names[@]}" | sort -n
+fi

@@ -1,0 +1,14 @@
+test1 > tmpout
+diff test_result1 tmpout
+test2 > tmpout
+diff test_result2 tmpout
+test3 > tmpout
+diff test_result3 tmpout
+test4 > tmpout
+diff test_result4 tmpout
+test5 > tmpout
+diff test_result5 tmpout
+test6 > tmpout
+diff test_result6 tmpout
+test7 > tmpout
+diff test_result7 tmpout

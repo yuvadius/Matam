@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#this script receives a 6 digit course number as the first argument and
+#prints the line of the course number in the named file that is sent as the
+#second argument
+course="$1"
+courses_file="$2"
+course_line=""
+while read line           
+do
+	course_id="${line%% *}" #first word of string is the course id
+	if [[ $course_id == "$course" ]]; then        
+		course_line="$line"
+		break
+	fi
+done < "$courses_file"
+echo "$course_line"

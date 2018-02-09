@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#this function receives a value as the first argument and an array of numbers
+#as the second argument. the function prints the smallest number in the array
+#that is greater than the first argument. if there is no such number, the
+#function will print 0
+printMinInArray() {
+	minimal_value="$1"
+	min="0"
+	for var in "$@"
+	do
+		if [[ "${var//[0-9]}" = "" ]]; then # if var is a number
+			if [[ "$var" > "$minimal_value" ]]; then
+				if [[ "$var" < "$min" || $min == "0" ]]; then
+					min="$var"
+				fi
+			fi
+		fi
+	done
+	echo "$min"
+}
+
+#this function receives an array and prints it in ascending order 
+#and without any duplicates
+printArrayAscendingWithoutDuplicates() {
+	min="0"
+	while true
+	do
+		min=$(printMinInArray $min $@)
+		if [[ $min != "0" ]]; then
+			echo "$min"
+		else
+			break
+		fi
+	done
+}
+
+#this function receives a line from "courses.list" and prints all the 
+#prerequisite courses required for the course in the line(this function doesn't
+#print the courses in any specific order and might also print duplicates)
+findPrerequisiteCourses() {
+	course_number_of_digits=6 #a valid course has 6 digit numbers
+	prerequisite_courses=() #array of all prerequisite courses
+	for (( i=$#;i>0;i-- ));do
+		word=${!i}
+		size=${#word}
+		if (( size == course_number_of_digits )); then #if is a valid course
+			prerequisite_courses+=("$word")
+			course_line=$(findCourseLine $word $courses_file)
+			more_courses=$(findPrerequisiteCourses $course_line)
+			for course in "$more_courses"
+			do
+				prerequisite_courses+=("$course")
+			done
+		else
+			break
+		fi
+	done
+	for i in "${prerequisite_courses[@]}"
+	do
+		echo "$i"
+	done
+}
+
+courses_file="courses.list"
+course_line=$(findCourseLine $1 $courses_file)
+courses=$(findPrerequisiteCourses $course_line)
+printArrayAscendingWithoutDuplicates $courses

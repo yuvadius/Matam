@@ -1,0 +1,135 @@
+#!/bin/bash
+
+#this function receives a line from a course file(for example "094412.course")
+#prints the ID located in the line, which is the first word in the line
+getStudentID() {
+	echo $1
+}
+
+#this function receives a string that has the student grade in the last word
+#of the string. If the last word is a valid grade then the function will
+#print the word, otherwise the function will print 0
+printGrade() {
+	line=$@ #read the whole line passed to the functione
+	grade="${line##* }" #the last word in the string is the grade
+	if isValidGrade $grade; then
+		echo -n "$grade"
+	else
+		echo -n "0"
+	fi
+}
+
+#this function receives a string and returns true if the string is a number
+#and false otherwise
+isNumber() {
+	number=$1
+	if [[ "${number//[0-9]}" == "" && "$number" != "" ]]; then #if number
+		return 0 # 0 = true in linux
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives an argument and checks if the argument is a valid grade
+#a valid grade is a whole number between 0-100. This function returns true if
+#the grade is valid, false otherwise
+isValidGrade() {
+	grade=$@
+	if isNumber $grade; then #if, natural number
+		if (( grade >= 0 && grade <= 100 )); then
+			return 0 # 0 = true in linux
+		fi
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives a string and returns true is the string is a valid
+#semester, false otherwise. example of valid semester "1617B"
+isSemester() {
+	str=$1
+	char="${str: -1}"
+	if [[ "$char" == "A" || "$char" == "B" || "$char" == "C" ]]; then
+		str="${str:0:4}"
+		if isNumber $str; then 
+			return 0 # 0 = true in linux
+		fi
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives a student ID as the first argument and a course file
+#as a second argument(example for course file: "094412.course").
+#this function will print the student ID and the student's full name as
+#presented in the course file
+printIdAndName () {
+	courses_file="$2"
+	student_line=""
+	while read line           
+	do
+		student_id="${line%% *}" #first word of string is the student ID
+		if [[ $student_id == "$1" ]]; then        
+			student_line="$line"
+			break
+		fi
+	done < "$courses_file"
+
+	#echo student id and full name
+	space=false
+	for word in $student_line
+	do
+		if isSemester $word; then
+			break
+		else
+			if $space; then
+				echo -n " "
+			else
+				space=true
+			fi
+			echo -n "$word"
+		fi
+	done
+	echo ""
+}
+
+course_id=$1
+semester=$2
+passing_grade=55
+#get prerequisite courses for "course_id"
+prerequisite_courses=$(preCourses $course_id)
+courses_file="$course_id.course"
+students_cant_apply=()
+while read line
+do
+	if [[ $line = *"$semester"* ]]; then
+		student_id=$(getStudentID $line)
+		student_courses=$(semesterialGrades $student_id)
+
+		#split string into array newline
+		student_courses_array=()
+		while read -r student_course; do
+		   student_courses_array+=("$student_course")
+		done <<< "$student_courses"
+
+		for prerequisite_course_id in $prerequisite_courses
+		do
+			course_line=""
+			for i in "${student_courses_array[@]}"      
+			do
+				course_id="${i%% *}" #first word of string is the course id
+				if [[ $course_id == "$prerequisite_course_id" ]]; then        
+					course_line="$i"
+				fi
+			done
+			grade=$(printGrade $course_line)
+			if (( grade < passing_grade)); then #if student can't attend course
+				student_details="$(printIdAndName $student_id $courses_file)"
+				students_cant_apply+=("$student_details")
+				break
+			fi
+		done
+	fi
+done < "$courses_file"
+
+#prints array in ascending order
+if [[ "${#students_cant_apply[@]}" != "0" ]]; then #if array length isn't 0
+	printf "%s\n" "${students_cant_apply[@]}" | sort -n
+fi

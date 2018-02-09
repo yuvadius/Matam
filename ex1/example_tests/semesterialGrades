@@ -1,0 +1,130 @@
+#!/bin/bash
+
+#this function receives a line from the file "courses.list" and prints
+#everything in the line except for the prerequisite courses at the end
+printAllButCourses () {
+	n=$# #number of arguments passed to function
+	course_number_of_digits=6 #a valid course has 6 digit numbers
+	for (( i=$#;i>0;i-- ));do
+		word=${!i}
+		size=${#word}
+		if (( size == course_number_of_digits )); then
+			n=$((n-1))
+		else
+			break
+		fi
+	done
+
+	for (( i=1;i<=$n;i++ ));do
+		echo -n "${!i} "
+	done
+}
+
+#this function receives a line from a course file(for example "094412.course")
+#prints the grade located in the line, which is the last word in the line
+printGrade() {
+	line=$@ #read the whole line passed to the functione
+	grade="${line##* }" #the last word in the string is the grade
+	if isValidGrade $grade; then
+		echo -n "$grade"
+	else
+		echo -n "-"
+	fi
+}
+
+#this function receives a line from a course file(for example "094412.course")
+#prints the semester located in the line
+#which is the second last word in the line
+printSemester() {
+	n=$# #number of arguments passed to function
+	semester_characters=5 #a valid semester has 5 characters
+	for (( i=$#;i>0;i-- ));do
+		word=${!i}
+		size=${#word}
+		if (( size == semester_characters )); then
+			if isSemester $word; then
+				echo -n "$word "
+				break
+			fi
+		fi
+	done
+}
+
+#this function receives a string and returns true if the string is a number
+#and false otherwise
+isNumber() {
+	number=$1
+	if [[ "${number//[0-9]}" == "" && "$number" != "" ]]; then #if number
+		return 0 # 0 = true in linux
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives a string and returns true is the string is a valid
+#semester, false otherwise. example of valid semester "1617B"
+isSemester() {
+	str=$1
+	char="${str: -1}"
+	if [[ "$char" == "A" || "$char" == "B" || "$char" == "C" ]]; then
+		str="${str:0:4}"
+		if isNumber $str; then 
+			return 0 # 0 = true in linux
+		fi
+	fi
+	return 1 # 1 = false in linux
+}
+
+#this function receives an argument and checks if the argument is a valid grade
+#a valid grade is a whole number between 0-100 
+isValidGrade() {
+	grade=$@
+	if [[ "${grade//[0-9]}" == "" && "$grade" != "" ]]; then #if, natural number
+		if (( grade >= 0 && grade <= 100 )); then
+			return 0 # 0 = true in linux
+		fi
+	fi
+	return 1 # 1 = false in linux
+}
+
+courses_file="courses.list"
+student_id="$1"
+#if a semester wasn't sent to the script the script then the script will
+#print all of the students grades from all semesters
+semester="$2"
+
+final_print=()
+
+#loop over all files in directory. this loops over the course files in 
+#ascending order and therefor there is no need to sort the course files
+for file in *
+do
+	if [[ $file == *.course ]]
+	then
+		while read line           
+		do           
+			if [[ $line = *"$student_id"* && $line = *"$semester"* ]]; then
+				filename="${file%%.*}" #retrieve the filename without extension
+				while read course           
+				do
+					first_word="${course%% *}" #retrieve first word of string
+					if [[ $first_word == "$filename" ]]; then
+						#if no semester was sent to the script then print the
+						#semester before each line
+						print_line=""
+						if [[ "$semester" == "" ]]; then
+							print_line+="$(printSemester $line)"
+						fi
+						print_line+="$(printAllButCourses $course)"
+						print_line+="$(printGrade $line)"
+						final_print+=("$print_line")
+					fi       
+				done < "$courses_file"
+			fi        
+		done < "$file"
+	fi
+done
+
+#prints array in ascending order
+if [[ "${#final_print[@]}" != "0" ]]; then #if array length isn't 0
+	printf "%s\n" "${final_print[@]}" | sort -n
+fi
