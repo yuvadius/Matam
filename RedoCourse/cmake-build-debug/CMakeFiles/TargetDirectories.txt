@@ -1,0 +1,3 @@
+C:/Users/yuvadius/Desktop/Github/Matam/RedoCourse/cmake-build-debug/CMakeFiles/RedoCourse.dir
+C:/Users/yuvadius/Desktop/Github/Matam/RedoCourse/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/yuvadius/Desktop/Github/Matam/RedoCourse/cmake-build-debug/CMakeFiles/rebuild_cache.dir
